@@ -38,7 +38,7 @@ export const Register = (props) => {
             <input value={confirmPass} onChange={handleConfirmPassChange} type="password" placeholder="********" id="confirmPassword" name="confirmPassword"/>
             
             {!passwordsMatch && <p style={{ color: 'red' }}>Passwords do not match</p>}
-            <button className="login-btn" type="submit">Log In</button>
+            <button className="login-btn" type="submit">Sign up</button>
         </form>
         <button className="link-btn" onClick={() => props.onFormSwitch('login')}>Already have an account? Login here.</button>
     </div>
