@@ -1,0 +1,228 @@
+
+.taskAreaContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.taskAreaSections {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.taskAreaSection {
+    flex-grow: 1;
+    margin: 0 10px;
+    background-color: #ead2f0; 
+}
+
+/* Styles for all sections */
+.taskAreaNav {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    background-color: white;
+    box-shadow: 2px 2px 5px #7e5d77;
+    padding: 15px 5%;
+    width: auto;
+}
+
+.taskAreaNav button {
+    padding: 0 15px;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #7e5d77;
+}
+
+.taskAreaNav button:hover {
+    color: #000;
+}
+
+.contentContainer {
+    height: 400px;
+    overflow-y: auto; 
+}
+
+.messageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; 
+    gap: 5px; 
+}
+.message {
+    padding: 10px 20px;
+    margin-top: 10px; 
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    
+}
+
+.message.positive {
+    background-color: rgb(119, 250, 119);
+    color: #13583a; 
+}
+
+.message.negative {
+    background-color: rgb(244, 121, 121);
+    color: #870a16; 
+
+}
+
+
+.habitInputContainer,
+.dailyInputContainer,
+.todoInputContainer,
+.rewardInputContainer {
+    margin-bottom: 10px; 
+}
+
+.habitInput,
+.dailyInput,
+.todoInput,
+.rewardInput {
+    width: auto; 
+}
+
+/* Styles specific to Habits section */
+.habitItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.habitItem button {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.habitItem p {
+    flex-grow: 1;
+    margin: 0;
+}
+
+
+/* Styles specific to Dailies section */
+.dailyItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.dailyItem button {
+    margin-right: 10px;
+}
+
+.dailyItem p {
+    flex-grow: 1;
+    margin: 0;
+}
+.dailyItem.completed {
+    color: grey;
+    text-decoration: line-through;
+}
+
+.dailyItem.completed button {
+    background-color: grey;
+    color: white;
+}
+
+/* Styles specific to To Do Lists section */
+.todoItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.todoItem button {
+    margin-right: 10px;
+}
+
+.todoItem p {
+    flex-grow: 1;
+    margin: 0;
+}
+/* 在 TaskArea.css 中添加 */
+.todoItem.completed {
+    color: grey;
+    text-decoration: line-through;
+}
+
+.todoItem.completed button {
+    background-color: grey;
+    color: white;
+}
+
+/* Styles specific to Rewards section */
+.rewardItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.rewardItem button {
+    margin-right: 10px;
+}
+
+.rewardItem p {
+    flex-grow: 1;
+    margin: 0;
+}
+
+
+/* Button styling */
+.button {
+    padding: 10px 15px;
+    background-color: #774caf;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.1s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px; /* If you plan to use icons inside buttons */
+  }
+  
+  .button:hover {
+    background-color: #9261cc;
+    transform: translateY(-2px); /* subtle lift effect */
+  }
+  
+  .button:active {
+    transform: translateY(0);
+  }
+  
+  /* Navigation tab buttons */
+  .nav-button {
+    background-color: transparent;
+    border-bottom: 3px solid transparent;
+    transition: border-bottom-color 0.3s;
+  }
+  
+  .nav-button.active {
+    border-bottom-color: #774caf;
+  }
+  
+  /* Active state for both navigation buttons and dialog buttons */
+  .active {
+    background-color: #774caf; 
+    color: white;
+  }
+  
+  .inactive {
+    background-color: #ccc; 
+    color: #333; 
+  }
+  
+  /* Add mobile responsive adjustments if necessary */
+  @media (max-width: 600px) {
+    .button, .nav-button {
+      padding: 12px 20px;
+    }
+  }
+  
