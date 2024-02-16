@@ -5,7 +5,8 @@ import React, { useState} from 'react';
 import TaskAreaDialog from './TaskAreaDialog';
 
 
-const TaskArea = () => {
+const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
+    
     const defaultHabit = {
         id: Date.now(),
         content: 'Your default habit',
@@ -58,11 +59,14 @@ const TaskArea = () => {
     const handlePositiveClick = (habitId) => {
         // add logic to increase gold and experience
         addMessage("You get some Gold and Experience", 'positive');
+        updateLevel();
     };
     
     const handleNegativeClick = (habitId) => {
         // add logic to decrease health
         addMessage("You lose some Health", 'negative');
+        // update health
+        updateHealth();
     };
     const handleItemClick = (item, type) => {
         setEditingItem(item);
