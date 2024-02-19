@@ -18,15 +18,11 @@ jobs:
       with:
         node-version: '14.x'
 
-    - name: Debug current directory
-      run: |
-        ls -la
-        pwd
+    - name: Change directory to memo-minder-web
+      run: cd client/memo-minder-web
 
     - name: Install frontend dependencies
-      working-directory: ./client/memo-minder-web/package.json
       run: npm install
 
     - name: Run frontend tests
-      working-directory: ./client/memo-minder-web/package.json
       run: npm test
