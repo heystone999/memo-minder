@@ -19,10 +19,7 @@ jobs:
         node-version: '14.x'
 
     - name: Change directory to memo-minder-web
-      run: cd client/memo-minder-web
-
-    - name: Install frontend dependencies
-      run: npm install
-
-    - name: Run frontend tests
-      run: npm test
+      run: |
+        cd client/memo-minder-web
+        npm install
+        npm test
