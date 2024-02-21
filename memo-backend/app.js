@@ -3,8 +3,13 @@ const express = require('express')
 require('express-async-errors')
 const app = express()
 const cors = require('cors')
+
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
+const habitsRouter = require('./controllers/habits');
+const dailiesRouter = require('./controllers/dailies');
+const todosRouter = require('./controllers/todos');
+
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 
@@ -16,6 +21,7 @@ app.use(express.json())
 
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+app.use('/api/habits', habitsRouter);
 
 app.use(middleware.errorHandler)
 
