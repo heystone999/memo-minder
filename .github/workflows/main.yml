@@ -18,8 +18,9 @@ jobs:
       with:
         node-version: '14.x'
 
-    - name: Change directory to memo-minder-web
+    - name: Build and test
       run: |
         cd client/memo-minder-web
         npm install
+        npm run build
         npm test
