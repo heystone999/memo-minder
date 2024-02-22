@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
   Navigate,
 } from "react-router-dom";
 import './App.css';
@@ -10,7 +9,6 @@ import Navbar from './component/navBar/NavBar';
 import { Login } from "./pages/login/Login"
 import { Register } from './pages/register/Register';
 import Home from './pages/Home/Home';
-import Profile from './pages/profile/Profile';
 import Header from './component/header/Header'
 import TaskArea from './component/taskArea/TaskArea'
 import LevelUpPopup from './component/levelUpPopup/LevelUpPopup';

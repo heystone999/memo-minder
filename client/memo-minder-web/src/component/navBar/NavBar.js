@@ -38,7 +38,8 @@ function Navbar(){
 function UserMenu(props){
     return(
         <li className="user-menu-item">
-            <a> {props.text} </a>
+            {/* just for eslint scan */}
+            <a href="/login" className="logout-link"> {props.text} </a>
         </li>
     );
 }
