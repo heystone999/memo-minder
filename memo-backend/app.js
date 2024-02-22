@@ -13,8 +13,14 @@ const todosRouter = require('./controllers/todos');
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 
+// set this to 1 if running a jest test
+const jest_test = 0
 
-mongoose.connect(config.MONGODB_URI)
+if (jest_test) {
+    mongoose.connect("mongodb+srv://stone:helsinki@cluster0.opxsuzi.mongodb.net/MEMO?retryWrites=true&w=majority");
+} else {
+    mongoose.connect(config.MONGODB_URI);
+}
 
 app.use(cors())
 app.use(express.json())
