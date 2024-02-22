@@ -16,7 +16,7 @@ describe('POST /api/habits', () => {
 
   it('should add a new habit', async () => {
     const habitData = {
-      userId: '609c6b415c2c8a001d0d837a', // Assuming a valid user ID
+      userId: '609c6b415c2c8a001d0d837a',
       title: 'Exercise',
       type: 'positive'
     };

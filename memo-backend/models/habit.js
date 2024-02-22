@@ -23,6 +23,24 @@ const habitSchema = new mongoose.Schema({
   }
 });
 
+// Add conditional fields based on habit type
+habitSchema.add({
+  positiveCount: {
+    type: Number,
+    default: 0,
+    required: function() {
+      return this.type === 'positive' || this.type === 'both';
+    }
+  },
+  negativeCount: {
+    type: Number,
+    default: 0,
+    required: function() {
+      return this.type === 'negative' || this.type === 'both';
+    }
+  }
+});
+
 const Habit = mongoose.model('Habit', habitSchema);
 
 module.exports = Habit;
