@@ -14,7 +14,7 @@ const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 
 // set this to 1 if running a jest test
-const jest_test = 0
+const jest_test = 1
 
 if (jest_test) {
     mongoose.connect("mongodb+srv://stone:helsinki@cluster0.opxsuzi.mongodb.net/MEMO?retryWrites=true&w=majority");
