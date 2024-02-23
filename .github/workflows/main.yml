@@ -36,13 +36,11 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: '14.x'
-
-    - name: debug print directory
-      run: ls -al
         
-    - name: Build and test backend
+    - name: Build snd test backend
       run: |
-        cd memo-backend/tests
+        cd memo-backend
         npm install
         npm run build
+        cd tests
         npm test
