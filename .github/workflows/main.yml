@@ -37,9 +37,8 @@ jobs:
       with:
         node-version: '18.x'
         
-    - name: Build and test backend
+    - name: Test backend
       run: |
         cd memo-backend
         npm install
-        npm run dev
         npm test
