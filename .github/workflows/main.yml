@@ -37,10 +37,9 @@ jobs:
       with:
         node-version: '14.x'
         
-    - name: Build snd test backend
+    - name: Test backend
       run: |
         cd memo-backend
         npm install
-        npm run build
         cd tests
         npm test
