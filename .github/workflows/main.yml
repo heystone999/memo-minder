@@ -41,5 +41,4 @@ jobs:
       run: |
         cd memo-backend
         npm install
-        ls -al
         npm test
