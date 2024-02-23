@@ -37,8 +37,12 @@ jobs:
       with:
         node-version: '14.x'
 
+    - name: debug print directory
+      run: ls -al
+        
     - name: Build and test backend
       run: |
-        cd memo-backend
+        cd memo-backend/tests
         npm install
+        npm run build
         npm test
