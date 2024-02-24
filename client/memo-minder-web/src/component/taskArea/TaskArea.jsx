@@ -5,50 +5,60 @@ import React, { useState} from 'react';
 import TaskAreaDialog from './TaskAreaDialog';
 
 
-const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
-    
-    const defaultHabit = {
-        id: Date.now(),
-        content: 'Your default habit',
-        positive: true,
-        negative: true
-    };
+const TaskArea = ({ 
+    updateHealth, updateLevel,
+    habits, dailies, todos,
+    onAddHabit, onUpdateHabit, onDeleteHabit,
+    onAddDaily, onUpdateDaily, onDeleteDaily,
+    onAddTodo, onUpdateTodo, onDeleteTodo,
+    onClear,
 
-    const defaultDaily = {
-        id: Date.now(),
-        content: 'Your default daily',
-        completed: false
-    };
+}) => {
 
-    const defaultTodo = {
-        id: Date.now(),
-        content: 'Your default to-do',
-        completed: false
-    };
 
-    const defaultReward = {
-        id: Date.now(),
-        content: 'Your default reward'
-    };
-
+    // handle with the inputs
     const [habitInput, setHabitInput] = useState('');
-    const [habits, setHabits] = useState([defaultHabit]);
-
     const [dailyInput, setDailyInput] = useState('');
-    const [dailies, setDailies] = useState([defaultDaily]);
-
     const [todoInput, setTodoInput] = useState('');
-    const [todos, setTodos] = useState([defaultTodo]);
 
-    const [rewardInput, setRewardInput] = useState('');
-    const [rewards, setRewards] = useState([defaultReward]);
+    // Enter to add a habit, daily, to-do
+    const handleItemKeyPress = (input, setInput, addItem, itemOptions) => (event) => {
+        if (event.key === 'Enter') {
+            const trimmedInput = input.trim();
+            if (trimmedInput) {
+                const newItem = {
+                    id: Date.now(),
+                    content: trimmedInput,
+                    ...itemOptions
+                };
+                addItem(newItem);
+                setInput('');
+            }
+        }
+    };
 
-    const [editDialogVisible, setEditDialogVisible] = useState(false);
-    const [editingItem, setEditingItem] = useState(null);
-    const [editingType, setEditingType] = useState('');
+    const handleHabitKeyPress = handleItemKeyPress(habitInput, setHabitInput, onAddHabit, { positive: true, negative: true });
+    const handleDailyKeyPress = handleItemKeyPress(dailyInput, setDailyInput, onAddDaily, { completed: false });
+    const handleTodoKeyPress = handleItemKeyPress(todoInput, setTodoInput, onAddTodo, { completed: false });
+   
+    // handle habit button
+    const handlePositiveClick = (habitId) => {
+        console.log(`handlePositiveClick called with habitId: ${habitId}`);
+        // add logic to increase gold and experience
+        //addMessage("You get some Gold and Experience", 'positive');
+        updateLevel(); 
+        console.log('After updateLevel called');
+    };
 
+    const handleNegativeClick = (habitId) => {
+        console.log(`handleNegativeClick called with habitId: ${habitId}`);
+        // add logic to decrease health
+        //addMessage("You lose some Health", 'negative');
+        updateHealth(); 
+        console.log('After updateHealth called');
+    };
+{/* // handle message indicating experience changes
     const [messages, setMessages] = useState([]);
-
     const addMessage = (text, type) => {
         const newMessage = { id: Date.now(), text, type };
         setMessages(prevMessages => [...prevMessages, newMessage]);
@@ -56,49 +66,29 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
             setMessages(prevMessages => prevMessages.filter(msg => msg.id !== newMessage.id));
         }, 5000);
     };
-    const handlePositiveClick = (habitId) => {
-        // add logic to increase gold and experience
-        addMessage("You get some Gold and Experience", 'positive');
-        updateLevel();
-    };
-    
-    const handleNegativeClick = (habitId) => {
-        // add logic to decrease health
-        addMessage("You lose some Health", 'negative');
-        // update health
-        updateHealth();
-    };
+*/}  
+    // handle within dialog
+    const [editDialogVisible, setEditDialogVisible] = useState(false);
+    const [editingItem, setEditingItem] = useState(null);
+    const [editingType, setEditingType] = useState('');
+
     const handleItemClick = (item, type) => {
         setEditingItem(item);
         setEditingType(type);
         setEditDialogVisible(true);
     };
 
-    // save items
+    // save items in dialog
     const handleSaveItem = (updatedItem) => {
         switch (editingType) {
-        case 'Habit':
-            setHabits(habits.map(h => {
-                if (h.id === updatedItem.id) {
-                    return {
-                        ...h,
-                        content: updatedItem.content,
-                        notes: updatedItem.notes,
-                        positive: updatedItem.positive,
-                        negative: updatedItem.negative,
-                    };
-                }
-                return h;
-            }));
-            break;
+            case 'Habit':
+                onUpdateHabit(updatedItem);
+                break;
             case 'Daily':
-                setDailies(dailies.map(d => d.id === updatedItem.id ? updatedItem : d));
+                onUpdateDaily(updatedItem);
                 break;
             case 'To-Do':
-                setTodos(todos.map(t => t.id === updatedItem.id ? updatedItem : t));
-                break;
-            case 'Reward':
-                setRewards(rewards.map(r => r.id === updatedItem.id ? updatedItem : r));
+                onUpdateTodo(updatedItem);
                 break;
             default:
                 // Handle unknown type if necessary
@@ -107,20 +97,17 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
         setEditDialogVisible(false);
     };
 
-    // delete items
+    // delete items in dialog
     const handleDeleteItem = (itemToDelete) => {
         switch (editingType) {
             case 'Habit':
-                setHabits(habits.filter(h => h.id !== itemToDelete.id));
+                onDeleteHabit(itemToDelete.id);
                 break;
             case 'Daily':
-                setDailies(dailies.filter(d => d.id !== itemToDelete.id));
+                onDeleteDaily(itemToDelete.id);
                 break;
             case 'To-Do':
-                setTodos(todos.filter(t => t.id !== itemToDelete.id));
-                break;
-            case 'Reward':
-                setRewards(rewards.filter(r => r.id !== itemToDelete.id));
+                onDeleteTodo(itemToDelete.id);
                 break;
             default:
                 // Handle unknown type if necessary
@@ -129,126 +116,63 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
         setEditDialogVisible(false);
     };
 
-    // Enter to add a habit
-    const handleHabitKeyPress = (e) => {
-        if (e.key === 'Enter' && habitInput.trim() !== '') {
-            const newHabit = {
-                id: Date.now(), 
-                content: habitInput.trim(),
-                positive: true,
-                negative: true
-            };
-            setHabits([...habits, newHabit]);
-            setHabitInput('');
-        }
-    }; 
-    // Enter to add a daily
-    const handleDailyKeyPress = (e) => {
-        if (e.key === 'Enter' && dailyInput.trim() !== '') {
-            const newDaily = {
-                id: Date.now(),
-                content: dailyInput.trim(),
-                completed: false  // New daily tasks are not completed
-            };
-            setDailies([...dailies, newDaily]);
-            setDailyInput('');
+    const toggleItemCompletion = (items, updateItem) => (id, completed) => {
+        // Find the item to update
+        const itemToUpdate = items.find(item => item.id === id);
+        // If found, update that item's completed status
+        if (itemToUpdate) {
+            updateItem({ ...itemToUpdate, completed });
         }
     };
-    // Enter to add a to-do
-    const handleTodoKeyPress = (e) => {
-        if (e.key === 'Enter' && todoInput.trim() !== '') {
-            const newTodo = {
-                id: Date.now(),
-                content: todoInput.trim(),
-                completed: false  // New to do tasks are not completed
-            };
-            setTodos([...todos, newTodo]);
-            setTodoInput('');
-        }
-    };
-    // Enter to add a reward
-    const handleRewardKeyPress = (e) => {
-        if (e.key === 'Enter' && rewardInput.trim() !== '') {
-            const newReward = {
-                id: Date.now(),
-                content: rewardInput.trim()
-            };
-            setRewards([...rewards, newReward]);
-            setRewardInput('');
-        }
-    };
-    
+    const toggleDailyCompletion = toggleItemCompletion(dailies, onUpdateDaily);
+    const toggleTodoCompletion = toggleItemCompletion(todos, onUpdateTodo);
     //handle marking a daily as due or completed
-    const markDailyAsCompleted = (id) => {
-        setDailies(dailies.map(daily => {
-            if (daily.id === id) {
-                return { ...daily, completed: true };
-            }
-            return daily;
-        }));
+    const markDailyAsCompleted = (dailyId) => {
+        toggleDailyCompletion(dailyId, true);
+        updateLevel();
     };
-    const markDailyAsIncomplete = (id) => {
-        setDailies(dailies.map(daily => {
-            if (daily.id === id) {
-                return { ...daily, completed: false };
-            }
-            return daily;
-        }));
+    const markDailyAsIncomplete = (dailyId) => {
+        toggleDailyCompletion(dailyId, false);
     };
     // handle marking a to-do as scheduled or completed
-    const markTodoAsCompleted = (id) => {
-        setTodos(todos.map(todo => {
-            if (todo.id === id) {
-                return { ...todo, completed: true };
-            }
-            return todo;
-        }));
+    const markTodoAsCompleted = (todoId) => {
+        toggleTodoCompletion(todoId, true);
+        updateLevel();
     };
-    const markTodoAsIncomplete = (id) => {
-        setTodos(todos.map(todo => {
-            if (todo.id === id) {
-                return { ...todo, completed: false };
-            }
-            return todo;
-        }));
+    const markTodoAsIncomplete = (todoId) => {
+        toggleTodoCompletion(todoId, false);
     };
+
     const [selectedDailyTab, setSelectedDailyTab] = useState('All');
-    // keep track of the selected tab
-    const getFilteredDailies = () => {
-        switch (selectedDailyTab) {
-            case 'All':
-                return dailies;
-            case 'Due':
-                return dailies.filter(daily => !daily.completed);
+    const [selectedTodoTab, setSelectedTodoTab] = useState('All');
+    // Generic function to filter items based on tab selection
+    const filterItemsByTab = (items, selectedTab, tabMap) => {
+        switch (selectedTab) {
+            case tabMap.due:
+                return items.filter(item => !item.completed);
             case 'Completed':
-                return dailies.filter(daily => daily.completed);
+                return items.filter(item => item.completed);
+            case 'All':
             default:
-                return dailies;
+                return items;
         }
     };
-    // to-do
-    const [selectedTodoTab, setSelectedTodoTab] = useState('All');
+    //  // keep track of the selected tab
+    const filteredDailies = filterItemsByTab(dailies, selectedDailyTab, { due: 'Due' });
+    const filteredTodos = filterItemsByTab(todos, selectedTodoTab, { due: 'Scheduled' });
 
-    const filteredTodos = todos.filter(todo => {
-        if (selectedTodoTab === 'Scheduled') return !todo.completed;
-        if (selectedTodoTab === 'Completed') return todo.completed;
-        return true; 
-    });
-    const handleTodoTabClick = (tab) => {
-        setSelectedTodoTab(tab);
-    };
-
-
-
-    // use TaskAreaDialog components
     return (
         <div className="taskAreaContainer">
-            <div className="messageContainer" style={{position: 'fixed', top: '20px', right: '20px', zIndex: 1000}}>
+            {/*
+            <div className="messageContainer" style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 1000 }}>
                 {messages.map(msg => (
                     <div key={msg.id} className={`message ${msg.type}`}>
                         {msg.text}
                     </div>
                 ))}
+            </div> */}
+            <div className="clearButtonContainer">
+                <button onClick={onClear} className="clearButton">Clear and Reset</button>
             </div>
             <TaskButton />
             <div className="taskAreaSections">
@@ -262,10 +186,10 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
                     </div>
                     <div className="contentContainer">
                         <div className="habitInputContainer">
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 placeholder="Add a habit"
-                                value = {habitInput} 
+                                value={habitInput}
                                 onChange={(e) => setHabitInput(e.target.value)}
                                 onKeyDown={handleHabitKeyPress}
                                 className="habitInput"
@@ -276,16 +200,22 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
                             {/* Individual Habit Item */}
                             {habits.map(habit => (
                                 <div className="habitItem" key={habit.id}>
-                                    {habit.positive && <button onClick={() => handlePositiveClick(habit.id)}>+</button>}
+                                    {habit.positive && <button onClick={() => {
+                                        handlePositiveClick(habit.id);
+                                        
+                                    }}>+</button>}
                                     <p onClick={() => handleItemClick(habit, 'Habit')}>{habit.content}</p>
-                                    {habit.negative && <button onClick={() => handleNegativeClick(habit.id)}>-</button>}
+                                    {habit.negative && <button onClick={() => {
+                                        handleNegativeClick(habit.id);
+                                        
+                                    }}>-</button>}
                                 </div>
                             ))}
                             {/* Add more habit items here */}
                         </div>
                     </div>
                 </div>
-    
+
                 {/* Dailies Section */}
                 <div className="taskAreaSection">
                     <h2>Dailies</h2>
@@ -296,8 +226,8 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
                     </div>
                     <div className="contentContainer">
                         <div className="dailyInputContainer">
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 placeholder="Add a daily"
                                 value={dailyInput}
                                 onChange={(e) => setDailyInput(e.target.value)}
@@ -307,12 +237,13 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
                         </div>
                         {/* Daily List */}
                         <div className="taskList">
-                            {getFilteredDailies().map(daily => (
+                            {filteredDailies.map(daily => (
                                 <div className={`dailyItem ${daily.completed ? 'completed' : ''}`} key={daily.id}>
-                                    {/* “+” mark completed dail */}
                                     <button onClick={(e) => {
                                         e.stopPropagation();  // prevent
                                         daily.completed ? markDailyAsIncomplete(daily.id) : markDailyAsCompleted(daily.id);
+                                        
+
                                     }}>
                                         {daily.completed ? '-' : '+'}
                                     </button>
@@ -323,27 +254,27 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
                         </div>
                     </div>
                 </div>
-    
+
                 {/* To Do Lists Section */}
                 <div className="taskAreaSection">
                     <h2>To Do Lists</h2>
                     <div className="taskAreaNav">
-                        <button onClick={() => handleTodoTabClick('All')}>All</button>
-                        <button onClick={() => handleTodoTabClick('Scheduled')}>Scheduled</button>
-                        <button onClick={() => handleTodoTabClick('Completed')}>Completed</button>
+                        <button onClick={() => setSelectedTodoTab('All')}>All</button>
+                        <button onClick={() => setSelectedTodoTab('Scheduled')}>Scheduled</button>
+                        <button onClick={() => setSelectedTodoTab('Completed')}>Completed</button>
                     </div>
                     <div className="contentContainer">
                         <div className="todoInputContainer">
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 placeholder="Add a To Do"
                                 value={todoInput}
                                 onChange={(e) => setTodoInput(e.target.value)}
                                 onKeyDown={handleTodoKeyPress}
-                                className="todoInput"                              
+                                className="todoInput"
                             />
                         </div>
-                                                
+
                         {/* To Do List */}
                         <div className="taskList">
                             {filteredTodos.map(todo => (
@@ -351,8 +282,10 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
                                     <button onClick={(e) => {
                                         e.stopPropagation();
                                         todo.completed ? markTodoAsIncomplete(todo.id) : markTodoAsCompleted(todo.id);
-                                    }}>    
+                                        
+                                    }}>
                                         {todo.completed ? '-' : '+'}
+                                        
                                     </button>
                                     <p onClick={() => handleItemClick(todo, 'To-Do')}>{todo.content}</p>
                                 </div>
@@ -360,9 +293,9 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
                         </div>
                     </div>
                 </div>
-    
+
                 {/* Rewards Section */}
-                <div className="taskAreaSection">
+                {/*<div className="taskAreaSection">
                     <h2>Rewards</h2>
                     <div className="taskAreaNav">
                         <button>All</button>
@@ -380,27 +313,25 @@ const TaskArea = ({ updateHealth, updateExperience, updateLevel }) => {
                                 className="rewardInput"
                             />
                         </div>
-                        {/* Reward List */}
                         <div className="taskList">
-                            {/* Individual Reward Item */}
                             {rewards.map(reward => (
                                 <div className="rewardItem" key={reward.id} onClick={() => handleItemClick(reward, 'Reward')}>
                                     <button>+</button>
                                     <p>{reward.content}</p>
                                 </div>
                             ))}
-                            {/* Add more Reward items here */}
                         </div>
-                    </div>
-                </div>
+                    </div> 
+                </div> */}
+
             </div>
             {editDialogVisible && editingItem && (
                 <TaskAreaDialog
-                item={editingItem}
-                type={editingType} //'Habit', 'Daily', 'To-do', 'Reward'
-                onClose={() => setEditDialogVisible(false)}
-                onSave={handleSaveItem}
-                onDelete={handleDeleteItem}
+                    item={editingItem}
+                    type={editingType} //'Habit', 'Daily', 'To-do', 'Reward'
+                    onClose={() => setEditDialogVisible(false)}
+                    onSave={handleSaveItem}
+                    onDelete={handleDeleteItem}
                 />
             )}
         </div>

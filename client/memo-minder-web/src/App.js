@@ -15,6 +15,15 @@ import Header from './component/header/Header'
 import TaskArea from './component/taskArea/TaskArea'
 import LevelUpPopup from './component/levelUpPopup/LevelUpPopup';
 
+
+// function to create default items for TaskArea
+const createDefaultItem = (content, options = {}) => ({
+  id: Date.now(),
+  content,
+  ...options,
+});
+
+
 function App() {
 
   /* 
@@ -66,6 +75,61 @@ function App() {
     localStorage.setItem('experience', experience.toString());
   }, [health, level, experience]);
 
+  // initialize with default tasks and  add a new habit, daily, to-do to the task lists
+  const defaultHabit = createDefaultItem('Your default habit', { positive: true, negative: true });
+  const defaultDaily = createDefaultItem('Your default daily', { completed: false });
+  const defaultTodo = createDefaultItem('Your default to-do', { completed: false });
+
+  const [habits, setHabits] = useState(() => JSON.parse(localStorage.getItem('habits')) || [defaultHabit]);
+  const [dailies, setDailies] = useState(() => JSON.parse(localStorage.getItem('dailies')) || [defaultDaily]);
+  const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('todos')) || [defaultTodo]);
+  
+  const addHabit = (habit) => {setHabits(prev => [...prev, habit])};
+  const addDaily = (daily) => {setDailies(prev => [...prev, daily])};
+  const addTodo = (todo) => {setTodos(prev => [...prev, todo]);};
+  
+  //update an existing habit, daily, to-do
+  const createUpdater = (setter) => (updatedItem) => {
+    setter((prevItems) => {
+      return prevItems.map((item) => {
+        if (item.id === updatedItem.id) {
+          return updatedItem;
+        }
+        return item;
+      });
+    });
+  };
+  const updateHabit = createUpdater(setHabits);
+  const updateDaily = createUpdater(setDailies);
+  const updateTodo = createUpdater(setTodos);
+
+  // delete an existing habit, daily, to-do
+  const createDeleter = (setter) => (itemId) => {
+    setter((prevItems) => prevItems.filter((item) => item.id !== itemId));
+  };
+  const deleteHabit = createDeleter(setHabits);
+  const deleteDaily = createDeleter(setDailies);
+  const deleteTodo = createDeleter(setTodos);
+
+  useEffect(() => {
+    // save habits, dailies, todos to local storage whenever it changes
+    localStorage.setItem('habits', JSON.stringify(habits));
+    localStorage.setItem('dailies', JSON.stringify(dailies));
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [habits, dailies, todos]); 
+
+  const clearStorageAndResetStates = () => {
+    // clear all localStorage
+    localStorage.clear();
+    // update to default state
+    setHabits([defaultHabit]); 
+    setDailies([defaultDaily]); 
+    setTodos([defaultTodo]);
+    setHealth(100);
+    setExperience(0);
+    setLevel(1);
+    
+  };
 
   const Layout = () => {
     return (
@@ -74,7 +138,24 @@ function App() {
         <div style={{ display: "flex; flex-direction: column;"}}>
           {/* pass health props to Header and TaskArea */}
           <Header health={health} experience={experience} level={level}/>
-          <TaskArea updateHealth={updateHealth} updateLevel={updateLevel} />
+          
+          <TaskArea
+          updateHealth={updateHealth} 
+          updateLevel={updateLevel}
+          habits = {habits}
+          dailies = {dailies}
+          todos = {todos}
+          onAddHabit = {addHabit}
+          onUpdateHabit={updateHabit}
+          onDeleteHabit={deleteHabit}
+          onAddDaily = {addDaily}
+          onUpdateDaily={updateDaily}
+          onDeleteDaily={deleteDaily}
+          onAddTodo = {addTodo}
+          onUpdateTodo={updateTodo}
+          onDeleteTodo={deleteTodo}
+          onClear = {clearStorageAndResetStates} 
+          />
         </div>
       </div>
     )
