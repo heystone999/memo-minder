@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import "./Popup.css";
 
 const Popup = ({ show, onClose, message }) => {
@@ -17,7 +17,7 @@ const Popup = ({ show, onClose, message }) => {
   if (!show) return null;
 
   return (
-    <div className="popup">
+    <div className="popup" style={{ backgroundColor: message.background_color }}>
       <div className="popup-content">
         <h2>{message.title}</h2>
         <p>{message.body}</p>

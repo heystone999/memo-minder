@@ -31,12 +31,12 @@ function App() {
 
   /* Popup */
   const [showPopup, setShowPopup] = useState(false);
-  const [popupMessage, setPopupMessage] = useState({ title: '', body: '' });
+  const [popupMessage, setPopupMessage] = useState({ title: '', body: '', background_color: ''});
   const closePopup = () => {
     setShowPopup(false);
   };
-  const showCustomPopup = (title, body) => {
-    setPopupMessage({ title, body });
+  const showCustomPopup = (title, body, background_color) => {
+    setPopupMessage({ title, body, background_color });
     setShowPopup(true);
   };
   /* 
@@ -51,7 +51,7 @@ function App() {
     setHealth(prevHealth => {
       const newHealth = prevHealth - 10;
       if (newHealth <= 0) {
-        showCustomPopup("Health Depleted", "Your health has depleted to zero. Try upgrading to restore full health.");
+        showCustomPopup("Health Depleted", "Your health has depleted to zero. Try upgrading to restore full health.", "rgba(243, 97, 105, 0.7)");
         return 0; 
       }
       return newHealth;
@@ -75,7 +75,7 @@ function App() {
       setLevel(prevLevel => prevLevel + Math.floor(newExperience / 100));
       setExperience(0);
       setHealth(100);
-      showCustomPopup("Level Up", "Congratulations! You've leveled up!");
+      showCustomPopup("Level Up", "Congratulations! You've leveled up!", "rgba(255, 204, 85, 0.7)");
     }
   };
 
