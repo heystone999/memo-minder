@@ -9,8 +9,7 @@ export const Login = (props) => {
 
     const handleSubmit = (e) =>{
         e.preventDefault();
-
-        // Transfer to Home
+        // Transfer to Home page
         navigate("/");
     }
 
