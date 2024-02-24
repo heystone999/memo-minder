@@ -143,23 +143,46 @@ const TaskArea = ({
         toggleTodoCompletion(todoId, false);
     };
 
+    const [selectedHabitTab, setSelectedHabitTab] = useState('All');
     const [selectedDailyTab, setSelectedDailyTab] = useState('All');
     const [selectedTodoTab, setSelectedTodoTab] = useState('All');
     // Generic function to filter items based on tab selection
     const filterItemsByTab = (items, selectedTab, tabMap) => {
         switch (selectedTab) {
-            case tabMap.due:
-                return items.filter(item => !item.completed);
-            case 'Completed':
-                return items.filter(item => item.completed);
+            case tabMap.feature1:
+                return items.filter(item => tabMap.condition1(item));
+            case tabMap.feature2:
+                return items.filter(item => tabMap.condition2(item));
             case 'All':
             default:
                 return items;
         }
     };
+    const habitTabMap = {
+        feature1: 'Good Habits',
+        feature2: 'Bad Habits',
+        condition1: (item) => item.positive && !item.negative,
+        condition2: (item) => !item.positive && item.negative
+      };
+      
+      const dailyTabMap = {
+        feature1: 'Due',
+        feature2: 'Completed',
+        condition1: (item) => !item.completed,
+        condition2: (item) => item.completed
+      };
+      
+      const todoTabMap = {
+        feature1: 'Scheduled',
+        feature2: 'Completed',
+        condition1: (item) => !item.completed,
+        condition2: (item) => item.completed
+      };
+
     //  // keep track of the selected tab
-    const filteredDailies = filterItemsByTab(dailies, selectedDailyTab, { due: 'Due' });
-    const filteredTodos = filterItemsByTab(todos, selectedTodoTab, { due: 'Scheduled' });
+    const filteredHabits = filterItemsByTab(habits, selectedHabitTab, habitTabMap);
+    const filteredDailies = filterItemsByTab(dailies, selectedDailyTab, dailyTabMap);
+    const filteredTodos = filterItemsByTab(todos, selectedTodoTab, todoTabMap);
 
     return (
         <div className="taskAreaContainer">
@@ -174,15 +197,20 @@ const TaskArea = ({
             <div className="clearButtonContainer">
                 <button onClick={onClear} className="clearButton">Clear and Reset</button>
             </div>
-            <TaskButton />
+            <TaskButton 
+                onAddHabit={onAddHabit}
+                onAddDaily={onAddDaily}
+                onAddTodo={onAddTodo}
+            />
             <div className="taskAreaSections">
                 {/* Habits Section */}
                 <div className="taskAreaSection">
                     <h2>Habits</h2>
+                    {/* First version: Weak/ Strong features change to Good/Bad habits*/}
                     <div className="taskAreaNav">
-                        <button>All</button>
-                        <button>Weak Habits</button>
-                        <button>Strong Habits</button>
+                        <button onClick={() => setSelectedHabitTab ("All")}>All</button>
+                        <button onClick={() => setSelectedHabitTab ("Good Habits")}>Good Habits</button> 
+                        <button onClick={() => setSelectedHabitTab ("Bad Habits")}>Bad Habits</button>
                     </div>
                     <div className="contentContainer">
                         <div className="habitInputContainer">
@@ -198,7 +226,7 @@ const TaskArea = ({
                         {/* Habit List */}
                         <div className="taskList">
                             {/* Individual Habit Item */}
-                            {habits.map(habit => (
+                            {filteredHabits.map(habit => (
                                 <div className="habitItem" key={habit.id}>
                                     {habit.positive && <button onClick={() => {
                                         handlePositiveClick(habit.id);

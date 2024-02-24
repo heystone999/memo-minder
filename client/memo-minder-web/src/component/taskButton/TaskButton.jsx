@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './TaskButton.css';
 import TaskDialog from './TaskDialog';
 
-const TaskButton = () => {
+const TaskButton = ({ onAddHabit, onAddDaily, onAddTodo }) => {
     const [showMenu, setShowMenu] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -21,15 +21,53 @@ const TaskButton = () => {
     };
 
     // TODO: createXX logic
-    const handleCreateHabit = () => {
-        console.log('Creating habit...');
+    const handleCreateTask = () => {
+        console.log('Creating...');
+        let createFunction;
+        let newItem;
+
+        switch (dialogTitle) {
+            case 'Create Habit':
+                createFunction = onAddHabit;
+                newItem = {
+                    id: Date.now(),
+                    content: habitTitle,
+                    notes: habitNotes,
+                    positive: true,  
+                    negative: true   
+                };
+                break;
+            case 'Create Daily':
+                createFunction = onAddDaily;
+                newItem = {
+                    id: Date.now(),
+                    content: habitTitle,
+                    notes: habitNotes,
+                    completed: false  
+                };
+                break;
+            case 'Create To Do':
+                createFunction = onAddTodo;
+                newItem = {
+                    id: Date.now(),
+                    content: habitTitle,
+                    notes: habitNotes,
+                    completed: false
+                };
+                break;
+            default:
+                console.warn('Unknown task type:', dialogTitle);
+                return;
+        }
+
+        createFunction(newItem);
         setShowDialog(false);
-        // 可以在这里将 habitTitle 和 habitNotes 传递给父组件，进行后续处理
     };
 
     const handleCancel = () => {
         console.log('Canceling...');
         setShowDialog(false);
+
     };
 
     return (
@@ -54,17 +92,19 @@ const TaskButton = () => {
                         <img src="/todo.png" alt="To Do" className="menu-icon" />
                         To Do
                     </button>
+                    {/* develop reward feature in next iteration
                     <button className="menu-item" onClick={() => handleMenuItemClick('Reward')}>
                         <img src="/reward.png" alt="Reward" className="menu-icon" />
                         Reward
                     </button>
+                    */}
                 </div>
             )}
 
             {showDialog && (
                 <div>
                     <div className="overlay"></div>
-                    <TaskDialog title={dialogTitle} onCancel={handleCancel} onClick={handleCreateHabit}>
+                    <TaskDialog title={dialogTitle} onCancel={handleCancel} onClick={handleCreateTask}>
                         <div className="input-container">
                             <label>Title*:</label>
                             <br />

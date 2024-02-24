@@ -8,6 +8,7 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
   const [notes, setNotes] = useState(item.notes || '');
   const [positive, setPositive] = useState(item.positive);
   const [negative, setNegative] = useState(item.negative);
+  const [completed, setCompleted] = useState(item.completed);
 
   const togglePositive = () => {
     setPositive(!positive);
@@ -25,13 +26,19 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
   }, [item]);
 
   const handleSave = () => {
-    onSave({
+    const updatedItem = {
       ...item,
       content: title,
       notes,
-      positive,
-      negative
-    });
+    };
+
+    if (type === 'Habit') {
+      updatedItem.positive = positive;
+      updatedItem.negative = negative;
+    } else {
+      updatedItem.completed = completed;
+    }
+    onSave(updatedItem);
   };
 
   const handleDelete = () => {
@@ -55,14 +62,23 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
           <button onClick={handleSave}>Save</button>
           <button onClick={onClose}>Cancel</button>
         </div>
-        <div className="dialogHeaderButtons">
-          <button className={`pos ${positive ? 'active' : 'inactive'}`} onClick={togglePositive}>
-            Positive
-          </button>
-          <button className={`neg ${negative ? 'active' : 'inactive'}`} onClick={toggleNegative}>
-            Negative
-          </button>
-        </div>
+          {type === 'Habit' && (
+            <div className="dialogHeaderButtons">
+              <button className={`pos ${positive ? 'active' : 'inactive'}`} onClick={togglePositive}>
+                Positive
+              </button>
+              <button className={`neg ${negative ? 'active' : 'inactive'}`} onClick={toggleNegative}>
+                Negative
+              </button>
+            </div>
+          )}
+          {type !== 'Habit' && (
+            <div className="dialogHeaderButtons">
+              <button className={`comp ${completed ? 'inactive' : 'active'}`} onClick={() => setCompleted(!completed)}>
+                {completed ? 'Mark as Incomplete' : 'Mark as Completed'}
+              </button>
+            </div>
+          )}
       </div>
     </div>
   );
