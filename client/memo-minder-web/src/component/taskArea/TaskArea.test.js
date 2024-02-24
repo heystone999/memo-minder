@@ -1,65 +1,194 @@
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import TaskArea from './TaskArea';
 
-describe('TaskArea Component', () => {
-  // Mock functions for updateHealth, updateExperience, updateLevel
-  const updateHealth = jest.fn();
-  const updateExperience = jest.fn();
-  const updateLevel = jest.fn();
+test('renders without crashing', () => {
+  render(
+    <TaskArea
+      updateHealth={() => { }}
+      updateLevel={() => { }}
+      habits={[]}
+      dailies={[]}
+      todos={[]}
+      onAddHabit={() => { }}
+      onUpdateHabit={() => { }}
+      onDeleteHabit={() => { }}
+      onAddDaily={() => { }}
+      onUpdateDaily={() => { }}
+      onDeleteDaily={() => { }}
+      onAddTodo={() => { }}
+      onUpdateTodo={() => { }}
+      onDeleteTodo={() => { }}
+      onClear={() => { }}
+    />
+  );
+});
 
-  test('renders TaskArea component', () => {
-    const { getByText, getByPlaceholderText } = render(
-      <TaskArea
-        updateHealth={updateHealth}
-        updateExperience={updateExperience}
-        updateLevel={updateLevel}
-      />
-    );
+test('adds a habit correctly', () => {
+  const onAddHabitMock = jest.fn();
+  render(
+    <TaskArea
+      updateHealth={() => { }}
+      updateLevel={() => { }}
+      habits={[]}
+      dailies={[]}
+      todos={[]}
+      onAddHabit={onAddHabitMock}
+      onUpdateHabit={() => { }}
+      onDeleteHabit={() => { }}
+      onAddDaily={() => { }}
+      onUpdateDaily={() => { }}
+      onDeleteDaily={() => { }}
+      onAddTodo={() => { }}
+      onUpdateTodo={() => { }}
+      onDeleteTodo={() => { }}
+      onClear={() => { }}
+    />
+  );
 
-    // Check if "Habits" section is rendered
-    expect(getByText('Habits')).toBeInTheDocument();
+  const habitInput = screen.getByPlaceholderText('Add a habit');
+  fireEvent.change(habitInput, { target: { value: 'Drink water' } });
+  fireEvent.keyDown(habitInput, { key: 'Enter', code: 'Enter' });
 
-    // Check if "Dailies" section is rendered
-    expect(getByText('Dailies')).toBeInTheDocument();
+  expect(onAddHabitMock).toHaveBeenCalledWith(expect.objectContaining({
+    content: 'Drink water',
+    positive: expect.any(Boolean),
+    negative: expect.any(Boolean)
+  }));
+});
 
-    // Check if "To Do Lists" section is rendered
-    expect(getByText('To Do Lists')).toBeInTheDocument();
+test('updates a habit correctly', () => {
+  const habits = [{ id: 1, content: 'Drink water', positive: true, negative: false }];
+  const onUpdateHabitMock = jest.fn();
+  render(
+    <TaskArea
+      updateHealth={() => { }}
+      updateLevel={() => { }}
+      habits={habits}
+      dailies={[]}
+      todos={[]}
+      onAddHabit={() => { }}
+      onUpdateHabit={onUpdateHabitMock}
+      onDeleteHabit={() => { }}
+      onAddDaily={() => { }}
+      onUpdateDaily={() => { }}
+      onDeleteDaily={() => { }}
+      onAddTodo={() => { }}
+      onUpdateTodo={() => { }}
+      onDeleteTodo={() => { }}
+      onClear={() => { }}
+    />
+  );
 
-    // Check if "Rewards" section is rendered
-    expect(getByText('Rewards')).toBeInTheDocument();
+  const habitItem = screen.getByText('Drink water');
+  fireEvent.click(habitItem);
 
-    // Check if habit input field is rendered
-    expect(getByPlaceholderText('Add a habit')).toBeInTheDocument();
+  expect(onUpdateHabitMock).not.toHaveBeenCalled();
 
-    // Check if daily input field is rendered
-    expect(getByPlaceholderText('Add a daily')).toBeInTheDocument();
+  const habitInput = screen.getByDisplayValue('Drink water');
+  fireEvent.change(habitInput, { target: { value: 'Drink water daily' } });
 
-    // Check if to-do input field is rendered
-    expect(getByPlaceholderText('Add a To Do')).toBeInTheDocument();
+  const saveButton = screen.getByText('Save');
+  fireEvent.click(saveButton);
 
-    // Check if reward input field is rendered
-    expect(getByPlaceholderText('Add a Reward')).toBeInTheDocument();
-  });
+  expect(onUpdateHabitMock).toHaveBeenCalledWith(expect.objectContaining({
+    id: habits[0].id,
+    content: 'Drink water daily',
+    positive: true,
+    negative: false
+  }));
+});
 
-  test('add a habit', () => {
-    const { getByPlaceholderText, getByText } = render(
-      <TaskArea
-        updateHealth={updateHealth}
-        updateExperience={updateExperience}
-        updateLevel={updateLevel}
-      />
-    );
+test('deletes a habit correctly', () => {
+  const habits = [{ id: 1, content: 'Drink water', positive: true, negative: false }];
+  const onDeleteHabitMock = jest.fn();
+  render(
+    <TaskArea
+      updateHealth={() => { }}
+      updateLevel={() => { }}
+      habits={habits}
+      dailies={[]}
+      todos={[]}
+      onAddHabit={() => { }}
+      onUpdateHabit={() => { }}
+      onDeleteHabit={onDeleteHabitMock}
+      onAddDaily={() => { }}
+      onUpdateDaily={() => { }}
+      onDeleteDaily={() => { }}
+      onAddTodo={() => { }}
+      onUpdateTodo={() => { }}
+      onDeleteTodo={() => { }}
+      onClear={() => { }}
+    />
+  );
 
-    const habitInput = getByPlaceholderText('Add a habit');
-    // const addButton = getByText('+');
+  const habitItem = screen.getByText('Drink water');
+  fireEvent.click(habitItem);
 
-    fireEvent.change(habitInput, { target: { value: 'New Habit' } });
-    fireEvent.keyDown(habitInput, { key: 'Enter', code: 'Enter' });
+  const deleteButton = screen.getByText(`Delete this Habit`);
+  fireEvent.click(deleteButton);
 
-    // Check if the new habit is added
-    expect(getByText('New Habit')).toBeInTheDocument();
-  });
+  expect(onDeleteHabitMock).toHaveBeenCalledWith(habits[0].id);
+});
 
-  // Write more tests for other functionalities as needed
+// health
+test('updates health when positive habit is clicked', () => {
+  const updateHealthMock = jest.fn();
+  const updateLevelMock = jest.fn();
+  const habits = [{ id: 1, content: 'Exercise', positive: true, negative: false }];
+
+  render(
+    <TaskArea
+      updateHealth={updateHealthMock}
+      updateLevel={updateLevelMock}
+      habits={habits}
+      dailies={[]}
+      todos={[]}
+      onAddHabit={() => { }}
+      onUpdateHabit={() => { }}
+      onDeleteHabit={() => { }}
+      onAddDaily={() => { }}
+      onUpdateDaily={() => { }}
+      onDeleteDaily={() => { }}
+      onAddTodo={() => { }}
+      onUpdateTodo={() => { }}
+      onDeleteTodo={() => { }}
+      onClear={() => { }}
+    />
+  );
+
+  const positiveHabitButton = screen.getByText('+');
+  fireEvent.click(positiveHabitButton);
+
+  expect(updateLevelMock).toHaveBeenCalled();
+});
+
+test('updates health when negative habit is clicked', () => {
+  const updateHealthMock = jest.fn();
+  const updateLevelMock = jest.fn();
+  const habits = [{ id: 1, content: 'Smoking', positive: false, negative: true }];
+
+  render(
+    <TaskArea
+      updateHealth={updateHealthMock}
+      updateLevel={updateLevelMock}
+      habits={habits}
+      dailies={[]}
+      todos={[]}
+      onAddHabit={() => { }}
+      onUpdateHabit={() => { }}
+      onDeleteHabit={() => { }}
+      onAddDaily={() => { }}
+      onUpdateDaily={() => { }}
+      onDeleteDaily={() => { }}
+      onAddTodo={() => { }}
+      onUpdateTodo={() => { }}
+      onDeleteTodo={() => { }}
+      onClear={() => { }}
+    />
+  );
+
+  const negativeHabitButton = screen.getByText('-');
+  fireEvent.click(negativeHabitButton);
+
+  expect(updateHealthMock).toHaveBeenCalled();
 });
