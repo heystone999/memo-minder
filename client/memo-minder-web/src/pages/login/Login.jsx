@@ -1,15 +1,17 @@
-import React, {useState} from "react"
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import './login.css';
-import { Link } from "react-router-dom";
-
 
 export const Login = (props) => {
     const [email, setEmail] = useState('');
     const [pass, setPass] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = (e) =>{
         e.preventDefault();
-        console.log(email);
+
+        // Transfer to Home
+        navigate("/");
     }
 
     return (
@@ -26,7 +28,6 @@ export const Login = (props) => {
                 <Link to="/register">
                     <button className="link-btn">Don't have an account? Register.</button>
                 </Link>
-               
             </div>
         </div>
     )
