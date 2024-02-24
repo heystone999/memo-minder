@@ -57,7 +57,9 @@ const TaskArea = ({
         updateHealth(); 
         console.log('After updateHealth called');
     };
-{/* // handle message indicating experience changes
+
+    // handle message indicating experience changes
+    /*
     const [messages, setMessages] = useState([]);
     const addMessage = (text, type) => {
         const newMessage = { id: Date.now(), text, type };
@@ -66,7 +68,8 @@ const TaskArea = ({
             setMessages(prevMessages => prevMessages.filter(msg => msg.id !== newMessage.id));
         }, 5000);
     };
-*/}  
+    */
+
     // handle within dialog
     const [editDialogVisible, setEditDialogVisible] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
