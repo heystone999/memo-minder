@@ -1,6 +1,5 @@
 import React from 'react';
 import "./Header.css"
-import TaskArea from '../taskArea/TaskArea';
 
 const Header = ({health, experience, level}) =>{
     

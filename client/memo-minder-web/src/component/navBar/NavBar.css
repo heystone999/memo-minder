@@ -80,4 +80,8 @@ nav{
     transform: translateY(-20);
     transition: var(--spend) ease;
 }
+.logout-link {
+    color: #f0f0f0;
+    text-decoration: none;
+}
 /*-- User Menu end --*/
