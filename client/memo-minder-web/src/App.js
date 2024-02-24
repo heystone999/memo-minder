@@ -11,7 +11,7 @@ import { Register } from './pages/register/Register';
 import Home from './pages/Home/Home';
 import Header from './component/header/Header'
 import TaskArea from './component/taskArea/TaskArea'
-import LevelUpPopup from './component/levelUpPopup/LevelUpPopup';
+import Popup from './component/popup/Popup';
 
 
 // function to create default items for TaskArea
@@ -23,16 +23,21 @@ const createDefaultItem = (content, options = {}) => ({
 
 
 function App() {
-
   /* 
   limitation to get access to home page 
   before login (change to false to apply)
   */
   const currentUser = true;
-  /* update level popup*/
-  const [showLevelUpPopup, setShowLevelUpPopup] = useState(false);
-  const closeLevelUpPopup = () => {
-    setShowLevelUpPopup(false);
+
+  /* Popup */
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState({ title: '', body: '' });
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+  const showCustomPopup = (title, body) => {
+    setPopupMessage({ title, body });
+    setShowPopup(true);
   };
   /* 
   health bar 
@@ -43,8 +48,16 @@ function App() {
   const initialHealth = parseInt(localStorage.getItem('health')) || 100;
   const [health, setHealth] = useState(initialHealth);
   const updateHealth = () => {
-    setHealth(prevHealth => prevHealth - 10);
+    setHealth(prevHealth => {
+      const newHealth = prevHealth - 10;
+      if (newHealth <= 0) {
+        showCustomPopup("Health Depleted", "Your health has depleted to zero. Try upgrading to restore full health.");
+        return 0; 
+      }
+      return newHealth;
+    });
   };
+  
   /* 
   level bar 
   Get initial level from local storage,
@@ -62,7 +75,7 @@ function App() {
       setLevel(prevLevel => prevLevel + Math.floor(newExperience / 100));
       setExperience(0);
       setHealth(100);
-      setShowLevelUpPopup(true);
+      showCustomPopup("Level Up", "Congratulations! You've leveled up!");
     }
   };
 
@@ -136,6 +149,7 @@ function App() {
         <div style={{ display: "flex; flex-direction: column;"}}>
           {/* pass health props to Header and TaskArea */}
           <Header health={health} experience={experience} level={level}/>
+          <Popup show={showPopup} onClose={closePopup} message={popupMessage} />
           
           <TaskArea
           updateHealth={updateHealth} 
@@ -199,7 +213,7 @@ function App() {
   return (
     <div>
       <RouterProvider router={router} />
-      <LevelUpPopup show={showLevelUpPopup} onClose={closeLevelUpPopup} />
+      <Popup show={showPopup} onClose={closePopup} message={popupMessage} />
     </div>
   );
 }
