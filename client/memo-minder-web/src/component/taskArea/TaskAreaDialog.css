@@ -20,7 +20,7 @@
     gap: 10px;
   }
 
-  .pos, .neg {
+  .pos, .neg, .comp {
     width: 100px; 
     height: 50px; 
     font-size: 1rem;
@@ -30,15 +30,18 @@
     transition: background-color 0.3s;
   }
 
-  .pos.active, .neg.active {
+  .pos.active, .neg.active, .comp.active {
     background-color: #774caf; 
     color: white;
   }
   
-  .pos.inactive, .neg.inactive {
+  .pos.inactive, .neg.inactive, .comp.inactive{
     background-color: #ccc; 
     color: #333; 
   }
+
+
+
   .dialog {
     background: rgb(196, 236, 255);
     padding: 20px;
