@@ -17,7 +17,7 @@ const mongoose = require('mongoose')
 const jest_test = 1
 
 if (jest_test) {
-    mongoose.connect("mongodb+srv://stone:helsinki@cluster0.opxsuzi.mongodb.net/MEMO?retryWrites=true&w=majority");
+    mongoose.connect("mongodb+srv://stone:helsinki@cluster0.opxsuzi.mongodb.net/testMemo?retryWrites=true&w=majority");
 } else {
     mongoose.connect(config.MONGODB_URI);
 }
