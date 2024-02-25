@@ -1,3 +1,4 @@
+type: web
 services:
   - name: frontend
     buildCommand: npm install && npm run build
