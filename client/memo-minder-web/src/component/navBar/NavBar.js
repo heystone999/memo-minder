@@ -9,7 +9,7 @@ function Navbar({ showTaskArea, showShop, showChallenge, handleTaskClick, handle
     <nav>
       <div className="nav-left">
         <Link className="logo" to="/">
-          <span>MEMO MINDER</span>
+          MEMO MINDER
         </Link>
         <Link to="/" onClick={handleTaskClick} className={showTaskArea ? "active" : ""}>
         <span>Tasks</span>

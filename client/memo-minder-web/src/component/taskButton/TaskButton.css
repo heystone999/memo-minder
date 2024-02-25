@@ -1,6 +1,6 @@
 .task-button-container {
     position: relative;
-    margin-right: 20px;
+    margin: 10px 20px;
 }
 
 .add-task-button-container {
@@ -17,7 +17,7 @@
     text-align: center;
     background-color: #7439db;
     border-radius: 50%;
-    margin-right: 10px;
+
 }
 
 .add-task-button {

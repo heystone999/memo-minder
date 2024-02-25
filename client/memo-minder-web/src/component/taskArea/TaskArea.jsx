@@ -196,14 +196,16 @@ const TaskArea = ({
                     </div>
                 ))}
             </div> */}
-            <div className="clearButtonContainer">
-                <button onClick={onClear} className="clearButton">Clear and Reset</button>
+            <div className="controlButton">
+                <div className="clearButtonContainer">
+                    <button onClick={onClear} className="clearButton">Clear and Reset</button>
+                </div>
+                <TaskButton 
+                    onAddHabit={onAddHabit}
+                    onAddDaily={onAddDaily}
+                    onAddTodo={onAddTodo}
+                />
             </div>
-            <TaskButton 
-                onAddHabit={onAddHabit}
-                onAddDaily={onAddDaily}
-                onAddTodo={onAddTodo}
-            />
             <div className="taskAreaSections">
                 {/* Habits Section */}
                 <div className="taskAreaSection">

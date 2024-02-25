@@ -143,10 +143,14 @@ input[type="text"] {
     background-color: grey;
     color: white;
 }
+.controlButton{
+    display: flex;
+    justify-content: flex-end
+}
 
 .clearButtonContainer {
     display: flex;
-    margin-left: 20px;
+    margin: 10px 20px;
   }
   
   .clearButton {
