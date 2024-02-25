@@ -1,20 +1,13 @@
-type: web
 services:
-  - name: frontend
+  - type: web
+    name: frontend
+    runtime: node
+    rootDir: client/memo-minder-web
     buildCommand: npm install && npm run build
-    root: client/memo-minder-web
-    env:
-      - name: NODE_ENV
-        value: production
-
-  - name: backend
+    startCommand: npm start
+  - type: web
+    name: backend
+    runtime: node
+    rootDir: memo-backend
     buildCommand: npm install
     startCommand: npm start
-    root: memo-backend
-    env:
-      - name: NODE_ENV
-        value: production
-      - name: MONGODB_URI
-        value: "mongodb+srv://stone:helsinki@cluster0.opxsuzi.mongodb.net/MEMO?retryWrites=true&w=majority"
-      - name: SECRET
-        value: "MEMO"
