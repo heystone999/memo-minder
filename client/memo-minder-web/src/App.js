@@ -11,6 +11,8 @@ import { Register } from './pages/register/Register';
 import Home from './pages/Home/Home';
 import Header from './component/header/Header'
 import TaskArea from './component/taskArea/TaskArea'
+import ShopArea from "./component/shopArea/ShopArea";
+import ChallengeArea from './component/challengeArea/ChallengeArea';
 import Popup from './component/popup/Popup';
 
 
@@ -141,37 +143,76 @@ function App() {
     setLevel(1);
     
   };
+  
+  /*-Transfer for different Areas start-*/
+  const [showTaskArea, setShowTaskArea] = useState(true);
+  const [showShop, setShowShop] = useState(false);
+  const [showChallenge, setShowChallenge] = useState(false);
+  const handleTaskClick = () => {
+    setShowTaskArea(true);
+    setShowShop(false);
+  };
+  const handleShopClick = () => {
+    setShowTaskArea(false);
+    setShowShop(true);
+  };
+  const handleChallengeClick = () => {
+    setShowTaskArea(false);
+    setShowShop(false);
+    setShowChallenge(true);
+  };
+  /*-Transfer for different Areas end-*/
 
-  const Layout = () => {
+  const Layout = ({ showTaskArea, showShop, showChallenge, handleTaskClick, handleShopClick, handleChallengeClick }) => {
+    
     return (
-      <div>
-        <Navbar/>
-        <div style={{ display: "flex; flex-direction: column;"}}>
-          {/* pass health props to Header and TaskArea */}
-          <Header health={health} experience={experience} level={level}/>
-          <Popup show={showPopup} onClose={closePopup} message={popupMessage} />
-          
-          <TaskArea
-          updateHealth={updateHealth} 
-          updateLevel={updateLevel}
-          habits = {habits}
-          dailies = {dailies}
-          todos = {todos}
-          onAddHabit = {addHabit}
-          onUpdateHabit={updateHabit}
-          onDeleteHabit={deleteHabit}
-          onAddDaily = {addDaily}
-          onUpdateDaily={updateDaily}
-          onDeleteDaily={deleteDaily}
-          onAddTodo = {addTodo}
-          onUpdateTodo={updateTodo}
-          onDeleteTodo={deleteTodo}
-          onClear = {clearStorageAndResetStates} 
-          />
+        <div>
+            {/* Pass handleTaskClick and handleShopClick as props to Navbar component */}
+            <Navbar
+                handleTaskClick={handleTaskClick}
+                handleShopClick={handleShopClick}
+                handleChallengeClick={handleChallengeClick}
+            />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+                {/* pass health props to Header and TaskArea */}
+                <Header health={health} experience={experience} level={level} />
+                <Popup show={showPopup} onClose={closePopup} message={popupMessage} />
+
+                {/* TaskArea and ShopArea outside Navbar */}
+                <div>
+                  {showTaskArea ? (
+                      <TaskArea
+                          updateHealth={updateHealth}
+                          updateLevel={updateLevel}
+                          habits={habits}
+                          dailies={dailies}
+                          todos={todos}
+                          onAddHabit={addHabit}
+                          onUpdateHabit={updateHabit}
+                          onDeleteHabit={deleteHabit}
+                          onAddDaily={addDaily}
+                          onUpdateDaily={updateDaily}
+                          onDeleteDaily={deleteDaily}
+                          onAddTodo={addTodo}
+                          onUpdateTodo={updateTodo}
+                          onDeleteTodo={deleteTodo}
+                          onClear={clearStorageAndResetStates}
+                      />
+                  ) : showShop ? (
+                      <ShopArea />
+                  ) : (
+                      <ChallengeArea />
+                  )}
+              </div>
+
+            </div>
         </div>
-      </div>
-    )
-  }
+    );
+};
+
+
+
+  
 
   /* -- prevent to access home page before login start -- */
   /* -- 要用的时候把上面那个currentUser改成false就ok -- */
@@ -187,7 +228,17 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <ProtectedRoute><Layout/></ProtectedRoute>,
+      element: 
+        <ProtectedRoute>
+        <Layout
+            showTaskArea={showTaskArea}
+            showShop={showShop}
+            showChallenge={showChallenge}
+            handleTaskClick={handleTaskClick}
+            handleShopClick={handleShopClick}
+            handleChallengeClick={handleChallengeClick}
+        />
+        </ProtectedRoute>,
       children:[
         {
           path: "/",

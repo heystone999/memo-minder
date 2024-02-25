@@ -7,7 +7,7 @@ import TaskAreaDialog from './TaskAreaDialog';
 
 const TaskArea = ({ 
     updateHealth, updateLevel,
-    habits, dailies, todos,
+    habits = [], dailies = [], todos = [],
     onAddHabit, onUpdateHabit, onDeleteHabit,
     onAddDaily, onUpdateDaily, onDeleteDaily,
     onAddTodo, onUpdateTodo, onDeleteTodo,
@@ -156,8 +156,7 @@ const TaskArea = ({
                 return items.filter(item => tabMap.condition1(item));
             case tabMap.feature2:
                 return items.filter(item => tabMap.condition2(item));
-            case 'All':
-            default:
+            default: 
                 return items;
         }
     };
