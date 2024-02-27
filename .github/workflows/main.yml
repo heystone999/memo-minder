@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  frontend-build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14.x'
+
+    - name: Build and test frontend
+      run: |
+        cd client/memo-minder-web
+        npm install
+        npm run build
+        npm test
+
+  backend-build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.x'
+        
+    - name: Test backend
+      run: |
+        cd memo-backend
+        npm install
+        npm test
