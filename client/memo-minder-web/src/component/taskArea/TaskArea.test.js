@@ -138,12 +138,14 @@ test('deletes a habit correctly', () => {
 test('updates health when positive habit is clicked', () => {
   const updateHealthMock = jest.fn();
   const updateLevelMock = jest.fn();
+  const updateCoinMock = jest.fn();
   const habits = [{ id: 1, content: 'Exercise', positive: true, negative: false }];
 
   render(
     <TaskArea
       updateHealth={updateHealthMock}
       updateLevel={updateLevelMock}
+      updateCoin={updateCoinMock}
       habits={habits}
       dailies={[]}
       todos={[]}

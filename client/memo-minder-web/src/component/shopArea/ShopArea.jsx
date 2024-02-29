@@ -8,7 +8,7 @@ const products = [
   { id: 'magicBook', name: 'MagicBook', price: 40, imgSrc: '/book.png', soldSrc: '/sold_book.png' },
 ];
 
-const ShopArea = () => {
+const ShopArea = ({coin, decreaseCoin}) => {
   const [boughtItems, setBoughtItems] = useState(() => {
     const saved = localStorage.getItem('boughtItems');
     return saved ? JSON.parse(saved) : {};
@@ -19,23 +19,26 @@ const ShopArea = () => {
   }, [boughtItems]);
 
   const handleBuy = (productId) => {
-    const newBoughtItems = {
-      ...boughtItems,
-      [productId]: true,
-    };
-  
-    // 更新组件状态
-    setBoughtItems(newBoughtItems);
-  
-    // 更新localStorage
-    localStorage.setItem('boughtItems', JSON.stringify(newBoughtItems));
-  
-    // 创建并派发自定义事件
-    const event = new Event('localStorageChanged');
-    window.dispatchEvent(event);
-  
-    // 显示自定义弹窗
-    showCustomPopup("Purchase Successful", "You have successfully purchased the item.", "rgba(8,186,255, 0.7)");
+    const product = products.find(p => p.id === productId);
+    if (coin >= product.price) {
+      const newBoughtItems = {
+        ...boughtItems,
+        [productId]: true,
+      };
+      
+      // update state 
+      setBoughtItems(newBoughtItems);
+      // Deduct the price from the coin total using decreaseCoin
+      decreaseCoin(product.price);
+      // update localStorage
+      localStorage.setItem('boughtItems', JSON.stringify(newBoughtItems));
+      const event = new Event('localStorageChanged');
+      window.dispatchEvent(event);
+      // show popup
+      showCustomPopup("Purchase Successful", `You have successfully purchased the ${product.name}.`, "rgba(8,186,255, 0.7)");
+    } else {
+      showCustomPopup("Purchase Failed", "You do not have enough coins.", "rgba(243, 97, 105, 0.7)");
+    }
   };
   
     /* Popup */

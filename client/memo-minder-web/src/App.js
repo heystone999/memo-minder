@@ -81,7 +81,9 @@ function App() {
   };
   /* 
   coin  
-  +1Q per update
+  +1Q per task
+  decrease corresponding coins 
+  from purchasing items in shop
   */
   const initialCoin = parseInt(localStorage.getItem('coin')) || 0;
   const [coin, setCoin] = useState(initialCoin);
@@ -91,7 +93,14 @@ function App() {
       return newCoin;
     });
   };
-
+  const decreaseCoin = (price) => {
+    setCoin(prevCoin => {
+      // let coin >= 0
+      const newCoin = Math.max(0, prevCoin - price);
+      localStorage.setItem('coin', newCoin); // update in localStorage
+      return newCoin;
+    });
+  };
 
 
   useEffect(() => {
@@ -216,7 +225,7 @@ function App() {
                           onClear={clearStorageAndResetStates}
                       />
                   ) : showShop ? (
-                      <ShopArea />
+                      <ShopArea coin={coin} updateCoin={updateCoin} decreaseCoin={decreaseCoin}/>
                   ) : (
                       <ChallengeArea />
                   )}
