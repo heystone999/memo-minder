@@ -20,7 +20,7 @@
     display: flex;
     position: relative;
     z-index: 2;
-    top: 24vh;
+    top: 26vh;
     right: 27vh;
     width: 50%;
     margin: auto;
@@ -32,7 +32,6 @@
     flex: 1; /* Flexible layout for items to stretch or shrink based on available space */
     min-width: 10%; /* Prevents excessive shrinking */
     height: auto; /* Height adjusts to content */
-    padding: 2%; /* Padding set as a percentage for responsiveness */
     background-color: transparent;
     text-align: center;
     display: flex;
@@ -50,10 +49,11 @@
     justify-content: center;
     align-items: center;
     transition: all 0.5s ease; /* Smooth transition effect for any change */
+    align-items: flex-end;
   }
   
   .product img {
-    width: 80%; /* Image width relative to .product width */
+    width: 70%; /* Image width relative to .product width */
     height: auto; /* Maintains aspect ratio */
     object-fit: cover; /* Covers the area without breaking aspect ratio */
   }
@@ -64,23 +64,29 @@
     transition: font-size 0.3s ease; 
     font-size: 1.2vw; 
   }
-  
+  /* -- Product Button start -- */
   .product button {
     background-color: #ffffff;
     color: black;
     border: none;
-    padding: 1.2vw 2vw; 
+    padding: 1vw 1.8vw; 
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease; 
     border-radius: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     font-size: 1vw; 
   }
-  
   .product button:hover {
-    background-color: #fadf67; /* Slightly darker shade on hover */
+    background-color: #fadf67; 
   }
-  
+  .product button.disabled, .product button:disabled {
+    background-color: #cccccc;
+    color: #666666; 
+    cursor: not-allowed; 
+    box-shadow: none; 
+  }
+  /* -- Product Button end -- */
+
   @media (max-width: 768px) {
     .product h3, .product p, .product button {
       font-size: 1.2vw; 

@@ -61,3 +61,16 @@ span{
     font-weight: 600;
     font-size: 105%;
 }
+
+.bought-items-images{
+    display: flex;
+    align-items: center;
+    margin-left: 100px;
+}
+.bought-items-images img {
+    width: 80px; 
+    height: 80px; 
+    object-fit: cover;
+    padding: 0 10px;
+  }
+  
