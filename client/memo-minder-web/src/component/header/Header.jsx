@@ -9,6 +9,7 @@ const defaultProducts = [
 
 const Header = ({ health, experience, level, products = defaultProducts }) => {
     const [boughtProducts, setBoughtProducts] = useState([]);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     useEffect(() => {
         // update state
@@ -21,46 +22,79 @@ const Header = ({ health, experience, level, products = defaultProducts }) => {
         // get bought products
         updateBoughtProducts();
 
+        // 尝试从 localStorage 读取保存的选中物品
+        const savedSelectedItem = localStorage.getItem('selectedItem');
+        if (savedSelectedItem) {
+            setSelectedItem(JSON.parse(savedSelectedItem));
+        } 
         const handleLocalStorageChange = () => {
             updateBoughtProducts();
         };
-
         window.addEventListener('localStorageChanged', handleLocalStorageChange);
-
         return () => {
             window.removeEventListener('localStorageChanged', handleLocalStorageChange);
         };
     }, [products]); 
 
+    const handleItemClick = (product) => {
+        setSelectedItem(product);
+        localStorage.setItem('selectedItem', JSON.stringify(product));
+    };
+
+
     return(
         <div className="header">
-            <div className="user-character">
-                <img className="user-character-pic" src="/user-pic.JPG" alt=""/>
-            </div>
-            <div className="user-character-info">
-                <div className="username">Ray</div>
-                <div className="user-data">
-                    <div className="health">
-                        <img src="/heart.png" alt=""/>
-                        <div className="health-bar">
-                            <div className="health-level" style={{ width: `${health}%` }}></div>
+            {/*-------- User Start --------*/}
+            <div className="user">
+                <div className="user-character">
+                    <img className="user-character-pic" src="/male.png" alt=""/>
+                    {/* show if a weaspon is selected, else show nothing*/}
+                    {selectedItem ? (
+                        <img className="selected-weapon" src={selectedItem.imgSrc} alt={selectedItem.name} />
+                    ) : null 
+                    }
+                </div>
+                <div className="user-character-info">
+                    <div className="username">Ray</div>
+                    <div className="user-data">
+                        {/*- Health Bar -*/}
+                        <div className="health">
+                            <img src="/heart.png" alt=""/>
+                            <div className="health-bar">
+                                <div className="health-level" style={{ width: `${health}%` }}></div>
+                            </div>
+                            <span>{health}/100</span>
                         </div>
-                        <span>{health}/100</span>
-                    </div>
-                    <div className="level">
-                        <img src="/star.png" alt=""/>
-                        <div className="level-bar">
-                            <div className="level-level" style={{ width: `${experience}%` }}></div>
+                        {/*- Level Bar -*/}
+                        <div className="level">
+                            <img src="/star.png" alt=""/>
+                            <div className="level-bar">
+                                <div className="level-level" style={{ width: `${experience}%` }}></div>
+                            </div>
+                            <span>Level {level}: {experience}/100</span>
                         </div>
-                        <span>Level {level}: {experience}/100</span>
                     </div>
                 </div>
             </div>
-            <div className="bought-items-images">
-                {boughtProducts.map(product => (
-                    <img key={product.id} src={product.soldSrc} alt={product.name} title={`Bought: ${product.name}`} />
-                ))}
+            {/*-------- User End --------*/}
+            {/*-------- Bag Start --------*/}
+            <div className="bag">
+                <div className="bag-name">Bag</div>
+                <div className="bought-items-images">
+                    {boughtProducts.map(product => (
+                        <img
+                            key={product.id}
+                            src={product.soldSrc}
+                            alt={product.name}
+                            title={`Bought: ${product.name}`}
+                            onClick={() => handleItemClick(product)}
+                            style={selectedItem && selectedItem.id === product.id ? { backgroundColor: '#f75d5d' } : {}}
+                        />
+                    ))}
+                </div>
             </div>
+            
+            {/*-------- Bag End --------*/}
         </div>
     );
 };

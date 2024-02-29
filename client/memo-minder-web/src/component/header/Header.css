@@ -4,14 +4,23 @@
     flex-direction: row;
     padding: 30px;
     color: white;
-    background-image: linear-gradient(79deg, #7439db, #C66FBC 48%, #F7944D)
+    background-image: linear-gradient(79deg, #7439db, #C66FBC 48%, #F7944D);
+    justify-content: space-between;
 }
-.user-character img{
+.selected-weapon{
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 180px;
+    left: 130px;
+}
+.user-character-pic{
     width: 150px;
     height: 150px;
     border-radius: 10px;
     border: 3px solid white;
     margin-right: 15px;
+    background-color: #edbae7;
 }
 .username{
     font-weight: bold;
@@ -24,7 +33,7 @@
     margin-right: 10px;
 }
 .health-bar {
-    width: 200px;
+    min-width: 200px;
     height: 20px;
     border-radius: 10px;
     border: 2px solid white;
@@ -42,7 +51,7 @@
     border-radius: 10px;
 }
 .level-bar {
-    width: 200px;
+    min-width: 200px;
     height: 20px;
     border-radius: 10px;
     border: 2px solid white;
@@ -62,15 +71,31 @@ span{
     font-size: 105%;
 }
 
+/*---------- Bag Start ---------*/
+.bag{
+    display: flex;
+    flex-direction: column
+}
+.bag-name{
+    display: flex;
+    justify-content: flex-end;
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-right: 10px;
+}
 .bought-items-images{
     display: flex;
-    align-items: center;
-    margin-left: 100px;
+
 }
 .bought-items-images img {
-    width: 80px; 
-    height: 80px; 
+    width: 50px; 
+    height: 50px; 
     object-fit: cover;
-    padding: 0 10px;
+    padding: 10px;
+    background-color: #7439db;
+    margin: 3px;
+    border-radius: 8px;
+    border: 2px solid white;
   }
+/*------------ Bag End -----------*/
   
