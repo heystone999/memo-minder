@@ -6,7 +6,7 @@ import TaskAreaDialog from './TaskAreaDialog';
 
 
 const TaskArea = ({ 
-    updateHealth, updateLevel,
+    updateHealth, updateLevel, updateCoin,
     habits = [], dailies = [], todos = [],
     onAddHabit, onUpdateHabit, onDeleteHabit,
     onAddDaily, onUpdateDaily, onDeleteDaily,
@@ -46,6 +46,7 @@ const TaskArea = ({
         console.log(`handlePositiveClick called with habitId: ${habitId}`);
         // add logic to increase gold and experience
         //addMessage("You get some Gold and Experience", 'positive');
+        updateCoin(); 
         updateLevel(); 
         console.log('After updateLevel called');
     };
@@ -133,6 +134,7 @@ const TaskArea = ({
     const markDailyAsCompleted = (dailyId) => {
         toggleDailyCompletion(dailyId, true);
         updateLevel();
+        updateCoin(); 
     };
     const markDailyAsIncomplete = (dailyId) => {
         toggleDailyCompletion(dailyId, false);
@@ -141,6 +143,7 @@ const TaskArea = ({
     const markTodoAsCompleted = (todoId) => {
         toggleTodoCompletion(todoId, true);
         updateLevel();
+        updateCoin(); 
     };
     const markTodoAsIncomplete = (todoId) => {
         toggleTodoCompletion(todoId, false);

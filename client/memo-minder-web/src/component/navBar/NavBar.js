@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import "./NavBar.css";
 import React, { useState } from "react";
 
-function Navbar({ showTaskArea, showShop, showChallenge, handleTaskClick, handleShopClick, handleChallengeClick }) {
+function Navbar({ coin, showTaskArea, showShop, showChallenge, handleTaskClick, handleShopClick, handleChallengeClick }) {
   const [open, setOpen] = useState(false);
 
   const handleShopLinkClick = () => {
@@ -38,6 +38,11 @@ function Navbar({ showTaskArea, showShop, showChallenge, handleTaskClick, handle
       </div>
       <div className="nav-middle"></div>
       <div className="nav-right">
+        <div className="coin">
+          <img className="coin-icon" src="/coin.png" alt=""/>
+          <div className="coin-number">{coin}</div>
+        </div>
+        
         <div className="user">
           <img
             className="user-pic"

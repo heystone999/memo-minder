@@ -59,7 +59,6 @@ function App() {
       return newHealth;
     });
   };
-  
   /* 
   level bar 
   Get initial level from local storage,
@@ -80,13 +79,28 @@ function App() {
       showCustomPopup("Level Up", "Congratulations! You've leveled up!", "rgba(255, 204, 85, 0.7)");
     }
   };
+  /* 
+  coin  
+  +1Q per update
+  */
+  const initialCoin = parseInt(localStorage.getItem('coin')) || 0;
+  const [coin, setCoin] = useState(initialCoin);
+  const updateCoin = () => {
+    setCoin(prevCoin => {
+      const newCoin = prevCoin + 10;
+      return newCoin;
+    });
+  };
+
+
 
   useEffect(() => {
     // Save health & level to local storage whenever it changes
     localStorage.setItem('health', health.toString());
     localStorage.setItem('level', level.toString());
     localStorage.setItem('experience', experience.toString());
-  }, [health, level, experience]);
+    localStorage.setItem('coin', coin.toString());
+  }, [health, level, experience, coin]);
 
   // initialize with default tasks and  add a new habit, daily, to-do to the task lists
   const defaultHabit = createDefaultItem('Your default habit', { positive: true, negative: true });
@@ -140,6 +154,7 @@ function App() {
     setTodos([defaultTodo]);
     setHealth(100);
     setExperience(0);
+    setCoin(0);
     setLevel(1);
     
   };
@@ -172,10 +187,11 @@ function App() {
                 handleTaskClick={handleTaskClick}
                 handleShopClick={handleShopClick}
                 handleChallengeClick={handleChallengeClick}
+                coin={coin}
             />
             <div style={{ display: "flex", flexDirection: "column" }}>
                 {/* pass health props to Header and TaskArea */}
-                <Header health={health} experience={experience} level={level} />
+                <Header health={health} experience={experience} level={level}/>
                 <Popup show={showPopup} onClose={closePopup} message={popupMessage} />
 
                 {/* TaskArea and ShopArea outside Navbar */}
@@ -184,6 +200,7 @@ function App() {
                       <TaskArea
                           updateHealth={updateHealth}
                           updateLevel={updateLevel}
+                          updateCoin={updateCoin}
                           habits={habits}
                           dailies={dailies}
                           todos={todos}

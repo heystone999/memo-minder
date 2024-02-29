@@ -7,7 +7,7 @@ const defaultProducts = [
   { id: 'magicBook', name: 'MagicBook', price: 40, imgSrc: '/book.png', soldSrc: '/book.png' },
 ];
 
-const Header = ({ health, experience, level, products = defaultProducts }) => {
+const Header = ({ health, experience, coin, level, products = defaultProducts }) => {
     const [boughtProducts, setBoughtProducts] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
 
@@ -22,7 +22,7 @@ const Header = ({ health, experience, level, products = defaultProducts }) => {
         // get bought products
         updateBoughtProducts();
 
-        // 尝试从 localStorage 读取保存的选中物品
+        // get selected item from localStorage
         const savedSelectedItem = localStorage.getItem('selectedItem');
         if (savedSelectedItem) {
             setSelectedItem(JSON.parse(savedSelectedItem));

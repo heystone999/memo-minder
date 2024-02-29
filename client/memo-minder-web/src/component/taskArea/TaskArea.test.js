@@ -6,6 +6,7 @@ test('renders without crashing', () => {
     <TaskArea
       updateHealth={() => { }}
       updateLevel={() => { }}
+      updateCoin={() => { }}
       habits={[]}
       dailies={[]}
       todos={[]}
@@ -29,6 +30,7 @@ test('adds a habit correctly', () => {
     <TaskArea
       updateHealth={() => { }}
       updateLevel={() => { }}
+      updateCoin={() => { }}
       habits={[]}
       dailies={[]}
       todos={[]}
@@ -63,6 +65,7 @@ test('updates a habit correctly', () => {
     <TaskArea
       updateHealth={() => { }}
       updateLevel={() => { }}
+      updateCoin={() => { }}
       habits={habits}
       dailies={[]}
       todos={[]}
@@ -105,6 +108,7 @@ test('deletes a habit correctly', () => {
     <TaskArea
       updateHealth={() => { }}
       updateLevel={() => { }}
+      updateCoin={() => { }}
       habits={habits}
       dailies={[]}
       todos={[]}

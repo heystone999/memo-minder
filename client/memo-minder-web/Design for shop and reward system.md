@@ -2,13 +2,13 @@ Design for Rwards and Shop System
 1. Tasks and Reward Mechanisms
 - Habit Task
 Experience Points: 10/ task
-Coins: 5/ task
+Coins: 10/ task
 - Daily Task
 Experience Points: 15/ task
 Coins: 10/ task
 - To-Do List
 Experience Points: 20/ task.
-Coins: 15/ task
+Coins: 10/ task
 
 2. Experience Points and Leveling Mechanism
 - Uplevel: 100/level

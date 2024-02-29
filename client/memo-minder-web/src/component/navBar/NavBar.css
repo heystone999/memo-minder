@@ -48,6 +48,22 @@ nav{
     font-size: 95%;
     color: #7e5d77;
 }
+.coin{
+    display: flex;
+    margin: 5px;
+}
+.coin-icon{
+    width: 30px;
+    height: 30px;  
+}
+.coin-number{
+    display: flex;
+    color: #7e5d77;
+    padding: 0 10px;
+    font-weight: 700;
+    flex-direction: column;
+    justify-content: center;
+}
 /*-- NarBar Right End --*/
 
 /*-- User Menu start --*/
