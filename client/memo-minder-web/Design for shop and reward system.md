@@ -29,7 +29,7 @@ Coins: 15/ task
 - Level 30: Mana potion(Attack + 15) 
 
 5. Shop Items
-- Stick (Attack +5) -> 20 coins
+- Stick (Attack +5) -> 15 coins
 - Sword (Attack + 10) -> 30 coins
 - Magic Book (Attack + 15) -> 40 coins
 

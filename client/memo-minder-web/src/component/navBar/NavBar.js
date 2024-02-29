@@ -5,6 +5,21 @@ import React, { useState } from "react";
 function Navbar({ showTaskArea, showShop, showChallenge, handleTaskClick, handleShopClick, handleChallengeClick }) {
   const [open, setOpen] = useState(false);
 
+  const handleShopLinkClick = () => {
+    setOpen(false); 
+    handleShopClick(); 
+    scrollToBottom(); // scroll to the end of the page
+  };
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }, 200); // excute after 200
+  };
+
   return (
     <nav>
       <div className="nav-left">
@@ -12,13 +27,13 @@ function Navbar({ showTaskArea, showShop, showChallenge, handleTaskClick, handle
           MEMO MINDER
         </Link>
         <Link to="/" onClick={handleTaskClick} className={showTaskArea ? "active" : ""}>
-        <span>Tasks</span>
+          <span>Tasks</span>
         </Link>
-        <Link to="/" onClick={handleShopClick} className={showShop ? "active" : ""}>
-        <span>Shops</span>
+        <Link to="/" onClick={handleShopLinkClick} className={showShop ? "active" : ""}>
+          <span>Shops</span>
         </Link>
         <Link to="/" onClick={handleChallengeClick} className={showChallenge ? "active" : ""}>
-        <span>Challenges</span>
+          <span>Challenges</span>
         </Link>
       </div>
       <div className="nav-middle"></div>
