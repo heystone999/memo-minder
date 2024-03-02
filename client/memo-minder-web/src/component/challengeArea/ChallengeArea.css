@@ -5,28 +5,36 @@
     overflow: hidden;
   }
   
-  .combat-background {
-    position: absolute;
-    top: 0;  
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('/public/combat_scenario.png'); /* Ensure the path is correct */
-    background-size: cover;
-    background-position: center;
-    z-index: 0; /* Keeps the background behind other content */
-    margin-top: 2px;
-  }
-
-  .character {
-    position: absolute;
-    width: 200px; 
-    height: 250px; 
-    background-size: contain;
-    background-repeat: no-repeat; 
-    transition: left 0.2s ease-out;
-    top: 37vh;
+.combat-background {
+  position: absolute;
+  top: 0;  
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/public/combat_scenario.png'); /* Ensure the path is correct */
+  background-size: cover;
+  background-position: center;
+  z-index: 0; /* Keeps the background behind other content */
+  margin-top: 2px;
 }
+
+.character {
+  position: absolute;
+  width: 200px; 
+  height: 250px; 
+  background-size: contain;
+  background-repeat: no-repeat; 
+  transition: left 0.2s ease-out;
+  top: 37vh;
+}
+.use-magic-icon{
+  width: 180px;
+}
+.lighting{
+  height: 400px;
+
+}
+/* Explain text */
 .explain-text{
   top: 10px;
   z-index: 1;
@@ -36,8 +44,6 @@
 .explain-text span{
   margin: 10px;
 }
-
-
 .keyboard-icon{
   padding: 2px;
   margin: 0 10px;

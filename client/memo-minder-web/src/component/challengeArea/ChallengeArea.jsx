@@ -10,7 +10,10 @@ const stickAttackRight = ['rightStick1.png', 'rightStick2.png', 'rightStick3.png
 const stickAttackLeft = ['leftStick1.png', 'leftStick2.png', 'leftStick3.png'];
 const swordAttackRight = ['rightSword1.png', 'rightSword2.png', 'rightSword3.png'];
 const swordAttackLeft = ['leftSword1.png', 'leftSword2.png', 'leftSword3.png'];
-
+// lightingAnimationFrames 定义移到组件外部或顶层
+const lightingAnimationFrames = [
+  'lighting1.png', 'lighting2.png', 'lighting3.png', 'lighting4.png', 'lighting5.png'
+];
 
 
 function ChallengeArea() {
@@ -30,6 +33,15 @@ function ChallengeArea() {
   const imageIndex = useRef(0);
   // magic state
   const [isMagicAttack, setIsMagicAttack] = useState(false);
+  // state for mouse position for apply magic attack
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+// 新增动画控制状态
+const [showLighting, setShowLighting] = useState(false);
+const [lightingPosition, setLightingPosition] = useState({ x: 0, y: 0 });
+const [currentLightingImage, setCurrentLightingImage] = useState('');
+// 使用useRef代替let来存储lightingAnimationIndex
+const lightingAnimationIndex = useRef(0);
+
   // popup
   const showCustomPopup = (title, body, background_color) => {
     setPopupMessage({ title, body, background_color });
@@ -47,6 +59,7 @@ function ChallengeArea() {
     });
   }, []);
 
+  
   // Animation
   useEffect(() => {
       let attackAnimationInterval;
@@ -147,20 +160,67 @@ function ChallengeArea() {
       };
   }, [direction, boughtItems, isMagicAttack]); // Ensure boughtItems is a dependency
 
+  // show use-magic icon with mouse
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      setMousePosition({ x: event.clientX, y: event.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
 
-  
+  // Magic attack click
+  useEffect(() => {
+    const handleMouseClick = (event) => {
+      if (!isMagicAttack) return;
+      setShowLighting(true);
+      setLightingPosition({ x: event.clientX, y: event.clientY });
+      lightingAnimationIndex.current = 0;
+      setCurrentLightingImage(lightingAnimationFrames[lightingAnimationIndex.current]);
+      const intervalId = setInterval(() => {
+        lightingAnimationIndex.current += 1;
+        if (lightingAnimationIndex.current >= lightingAnimationFrames.length) {
+          setShowLighting(false);
+          clearInterval(intervalId);
+        } else {
+          setCurrentLightingImage(lightingAnimationFrames[lightingAnimationIndex.current]);
+        }
+      }, 100); 
+      return () => {
+        clearInterval(intervalId);
+      };
+    };
+    window.addEventListener('click', handleMouseClick);
+    return () => {
+      window.removeEventListener('click', handleMouseClick);
+    };
+  }, [isMagicAttack, setShowLighting, setLightingPosition, setCurrentLightingImage]);
+
+
+
   return (
-      <div className="challenge-page">
-          <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
-          <div className="combat-background">
-              <div className="character" style={{ left: `${position}%`, backgroundImage: `url(${currentImage})` }}></div>
-          </div>
-          <div className="explain-text">
-            <span>Move Left <div className="keyboard-icon">A</div>/<div className="keyboard-icon">{"<"}-</div> Move Right <div className="keyboard-icon">D</div>/<div className="keyboard-icon">-{">"}</div></span>
-            <span>Normal Attack <div className="keyboard-icon">7</div> Stick Attack <div className="keyboard-icon">8</div> Sword Attack <div className="keyboard-icon">9</div></span>
-          </div>
+    <div className="challenge-page">
+      <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
+      <div className="combat-background">
+        <div className="character" style={{ left: `${position}%`, backgroundImage: `url(${currentImage})` }}></div>
+        {/* Conditional rendering for the magic icon */}
+        {isMagicAttack && (
+          <img className="use-magic-icon" src="UseLighting.png" alt="Use Lighting" style={{ position: 'absolute', left: mousePosition.x, top: mousePosition.y, transform: 'translate(-50%, -51%)' }} />
+        )}
+        {/* Conditional rendering for the lighting animation */}
+        {showLighting && (
+          <img className="lighting" src={currentLightingImage} alt="Lighting Animation" style={{ position: 'absolute', left: lightingPosition.x, top: lightingPosition.y, transform: 'translate(-50%, -80%)' }} />
+        )}
       </div>
+      <div className="explain-text">
+        {/* Your existing explanation text */}
+      </div>
+    </div>
   );
 }
 
