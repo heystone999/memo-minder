@@ -7,7 +7,7 @@ const defaultProducts = [
   { id: 'magicBook', name: 'MagicBook', price: 40, imgSrc: '/book.png', soldSrc: '/book.png' },
 ];
 
-const Header = ({ health, experience, coin, level, products = defaultProducts }) => {
+const Header = ({ health, experience, level, products = defaultProducts }) => {
     const [boughtProducts, setBoughtProducts] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
 
@@ -47,7 +47,7 @@ const Header = ({ health, experience, coin, level, products = defaultProducts })
             {/*-------- User Start --------*/}
             <div className="user">
                 <div className="user-character">
-                    <img className="user-character-pic" src="/male.png" alt=""/>
+                    <img className="user-character-pic" src="/char-pic.png" alt=""/>
                     {/* show if a weaspon is selected, else show nothing*/}
                     {selectedItem ? (
                         <img className="selected-weapon" src={selectedItem.imgSrc} alt={selectedItem.name} />

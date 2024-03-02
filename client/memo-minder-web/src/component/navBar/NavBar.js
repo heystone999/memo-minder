@@ -51,7 +51,7 @@ function Navbar({ coin, showTaskArea, showShop, showChallenge, handleTaskClick, 
         <div className="user">
           <img
             className="user-pic"
-            src="/user-pic.JPG"
+            src="/user-pic.png"
             alt=""
             onClick={() => {
               setOpen(!open);
