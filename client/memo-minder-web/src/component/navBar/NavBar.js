@@ -10,6 +10,11 @@ function Navbar({ coin, showTaskArea, showShop, showChallenge, handleTaskClick, 
     handleShopClick(); 
     scrollToBottom(); // scroll to the end of the page
   };
+  const handleChallengeLinkClick = () => {
+    setOpen(false); 
+    handleChallengeClick(); 
+    scrollToBottom(); // scroll to the end of the page
+  };
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -32,7 +37,7 @@ function Navbar({ coin, showTaskArea, showShop, showChallenge, handleTaskClick, 
         <Link to="/" onClick={handleShopLinkClick} className={showShop ? "active" : ""}>
           <span>Shops</span>
         </Link>
-        <Link to="/" onClick={handleChallengeClick} className={showChallenge ? "active" : ""}>
+        <Link to="/" onClick={handleChallengeLinkClick} className={showChallenge ? "active" : ""}>
           <span>Challenges</span>
         </Link>
       </div>
