@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./ChallengeArea.css";
 import Popup from '../popup/Popup';
 
+// Character image
 const imagesRight = ['char_right1.png', 'char_right2.png', 'char_right3.png'];
 const imagesLeft = ['char_left1.png', 'char_left2.png', 'char_left3.png'];
 const AttackRight = ['rightAtk1.png', 'rightAtk2.png', 'rightAtk3.png', 'rightAtk4.png', 'rightAtk6.png', 'rightAtk7.png', 'rightAtk8.png'];
@@ -10,10 +11,10 @@ const stickAttackRight = ['rightStick1.png', 'rightStick2.png', 'rightStick3.png
 const stickAttackLeft = ['leftStick1.png', 'leftStick2.png', 'leftStick3.png'];
 const swordAttackRight = ['rightSword1.png', 'rightSword2.png', 'rightSword3.png'];
 const swordAttackLeft = ['leftSword1.png', 'leftSword2.png', 'leftSword3.png'];
-// lightingAnimationFrames 定义移到组件外部或顶层
-const lightingAnimationFrames = [
-  'lighting1.png', 'lighting2.png', 'lighting3.png', 'lighting4.png', 'lighting5.png'
-];
+const lightingAnimationFrames = ['lighting1.png', 'lighting2.png', 'lighting3.png', 'lighting4.png', 'lighting5.png'];
+// Boss image
+const bossImagesLeft = ['wolfgoleft1.png', 'wolfgoleft2.png'];
+const bossImagesRight = ['wolfgoright1.png', 'wolfgoright2.png'];
 
 
 function ChallengeArea() {
@@ -35,31 +36,35 @@ function ChallengeArea() {
   const [isMagicAttack, setIsMagicAttack] = useState(false);
   // state for mouse position for apply magic attack
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-// 新增动画控制状态
-const [showLighting, setShowLighting] = useState(false);
-const [lightingPosition, setLightingPosition] = useState({ x: 0, y: 0 });
-const [currentLightingImage, setCurrentLightingImage] = useState('');
-// 使用useRef代替let来存储lightingAnimationIndex
-const lightingAnimationIndex = useRef(0);
-
+  // magic attack lighting
+  const [showLighting, setShowLighting] = useState(false);
+  const [lightingPosition, setLightingPosition] = useState({ x: 0, y: 0 });
+  const [currentLightingImage, setCurrentLightingImage] = useState('');
+  const lightingAnimationIndex = useRef(0);
   // popup
   const showCustomPopup = (title, body, background_color) => {
     setPopupMessage({ title, body, background_color });
     setShowPopup(true);
   };
+  // boss state
+  const [bossPosition, setBossPosition] = useState(95); // Initial boss position
+  const [currentBossImage, setCurrentBossImage] = useState('wolfgoleft1.png');
+  const bossImageIndex = useRef(0);
 
+  
   // Preload every pic
   useEffect(() => {
     [...imagesRight, ...imagesLeft, 
       ...swordAttackRight, ...swordAttackLeft,
       ...AttackRight, ...AttackLeft,
-      ...stickAttackRight, ...stickAttackLeft].forEach(image => {
+      ...stickAttackRight, ...stickAttackLeft,
+      ...bossImagesLeft, ...bossImagesRight].forEach(image => {
       const img = new Image();
       img.src = image;
     });
   }, []);
 
-  
+
   // Animation
   useEffect(() => {
       let attackAnimationInterval;
@@ -88,7 +93,7 @@ const lightingAnimationIndex = useRef(0);
             if (!attackAnimationInterval) {
               imageIndex.current = 0;
               attackAnimationInterval = setInterval(() => {
-                const attackImages = direction === 'right' ? swordAttackRight : swordAttackRight;
+                const attackImages = direction === 'right' ? swordAttackRight : swordAttackLeft;
                 setCurrentImage(attackImages[imageIndex.current % attackImages.length]);
                 imageIndex.current++;
               }, 150);
@@ -173,7 +178,6 @@ const lightingAnimationIndex = useRef(0);
     };
   }, []);
 
-
   // Magic attack click
   useEffect(() => {
     const handleMouseClick = (event) => {
@@ -201,13 +205,39 @@ const lightingAnimationIndex = useRef(0);
     };
   }, [isMagicAttack, setShowLighting, setLightingPosition, setCurrentLightingImage]);
 
-
+  /* ------------- Boss Start ------------ */
+  useEffect(() => {
+    const bossSpeed = 0.3;
+    const moveBoss = () => {
+      // calculate position 
+      const distance = bossPosition - position;
+      // update boss position
+      if (distance < -12) {
+        setBossPosition(bossPosition => Math.min(bossPosition + bossSpeed, 400));
+        setCurrentBossImage(bossImagesRight[bossImageIndex.current % bossImagesRight.length]);
+      } else if (distance > 6) {
+        setBossPosition(bossPosition => Math.max(bossPosition - bossSpeed, 0));
+        setCurrentBossImage(bossImagesLeft[bossImageIndex.current % bossImagesLeft.length]);
+      }
+      bossImageIndex.current = (bossImageIndex.current + 1) % bossImagesLeft.length;
+    };
+    // ensure boss move with character
+    const intervalId = setInterval(moveBoss, 80);
+  
+    return () => clearInterval(intervalId);
+  }, [position, bossPosition]); 
+  /* ------------- Boss End ------------- */
+  
 
   return (
     <div className="challenge-page">
       <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
+      
+      
       <div className="combat-background">
         <div className="character" style={{ left: `${position}%`, backgroundImage: `url(${currentImage})` }}></div>
+        {/* Render the boss */}
+      <div className="boss" style={{ left: `${bossPosition}%`, backgroundImage: `url(${currentBossImage})` }}></div>
         {/* Conditional rendering for the magic icon */}
         {isMagicAttack && (
           <img className="use-magic-icon" src="UseLighting.png" alt="Use Lighting" style={{ position: 'absolute', left: mousePosition.x, top: mousePosition.y, transform: 'translate(-50%, -51%)' }} />
@@ -218,7 +248,9 @@ const lightingAnimationIndex = useRef(0);
         )}
       </div>
       <div className="explain-text">
-        {/* Your existing explanation text */}
+            <span>Move Left <div className="keyboard-icon">A</div>/<div className="keyboard-icon">{"<"}-</div> Move Right <div className="keyboard-icon">D</div>/<div className="keyboard-icon">-{">"}</div></span>
+            <span>Normal Attack <div className="keyboard-icon">7</div> Stick Attack <div className="keyboard-icon">8</div> Sword Attack <div className="keyboard-icon">9</div></span>
+            <span>Open Magic State<div className="keyboard-icon">0</div>Magic Attack<div className="keyboard-icon">Mouse Click</div></span>
       </div>
     </div>
   );

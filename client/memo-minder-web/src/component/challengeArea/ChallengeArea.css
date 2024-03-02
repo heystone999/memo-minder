@@ -21,17 +21,20 @@
 .character {
   position: absolute;
   width: 200px; 
-  height: 250px; 
+  height: 270px; 
   background-size: contain;
   background-repeat: no-repeat; 
   transition: left 0.2s ease-out;
-  top: 37vh;
+  top: 35vh;
+  z-index: 3;
 }
 .use-magic-icon{
   width: 180px;
+  z-index: 3;
 }
 .lighting{
   height: 400px;
+  z-index: 3;
 
 }
 /* Explain text */
@@ -51,4 +54,17 @@
   border-radius: 5px;
   border: 1px solid white;
   font-size: small;
+}
+
+
+/* boss */
+.boss {
+  position: absolute;
+  width: 220px; 
+  height: 220px; 
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: left 0.2s ease-out;
+  top: 42vh; 
+  z-index: 2;
 }
