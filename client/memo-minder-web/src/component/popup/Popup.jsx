@@ -6,7 +6,7 @@ const Popup = ({ show, onClose, message }) => {
     if (show) {
       const timer = setTimeout(() => {
         onClose();
-      }, 2000);
+      }, 1700);
 
       return () => {
         clearTimeout(timer);

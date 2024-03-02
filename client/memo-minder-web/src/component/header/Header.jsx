@@ -18,10 +18,8 @@ const Header = ({ health, experience, level, products = defaultProducts }) => {
             const updatedBoughtProducts = products.filter(product => boughtItems[product.id]);
             setBoughtProducts(updatedBoughtProducts);
         };
-
         // get bought products
         updateBoughtProducts();
-
         // get selected item from localStorage
         const savedSelectedItem = localStorage.getItem('selectedItem');
         if (savedSelectedItem) {
@@ -36,6 +34,7 @@ const Header = ({ health, experience, level, products = defaultProducts }) => {
         };
     }, [products]); 
 
+    // show selected in character-pic
     const handleItemClick = (product) => {
         setSelectedItem(product);
         localStorage.setItem('selectedItem', JSON.stringify(product));
@@ -93,7 +92,6 @@ const Header = ({ health, experience, level, products = defaultProducts }) => {
                     ))}
                 </div>
             </div>
-            
             {/*-------- Bag End --------*/}
         </div>
     );
