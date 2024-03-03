@@ -66,7 +66,7 @@ const TaskArea = ({
         const reward = rewards.find(p => p.id === rewardId);
         if (coin >= reward.price){
             decreaseCoin(reward.price);
-            showCustomPopup("Purchase Successful", `You have successfully purchased: ${reward.content}.`, "rgba(8,186,255, 0.7)");
+            showCustomPopup("Purchase Successful", `You have successfully purchased: ${reward.content}.`, "rgba(8,186,255, 0.7)"); 
         } else {
             showCustomPopup ("Purchase Failed", "You do not have enough coins.", "rgba(243, 97, 105, 0.7)");
         }
@@ -79,9 +79,11 @@ const TaskArea = ({
         setShowPopup(false);
     };
     const showCustomPopup = (title, body, background_color) => {
+        console.log('showCustomPopup called')
         setPopupMessage({ title, body, background_color });
         setShowPopup(true);
     };
+
     // handle message indicating experience changes
     /*
     const [messages, setMessages] = useState([]);

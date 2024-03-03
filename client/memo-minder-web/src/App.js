@@ -100,6 +100,7 @@ function App() {
       localStorage.setItem('coin', newCoin); // update in localStorage
       return newCoin;
     });
+    showCustomPopup("Purchase Successfully", "You have purchased an item.", "rgba(8,186,255, 0.7)");
   };
 
 
