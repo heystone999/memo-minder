@@ -9,6 +9,7 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
   const [positive, setPositive] = useState(item.positive);
   const [negative, setNegative] = useState(item.negative);
   const [completed, setCompleted] = useState(item.completed);
+  const [price, setPrice] = useState(item.price);
 
   const togglePositive = () => {
     setPositive(!positive);
@@ -23,6 +24,7 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
     // when item change the state will be updated
     setTitle(item.content || '');
     setNotes(item.notes || '');
+    setPrice(item.price);
   }, [item]);
 
   const handleSave = () => {
@@ -35,8 +37,12 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
     if (type === 'Habit') {
       updatedItem.positive = positive;
       updatedItem.negative = negative;
-    } else {
+    } 
+    else if ((type === 'Daily') || (type === 'To-Do')) {
       updatedItem.completed = completed;
+    }
+    else if (type === 'Reward'){
+      updatedItem.price = price;
     }
     onSave(updatedItem);
   };
@@ -57,11 +63,21 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
           Notes:
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
         </label>
+        {(type === 'Reward') && (
+            <div className="dialogHeaderNotes">
+              <label>
+                Price*:
+                <input value={price} onChange={(e) => setPrice(e.target.value)} />
+              </label>
+            </div>
+          )}
+        
         <div className="dialogButtons">
           <button onClick={handleDelete}>{`Delete this ${type}`}</button>
           <button onClick={handleSave}>Save</button>
           <button onClick={onClose}>Cancel</button>
         </div>
+        <div className="dialogHeaderButtonsWrapper">
           {type === 'Habit' && (
             <div className="dialogHeaderButtons">
               <button className={`pos ${positive ? 'active' : 'inactive'}`} onClick={togglePositive}>
@@ -72,13 +88,14 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
               </button>
             </div>
           )}
-          {type !== 'Habit' && (
+          {((type === 'Daily') || (type === 'To-Do')) && (
             <div className="dialogHeaderButtons">
               <button className={`comp ${completed ? 'inactive' : 'active'}`} onClick={() => setCompleted(!completed)}>
                 {completed ? 'Mark as Incomplete' : 'Mark as Completed'}
               </button>
             </div>
           )}
+        </div>
       </div>
     </div>
   );

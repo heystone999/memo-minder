@@ -111,20 +111,27 @@ function App() {
     localStorage.setItem('coin', coin.toString());
   }, [health, level, experience, coin]);
 
-  // initialize with default tasks and  add a new habit, daily, to-do to the task lists
+  /* 
+  TaskArea:
+  Habit, Daily, To-do, reward
+  */
+  // initialize with default tasks and  add a new habit, daily, to-do, reward to the task lists
   const defaultHabit = createDefaultItem('Your default habit', { positive: true, negative: true });
   const defaultDaily = createDefaultItem('Your default daily', { completed: false });
   const defaultTodo = createDefaultItem('Your default to-do', { completed: false });
+  const defaultReward = createDefaultItem('Your default reward', { price: 10});
 
   const [habits, setHabits] = useState(() => JSON.parse(localStorage.getItem('habits')) || [defaultHabit]);
   const [dailies, setDailies] = useState(() => JSON.parse(localStorage.getItem('dailies')) || [defaultDaily]);
   const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('todos')) || [defaultTodo]);
+  const [rewards, setRewards] = useState(() => JSON.parse(localStorage.getItem('rewards')) || [defaultReward]); 
   
   const addHabit = (habit) => {setHabits(prev => [...prev, habit])};
   const addDaily = (daily) => {setDailies(prev => [...prev, daily])};
   const addTodo = (todo) => {setTodos(prev => [...prev, todo]);};
-  
-  //update an existing habit, daily, to-do
+  const addReward = (reward) => {setRewards(prev => [...prev, reward]);};
+
+  //update an existing habit, daily, to-do, reward
   const createUpdater = (setter) => (updatedItem) => {
     setter((prevItems) => {
       return prevItems.map((item) => {
@@ -138,21 +145,24 @@ function App() {
   const updateHabit = createUpdater(setHabits);
   const updateDaily = createUpdater(setDailies);
   const updateTodo = createUpdater(setTodos);
+  const updateReward = createUpdater(setRewards);
 
-  // delete an existing habit, daily, to-do
+  // delete an existing habit, daily, to-do, reward
   const createDeleter = (setter) => (itemId) => {
     setter((prevItems) => prevItems.filter((item) => item.id !== itemId));
   };
   const deleteHabit = createDeleter(setHabits);
   const deleteDaily = createDeleter(setDailies);
   const deleteTodo = createDeleter(setTodos);
+  const deleteReward = createDeleter(setRewards);
 
   useEffect(() => {
-    // save habits, dailies, todos to local storage whenever it changes
+    // save habits, dailies, todos, rewards to local storage whenever it changes
     localStorage.setItem('habits', JSON.stringify(habits));
     localStorage.setItem('dailies', JSON.stringify(dailies));
     localStorage.setItem('todos', JSON.stringify(todos));
-  }, [habits, dailies, todos]); 
+    localStorage.setItem('rewards', JSON.stringify(rewards));
+  }, [habits, dailies, todos, rewards]); 
 
   const clearStorageAndResetStates = () => {
     // clear all localStorage
@@ -161,6 +171,7 @@ function App() {
     setHabits([defaultHabit]); 
     setDailies([defaultDaily]); 
     setTodos([defaultTodo]);
+    setRewards([defaultReward]);
     setHealth(100);
     setExperience(0);
     setCoin(0);
@@ -209,10 +220,13 @@ function App() {
                       <TaskArea
                           updateHealth={updateHealth}
                           updateLevel={updateLevel}
+                          coin={coin}
                           updateCoin={updateCoin}
+                          decreaseCoin={decreaseCoin}
                           habits={habits}
                           dailies={dailies}
                           todos={todos}
+                          rewards = {rewards}
                           onAddHabit={addHabit}
                           onUpdateHabit={updateHabit}
                           onDeleteHabit={deleteHabit}
@@ -222,6 +236,9 @@ function App() {
                           onAddTodo={addTodo}
                           onUpdateTodo={updateTodo}
                           onDeleteTodo={deleteTodo}
+                          onAddReward = {addReward}
+                          onUpdateReward = {updateReward}
+                          onDeleteReward = {deleteReward}
                           onClear={clearStorageAndResetStates}
                       />
                   ) : showShop ? (
