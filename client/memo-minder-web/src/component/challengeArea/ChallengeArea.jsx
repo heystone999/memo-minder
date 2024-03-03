@@ -176,6 +176,10 @@ function ChallengeArea() {
         const transitionImage = direction === 'right' ? imagesRight[0] : imagesLeft[0];
         setCurrentImage(transitionImage);
       }
+      if (isMagicAttack) { 
+        const magicImage = direction === 'right' ? 'rightMagic.png' : 'leftMagic.png';
+        setCurrentImage(magicImage);
+      }
       if (attackAnimationInterval) {
         clearInterval(attackAnimationInterval);
         attackAnimationInterval = null;
@@ -281,18 +285,20 @@ function ChallengeArea() {
       bossImageIndex.current = (bossImageIndex.current + 1) % bossImagesLeft.length;
       // set boss attack interval
       if (!bossAttackCooldown && BossAttackCollision(distance)) {
-        setHealth(prevHealth => Math.max(prevHealth - 5, 0));
-        setBossAttackCooldown(true);
-        setTimeout(() => {
+        if (bossHealth > 0){
+          setHealth(prevHealth => Math.max(prevHealth - 5, 0));
+          setBossAttackCooldown(true);
+          setTimeout(() => {
           setBossAttackCooldown(false);
-        }, bossCooldownTime);
+          }, bossCooldownTime);
+        }
       }
     };
 
     const intervalId = setInterval(moveBoss, 80);
 
     return () => clearInterval(intervalId); 
-  }, [position, bossPosition, bossAttackCooldown]); 
+  }, [position, bossPosition, bossAttackCooldown, bossHealth]); 
   /* ------------- Boss Logic End ------------- */
 
   // check victory
