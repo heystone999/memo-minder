@@ -28,6 +28,74 @@
   top: 35vh;
   z-index: 3;
 }
+
+/*--Health Bar Start--*/
+.combat-health{
+  display: flex; 
+  align-items: center; 
+  position: absolute; 
+  bottom: 2vh;
+  left: 2vw;
+}
+.combat-health img{
+  width: 30px;
+  margin-bottom: 5px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+}
+.combat-health-bar {
+  display: flex; 
+  width: 200px;
+  height: 20px;
+  border-radius: 10px;
+  border: 2px solid white;
+  margin-bottom: 10px;
+  background-color: beige;
+}
+.combat-health-level {
+  height: 100%;
+  background-color: #f75d5d;
+  border-radius: 10px;
+}
+.combat-health span{
+  color: white;
+  margin-bottom: 10px;
+}
+.boss-health{
+  display: flex; 
+  align-items: center; 
+  position: absolute; 
+  top: 2vh;
+  right: 2vw;
+}
+.boss-health img{
+  width: 40px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+}
+.boss-health-bar {
+  display: flex; 
+  width: 200px;
+  height: 20px;
+  border-radius: 10px;
+  border: 2px solid white;
+  margin-bottom: 10px;
+  background-color: beige;
+}
+.boss-health-level {
+  height: 100%;
+  background-color: #f75d5d;
+  border-radius: 10px;
+}
+.boss-health span{
+  color: white;
+  margin-bottom: 10px;
+}
+/*--Health Bar End--*/
+
+/*Magic attack*/
 .use-magic-icon{
   width: 180px;
   z-index: 3;
@@ -35,7 +103,6 @@
 .lighting{
   height: 400px;
   z-index: 3;
-
 }
 /* Explain text */
 .explain-text{

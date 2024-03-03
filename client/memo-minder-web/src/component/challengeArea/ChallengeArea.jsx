@@ -20,6 +20,7 @@ const bossImagesRight = ['wolfgoright1.png', 'wolfgoright2.png'];
 function ChallengeArea() {
   // initial state
   const [position, setPosition] = useState(5); 
+  const [health, setHealth] = useState(100);
   const [currentImage, setCurrentImage] = useState('char_right1.png');
   const [direction, setDirection] = useState('right');
   // get bought items
@@ -48,8 +49,12 @@ function ChallengeArea() {
   };
   // boss state
   const [bossPosition, setBossPosition] = useState(95); // Initial boss position
+  const [bossHealth, setBossHealth] = useState(100); // 新增Boss血量状态
   const [currentBossImage, setCurrentBossImage] = useState('wolfgoleft1.png');
   const bossImageIndex = useRef(0);
+  // Add boss attack power
+  const [bossAttackCooldown, setBossAttackCooldown] = useState(false); 
+  const bossCooldownTime = 1000; 
 
   
   // Preload every pic
@@ -64,31 +69,35 @@ function ChallengeArea() {
     });
   }, []);
 
-
   // Animation
   useEffect(() => {
-      let attackAnimationInterval;
-      const updateImageForDirection = (dir) => {
-          const images = dir === 'right' ? imagesRight : imagesLeft;
-          setCurrentImage(images[imageIndex.current % images.length]);
-          imageIndex.current++;
-      };
-      /* ----------- key down start ----------*/
-      const handleKeyDown = (event) => {
-        // check if weapon is purchased
-        const isSwordAvailable = boughtItems['sword'];
-        const isStickAvailable = boughtItems['stick'];
-        const isBookAvailable = boughtItems['magicBook'];
-        if (event.key === "0") { // magic attck
-          if (isBookAvailable){
-            setIsMagicAttack(!isMagicAttack); // transfer to magic state
+    let attackAnimationInterval;
+    const updateImageForDirection = (dir) => {
+      const images = dir === 'right' ? imagesRight : imagesLeft;
+      setCurrentImage(images[imageIndex.current % images.length]);
+      imageIndex.current++;
+    };
+    // apply demage to boss
+    const applyDamageToBoss = (damageAmount) => {
+      setBossHealth((prevHealth) => Math.max(prevHealth - damageAmount, 0));
+    };
+    const handleKeyDown = (event) => {
+      // check if weapon is purchased
+      const isSwordAvailable = boughtItems['sword'];
+      const isStickAvailable = boughtItems['stick'];
+      const isBookAvailable = boughtItems['magicBook'];
+  
+      switch(event.key) {
+        case "0": // Toggle magic attack
+          if (isBookAvailable) {
+            setIsMagicAttack(!isMagicAttack);
             const magicImage = direction === 'right' ? 'rightMagic.png' : 'leftMagic.png';
             setCurrentImage(magicImage);
-            return; // prevent other state
-          }else{
+          } else {
             showCustomPopup("Purchase Required", "You need to purchase the Magic Book to use this attack.", "rgba(243, 97, 105, 0.7)");
           }
-        } if (event.key === "9") { // sword attack
+          break;
+        case "9": // Sword attack
           if (isSwordAvailable) {
             if (!attackAnimationInterval) {
               imageIndex.current = 0;
@@ -96,74 +105,95 @@ function ChallengeArea() {
                 const attackImages = direction === 'right' ? swordAttackRight : swordAttackLeft;
                 setCurrentImage(attackImages[imageIndex.current % attackImages.length]);
                 imageIndex.current++;
+                if (imageIndex.current === attackImages.length) {
+                  clearInterval(attackAnimationInterval);
+                  attackAnimationInterval = null;
+                  applyDamageToBoss(15); 
+                }
               }, 150);
             }
           } else {
             showCustomPopup("Purchase Required", "You need to purchase the Sword to use this attack.", "rgba(243, 97, 105, 0.7)");
           }
-        } else if (event.key === "8") { // stick attacks
+          break;
+        case "8": // Stick attack
           if (isStickAvailable) {
             if (!attackAnimationInterval) {
-              imageIndex.current = 0; 
+              imageIndex.current = 0;
               attackAnimationInterval = setInterval(() => {
                 const attackImages = direction === 'right' ? stickAttackRight : stickAttackLeft;
                 setCurrentImage(attackImages[imageIndex.current % attackImages.length]);
                 imageIndex.current++;
+                if (imageIndex.current === attackImages.length) {
+                  clearInterval(attackAnimationInterval);
+                  attackAnimationInterval = null;
+                  applyDamageToBoss(10); 
+                }
               }, 150);
             }
           } else {
             showCustomPopup("Purchase Required", "You need to purchase the Stick to use this attack.", "rgba(243, 97, 105, 0.7)");
           }
-        } else if (event.key === "7") { // normal attack
+          break;
+        case "7": // Normal attack
           if (!attackAnimationInterval) {
             imageIndex.current = 0;
             attackAnimationInterval = setInterval(() => {
               const attackImages = direction === 'right' ? AttackRight : AttackLeft;
               setCurrentImage(attackImages[imageIndex.current % attackImages.length]);
               imageIndex.current++;
+              if (imageIndex.current === attackImages.length) {
+                clearInterval(attackAnimationInterval);
+                attackAnimationInterval = null;
+                applyDamageToBoss(5); 
+              }
             }, 150);
           }
-        } else if (event.key.toLowerCase() === "a" || event.key === "ArrowLeft") {
+          break;
+        case "a":
+        case "ArrowLeft":
           setPosition(prevPosition => Math.max(prevPosition - 1, 0));
           setDirection('left');
           if (!attackAnimationInterval) {
             updateImageForDirection('left');
           }
-        } else if (event.key.toLowerCase() === "d" || event.key === "ArrowRight") {
+          break;
+        case "d":
+        case "ArrowRight":
           setPosition(prevPosition => Math.min(prevPosition + 1, 100));
           setDirection('right');
           if (!attackAnimationInterval) {
             updateImageForDirection('right');
           }
-        }
-      };
-      /* ----------- key down end ----------*/
-      /* ----------- key up start ----------*/
-      const handleKeyUp = (event) => {
-        if (event.key === "0" && !isMagicAttack) {
-          const transitionImage = direction === 'right' ? imagesRight[0] : imagesLeft[0];
-          setCurrentImage(transitionImage);
-        }if ((event.key === "7" || event.key === "8" || event.key === "9") && attackAnimationInterval) {
-          clearInterval(attackAnimationInterval);
-          attackAnimationInterval = null;
-          const transitionImage = direction === 'right' ? imagesRight[0] : imagesLeft[0];
-          setCurrentImage(transitionImage);
-          setTimeout(() => {
-            imageIndex.current = 0; // Reset index for walking animation after a short delay
-          }, 100);
-        }
-      };
-      /* ----------- key up end ----------*/
-      window.addEventListener("keydown", handleKeyDown);
-      window.addEventListener("keyup", handleKeyUp);
-      return () => {
-          window.removeEventListener("keydown", handleKeyDown);
-          window.removeEventListener("keyup", handleKeyUp);
-          if (attackAnimationInterval) {
-              clearInterval(attackAnimationInterval);
-          }
-      };
-  }, [direction, boughtItems, isMagicAttack]); // Ensure boughtItems is a dependency
+          break;
+        default:
+          break;
+      }
+    };
+  
+    const handleKeyUp = (event) => {
+      if (["0", "7", "8", "9"].includes(event.key)) {
+        const transitionImage = direction === 'right' ? imagesRight[0] : imagesLeft[0];
+        setCurrentImage(transitionImage);
+      }
+      if (attackAnimationInterval) {
+        clearInterval(attackAnimationInterval);
+        attackAnimationInterval = null;
+      }
+    };
+  
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      if (attackAnimationInterval) {
+        clearInterval(attackAnimationInterval);
+      }
+    };
+  }, [direction, boughtItems, isMagicAttack, position, bossHealth]); 
+  
 
   // show use-magic icon with mouse
   useEffect(() => {
@@ -182,62 +212,125 @@ function ChallengeArea() {
   useEffect(() => {
     const handleMouseClick = (event) => {
       if (!isMagicAttack) return;
+
       setShowLighting(true);
-      setLightingPosition({ x: event.clientX, y: event.clientY });
+      const lightingPos = { x: event.clientX, y: event.clientY };
+      setLightingPosition(lightingPos);
       lightingAnimationIndex.current = 0;
       setCurrentLightingImage(lightingAnimationFrames[lightingAnimationIndex.current]);
+
       const intervalId = setInterval(() => {
         lightingAnimationIndex.current += 1;
         if (lightingAnimationIndex.current >= lightingAnimationFrames.length) {
           setShowLighting(false);
           clearInterval(intervalId);
+          // check collison
+          if (CharacterAttackCollision(lightingPos, bossPosition)) {
+            setBossHealth((prevHealth) => Math.max(prevHealth - 20, 0)); 
+          }
         } else {
           setCurrentLightingImage(lightingAnimationFrames[lightingAnimationIndex.current]);
         }
-      }, 100); 
-      return () => {
-        clearInterval(intervalId);
-      };
-    };
-    window.addEventListener('click', handleMouseClick);
-    return () => {
-      window.removeEventListener('click', handleMouseClick);
-    };
-  }, [isMagicAttack, setShowLighting, setLightingPosition, setCurrentLightingImage]);
+      }, 100);
 
-  /* ------------- Boss Start ------------ */
+      return () => clearInterval(intervalId);
+    };
+
+    window.addEventListener('click', handleMouseClick);
+    return () => window.removeEventListener('click', handleMouseClick);
+  }, [isMagicAttack, bossPosition, bossHealth]);
+
+
+
+  // Boss Attack Collision detection function
+  const BossAttackCollision = (distance) => {
+    const collisionThreshold = 10; 
+    return Math.abs(distance) <= collisionThreshold;
+  };
+  // Character Attack collision detection
+  const CharacterAttackCollision = (lightingPosition, bossPosition) => {
+    const gameArea = document.querySelector('.combat-background');
+    if (!gameArea) {
+      console.error('Game area not found');
+      return false;
+    }
+    const gameAreaWidth = gameArea.offsetWidth; 
+    const gameAreaLeftEdge = gameArea.getBoundingClientRect().left; 
+    const lightingPositionPercentage = ((lightingPosition.x - gameAreaLeftEdge) / gameAreaWidth) * 100;
+
+    const collisionThreshold = 10;
+    const distance = Math.abs(lightingPositionPercentage - bossPosition); 
+    return distance <= collisionThreshold;
+  };
+
+
+
+  /* ------------- Boss Logic Start ------------ */
   useEffect(() => {
-    const bossSpeed = 0.3;
+    const bossSpeed = 0.3; // boss move speed
     const moveBoss = () => {
-      // calculate position 
       const distance = bossPosition - position;
       // update boss position
       if (distance < -12) {
-        setBossPosition(bossPosition => Math.min(bossPosition + bossSpeed, 400));
+        setBossPosition(bossPosition => Math.min(bossPosition + bossSpeed, 100));
         setCurrentBossImage(bossImagesRight[bossImageIndex.current % bossImagesRight.length]);
       } else if (distance > 6) {
         setBossPosition(bossPosition => Math.max(bossPosition - bossSpeed, 0));
         setCurrentBossImage(bossImagesLeft[bossImageIndex.current % bossImagesLeft.length]);
       }
       bossImageIndex.current = (bossImageIndex.current + 1) % bossImagesLeft.length;
+      // set boss attack interval
+      if (!bossAttackCooldown && BossAttackCollision(distance)) {
+        setHealth(prevHealth => Math.max(prevHealth - 5, 0));
+        setBossAttackCooldown(true);
+        setTimeout(() => {
+          setBossAttackCooldown(false);
+        }, bossCooldownTime);
+      }
     };
-    // ensure boss move with character
+
     const intervalId = setInterval(moveBoss, 80);
-  
-    return () => clearInterval(intervalId);
-  }, [position, bossPosition]); 
-  /* ------------- Boss End ------------- */
+
+    return () => clearInterval(intervalId); 
+  }, [position, bossPosition, bossAttackCooldown]); 
+  /* ------------- Boss Logic End ------------- */
+
+  // check victory
+  useEffect(() => {
+    if (bossHealth === 0) {
+      showCustomPopup("Victory!", "Congratulations, you have defeated the boss!", "rgba(8,186,255, 0.7)");
+    }
+  }, [bossHealth]); 
   
 
   return (
     <div className="challenge-page">
       <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
       
-      
       <div className="combat-background">
+        {/* Character Health Bar */}
+        <div className="combat-health">
+          <img src="/heart.png" alt="" />
+          <div className="combat-health-bar">
+              <div className="combat-health-level" style={{ width: `${health}%` }}></div>
+          </div>
+          <span>{health}/100</span>
+        </div>
+        {/* Boss Health Bar */}
+        <div className="boss-health">
+          <span>{bossHealth}/100</span>
+          <div className="boss-health-bar">
+              <div className="boss-health-level" style={{ width: `${bossHealth}%` }}></div>
+          </div>
+          <img src="/wolf-icon.png" alt="" />
+        </div>
+        {/* Character */}
         <div className="character" style={{ left: `${position}%`, backgroundImage: `url(${currentImage})` }}></div>
-        {/* Render the boss */}
-      <div className="boss" style={{ left: `${bossPosition}%`, backgroundImage: `url(${currentBossImage})` }}></div>
+        {/* Boss */}
+        {bossHealth > 0 &&(
+          <div className="boss" style={{ left: `${bossPosition}%`, backgroundImage: `url(${currentBossImage})` }}></div>
+        )}
+        
         {/* Conditional rendering for the magic icon */}
         {isMagicAttack && (
           <img className="use-magic-icon" src="UseLighting.png" alt="Use Lighting" style={{ position: 'absolute', left: mousePosition.x, top: mousePosition.y, transform: 'translate(-50%, -51%)' }} />
