@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './TaskButton.css';
 import TaskDialog from './TaskDialog';
 
-const TaskButton = ({ onAddHabit, onAddDaily, onAddTodo }) => {
+const TaskButton = ({ onAddHabit, onAddDaily, onAddTodo, onAddReward}) => {
     const [showMenu, setShowMenu] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [dialogTitle, setDialogTitle] = useState('');
@@ -55,6 +55,15 @@ const TaskButton = ({ onAddHabit, onAddDaily, onAddTodo }) => {
                     completed: false
                 };
                 break;
+            case 'Create Reward':
+                createFunction = onAddReward;
+                newItem = {
+                    id: Date.now(),
+                    content: habitTitle,
+                    notes: habitNotes,
+                    price: 10
+                };
+                break;
             default:
                 console.warn('Unknown task type:', dialogTitle);
                 return;
@@ -92,12 +101,11 @@ const TaskButton = ({ onAddHabit, onAddDaily, onAddTodo }) => {
                         <img src="/todo.png" alt="To Do" className="menu-icon" />
                         To Do
                     </button>
-                    {/* develop reward feature in next iteration
                     <button className="menu-item" onClick={() => handleMenuItemClick('Reward')}>
                         <img src="/reward.png" alt="Reward" className="menu-icon" />
                         Reward
                     </button>
-                    */}
+                    
                 </div>
             )}
 

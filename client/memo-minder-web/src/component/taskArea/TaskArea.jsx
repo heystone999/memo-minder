@@ -3,14 +3,15 @@ import './TaskArea.css';
 import TaskButton from '../taskButton/TaskButton';
 import React, { useState} from 'react';
 import TaskAreaDialog from './TaskAreaDialog';
-
+import Popup from '../popup/Popup';
 
 const TaskArea = ({ 
-    updateHealth, updateLevel, updateCoin,
-    habits = [], dailies = [], todos = [],
+    updateHealth, updateLevel, coin, updateCoin, decreaseCoin,
+    habits = [], dailies = [], todos = [], rewards = [],
     onAddHabit, onUpdateHabit, onDeleteHabit,
     onAddDaily, onUpdateDaily, onDeleteDaily,
     onAddTodo, onUpdateTodo, onDeleteTodo,
+    onAddReward, onUpdateReward, onDeleteReward,
     onClear,
 
 }) => {
@@ -20,8 +21,9 @@ const TaskArea = ({
     const [habitInput, setHabitInput] = useState('');
     const [dailyInput, setDailyInput] = useState('');
     const [todoInput, setTodoInput] = useState('');
+    const [rewardInput, setRewardInput] = useState('');
 
-    // Enter to add a habit, daily, to-do
+    // Enter to add a habit, daily, to-do, reward
     const handleItemKeyPress = (input, setInput, addItem, itemOptions) => (event) => {
         if (event.key === 'Enter') {
             const trimmedInput = input.trim();
@@ -40,6 +42,7 @@ const TaskArea = ({
     const handleHabitKeyPress = handleItemKeyPress(habitInput, setHabitInput, onAddHabit, { positive: true, negative: true });
     const handleDailyKeyPress = handleItemKeyPress(dailyInput, setDailyInput, onAddDaily, { completed: false });
     const handleTodoKeyPress = handleItemKeyPress(todoInput, setTodoInput, onAddTodo, { completed: false });
+    const handleRewardKeyPress = handleItemKeyPress(rewardInput, setRewardInput, onAddReward, {price: 10});
    
     // handle habit button
     const handlePositiveClick = (habitId) => {
@@ -57,6 +60,28 @@ const TaskArea = ({
         //addMessage("You lose some Health", 'negative');
         updateHealth(); 
         console.log('After updateHealth called');
+    };
+
+    const handlePayReward = (rewardId) => {
+        const reward = rewards.find(p => p.id === rewardId);
+        if (coin >= reward.price){
+            decreaseCoin(reward.price);
+            showCustomPopup("Purchase Successful", `You have successfully purchased: ${reward.content}.`, "rgba(8,186,255, 0.7)"); 
+        } else {
+            showCustomPopup ("Purchase Failed", "You do not have enough coins.", "rgba(243, 97, 105, 0.7)");
+        }
+        
+    }
+    /* shopArea Popup */
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState({ title: '', body: '', background_color: ''});
+    const closePopup = () => {
+        setShowPopup(false);
+    };
+    const showCustomPopup = (title, body, background_color) => {
+        console.log('showCustomPopup called')
+        setPopupMessage({ title, body, background_color });
+        setShowPopup(true);
     };
 
     // handle message indicating experience changes
@@ -94,6 +119,9 @@ const TaskArea = ({
             case 'To-Do':
                 onUpdateTodo(updatedItem);
                 break;
+            case 'Reward':
+                onUpdateReward(updatedItem);
+                break;
             default:
                 // Handle unknown type if necessary
                 break;
@@ -113,6 +141,9 @@ const TaskArea = ({
             case 'To-Do':
                 onDeleteTodo(itemToDelete.id);
                 break;
+            case 'Reward':
+                onDeleteReward(itemToDelete.id);
+                break;
             default:
                 // Handle unknown type if necessary
                 break;
@@ -120,6 +151,7 @@ const TaskArea = ({
         setEditDialogVisible(false);
     };
 
+    // daily and to-do tasks completion
     const toggleItemCompletion = (items, updateItem) => (id, completed) => {
         // Find the item to update
         const itemToUpdate = items.find(item => item.id === id);
@@ -130,6 +162,7 @@ const TaskArea = ({
     };
     const toggleDailyCompletion = toggleItemCompletion(dailies, onUpdateDaily);
     const toggleTodoCompletion = toggleItemCompletion(todos, onUpdateTodo);
+    
     //handle marking a daily as due or completed
     const markDailyAsCompleted = (dailyId) => {
         toggleDailyCompletion(dailyId, true);
@@ -152,6 +185,7 @@ const TaskArea = ({
     const [selectedHabitTab, setSelectedHabitTab] = useState('All');
     const [selectedDailyTab, setSelectedDailyTab] = useState('All');
     const [selectedTodoTab, setSelectedTodoTab] = useState('All');
+ 
     // Generic function to filter items based on tab selection
     const filterItemsByTab = (items, selectedTab, tabMap) => {
         switch (selectedTab) {
@@ -184,21 +218,14 @@ const TaskArea = ({
         condition2: (item) => item.completed
       };
 
-    //  // keep track of the selected tab
+    //  keep track of the selected tab
     const filteredHabits = filterItemsByTab(habits, selectedHabitTab, habitTabMap);
     const filteredDailies = filterItemsByTab(dailies, selectedDailyTab, dailyTabMap);
     const filteredTodos = filterItemsByTab(todos, selectedTodoTab, todoTabMap);
 
     return (
         <div className="taskAreaContainer">
-            {/*
-            <div className="messageContainer" style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 1000 }}>
-                {messages.map(msg => (
-                    <div key={msg.id} className={`message ${msg.type}`}>
-                        {msg.text}
-                    </div>
-                ))}
-            </div> */}
+            <Popup show={showPopup} onClose={closePopup} message={popupMessage} />
             <div className="controlButton">
                 <div className="clearButtonContainer">
                     <button onClick={onClear} className="clearButton">Clear and Reset</button>
@@ -207,6 +234,7 @@ const TaskArea = ({
                     onAddHabit={onAddHabit}
                     onAddDaily={onAddDaily}
                     onAddTodo={onAddTodo}
+                    onAddReward = {onAddReward}
                 />
             </div>
             <div className="taskAreaSections">
@@ -216,8 +244,8 @@ const TaskArea = ({
                     {/* First version: Weak/ Strong features change to Good/Bad habits*/}
                     <div className="taskAreaNav">
                         <button onClick={() => setSelectedHabitTab ("All")}>All</button>
-                        <button onClick={() => setSelectedHabitTab ("Good Habits")}>Good Habits</button> 
-                        <button onClick={() => setSelectedHabitTab ("Bad Habits")}>Bad Habits</button>
+                        <button onClick={() => setSelectedHabitTab ("Good Habits")}>Good</button> 
+                        <button onClick={() => setSelectedHabitTab ("Bad Habits")}>Bad</button>
                     </div>
                     <div className="contentContainer">
                         <div className="habitInputContainer">
@@ -330,12 +358,10 @@ const TaskArea = ({
                 </div>
 
                 {/* Rewards Section */}
-                {/*<div className="taskAreaSection">
+                <div className="taskAreaSection">
                     <h2>Rewards</h2>
                     <div className="taskAreaNav">
                         <button>All</button>
-                        <button>Custom</button>
-                        <button>Wishlist</button>
                     </div>
                     <div className="contentContainer">
                         <div className="rewardInputContainer">
@@ -350,14 +376,19 @@ const TaskArea = ({
                         </div>
                         <div className="taskList">
                             {rewards.map(reward => (
-                                <div className="rewardItem" key={reward.id} onClick={() => handleItemClick(reward, 'Reward')}>
-                                    <button>+</button>
-                                    <p>{reward.content}</p>
+                                <div className="rewardItem" key={reward.id}>
+                                    <button onClick={() => handlePayReward(reward.id)}>
+                                        {reward.price} coins
+                                    </button>
+                                    <p onClick={() => 
+                                        handleItemClick(reward, 'Reward')}>{reward.content}
+                                    </p>
+                                    
                                 </div>
                             ))}
                         </div>
                     </div> 
-                </div> */}
+                </div>
 
             </div>
             {editDialogVisible && editingItem && (
