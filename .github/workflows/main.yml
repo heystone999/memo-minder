@@ -29,13 +29,16 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: frontend-coverage-report
-        path: client/memo-minder-web/coverage/index.html
+        path: client/memo-minder-web/coverage
 
-    - name: Set coverage report output
-      run: echo "coverage_report=https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> $GITHUB_ENV
+    - name: Deploy test report to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./coverage
 
     - name: Display coverage report link
-      run: echo "Coverage report is available at $coverage_report"
+      run: echo "Coverage report is available at https://${{ github.repository }}/coverage/index.html"
 
   backend-build-and-test:
     runs-on: ubuntu-latest
