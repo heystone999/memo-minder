@@ -31,12 +31,11 @@ jobs:
         name: frontend-coverage-report
         path: client/memo-minder-web/coverage/index.html
 
-    - name: Get coverage report link
-      id: coverage-report-link
-      run: echo "::set-output name=coverage_report::https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+    - name: Set coverage report output
+      run: echo "coverage_report=https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> $GITHUB_ENV
 
     - name: Display coverage report link
-      run: echo "Coverage report is available at ${{ steps.coverage-report-link.outputs.coverage_report }}"
+      run: echo "Coverage report is available at $coverage_report"
 
   backend-build-and-test:
     runs-on: ubuntu-latest
