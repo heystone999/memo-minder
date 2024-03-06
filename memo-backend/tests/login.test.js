@@ -1,7 +1,7 @@
 const supertest = require('supertest');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const app = require('../app'); 
+const app = require('../app');
 const User = require('../models/user');
 
 const api = supertest(app);
@@ -13,7 +13,7 @@ describe('Login endpoint', () => {
     const user = new User({
       username: 'testuser',
       passwordHash: passwordHash,
-      name: 'Test User'
+      email: 'testemail@mail.com'
     });
     await user.save();
   });
@@ -27,7 +27,7 @@ describe('Login endpoint', () => {
 
     expect(response.body.token).toBeDefined();
     expect(response.body.username).toBe('testuser');
-    expect(response.body.name).toBe('Test User');
+    expect(response.body.email).toBe('testemail@mail.com');
   });
 
   test('Login with incorrect credentials should return 401', async () => {
