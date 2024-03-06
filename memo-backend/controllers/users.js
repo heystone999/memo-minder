@@ -19,12 +19,17 @@ usersRouter.post('/', async (request, response) => {
     return response.status(400).json({ error: 'password must be at least 3 characters long' })
   }
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!body.email || !emailRegex.test(body.email)) {
+    return response.status(400).json({ error: 'invalid email address' })
+  }
+
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(body.password, saltRounds)
 
   const user = new User({
     username: body.username,
-    name: body.name,
+    email: body.email,
     passwordHash
   })
 
