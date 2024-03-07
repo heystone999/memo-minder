@@ -21,6 +21,8 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+
+// Route to add one habit for a specific user
 router.post('/', verifyToken, async (req, res) => {
   try {
     const { title, note, type } = req.body;
@@ -57,6 +59,7 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
+
 // Route to fetch all habits for a specific user
 router.get('/user/:userId', verifyToken, async (req, res) => {
   try {
@@ -72,6 +75,44 @@ router.get('/user/:userId', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+// Route to modify a habit (update title and note)
+router.put('/:habitId', verifyToken, async (req, res) => {
+  try {
+    const habitId = req.params.habitId;
+    const userId = req.user.id;
+    const { title, note } = req.body;
+
+    // Check if title or note is provided
+    if (!title && !note) {
+      return res.status(400).json({ message: 'Title or note is required for modification' });
+    }
+
+    // Find the habit and ensure it belongs to the authenticated user
+    const habit = await Habit.findOne({ _id: habitId, user: userId });
+    if (!habit) {
+      return res.status(404).json({ message: 'Habit not found' });
+    }
+
+    // Update the habit with new title and note if provided
+    if (title) {
+      habit.title = title;
+    }
+    if (note) {
+      habit.note = note;
+    }
+
+    // Save the updated habit
+    await habit.save();
+
+    res.status(200).json({ message: 'Habit modified successfully', habit });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 // Route to delete a habit
 router.delete('/:habitId', verifyToken, async (req, res) => {

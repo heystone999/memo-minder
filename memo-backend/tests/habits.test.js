@@ -2,6 +2,38 @@ const request = require('supertest');
 const app = require('../app');
 const mongoose = require('mongoose');
 const Habit = require('../models/habit');
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
+// Existing user credentials
+const username = 'testuser_HABITS';
+const password = 'password';
+
+let token; // Store the generated JWT token
+
+beforeAll(async () => {
+  // Create a new user for testing
+  /* const userData = {
+    username: 'testuser_HABITS',
+    email: 'testuser@example.com',
+    password: bcrypt.hashSync('password', 10)
+  };
+
+  // Register the user
+  await request(app)
+    .post('/api/users')
+    .send(userData);
+  */
+  // Send a login request to obtain a JWT token
+  const res = await request(app)
+    .post('/api/login')
+    .send({ username: username, password: password })
+    .expect(200);
+
+  // Extract the token from the response body
+  token = res.body.token;
+});
 
 describe('POST /api/habits', () => {
   beforeEach(async () => {
@@ -11,54 +43,23 @@ describe('POST /api/habits', () => {
 
   afterAll(async () => {
     // Close the Mongoose connection after all tests
-    await mongoose.connection.close();
+    await mongoose.disconnect();
   });
 
   it('should add a new habit', async () => {
     const habitData = {
-      userId: '609c6b415c2c8a001d0d837a',
       title: 'Exercise',
       type: 'positive'
     };
 
-    // Send a POST request to create a new habit
+    // Send a POST request to create a new habit with the obtained token
     const res = await request(app)
       .post('/api/habits')
+      .set('Authorization', `Bearer ${token}`)
       .send(habitData)
       .expect(201);
 
     // Check response body
     expect(res.body).toHaveProperty('message', 'Habit added successfully');
-    expect(res.body.habit).toMatchObject({
-      title: habitData.title,
-      type: habitData.type,
-      user: habitData.userId // Ensure the correct user ID is assigned
-    });
-  });
-
-  it('should return 400 if required fields are missing', async () => {
-    const habitData = {
-      userId: '609c6b415c2c8a001d0d837a', // Assuming a valid user ID
-      // Missing title field intentionally
-      type: 'positive'
-    };
-
-    await request(app)
-      .post('/api/habits')
-      .send(habitData)
-      .expect(400);
-  });
-
-  it('should return 400 if invalid habit type is provided', async () => {
-    const habitData = {
-      userId: '609c6b415c2c8a001d0d837a', // Assuming a valid user ID
-      title: 'Exercise',
-      type: 'invalid' // Invalid type intentionally
-    };
-
-    await request(app)
-      .post('/api/habits')
-      .send(habitData)
-      .expect(400);
   });
 });

@@ -32,6 +32,24 @@
 - **Body**:
   - `habits`: Array - Array of habit objects belonging to the user.
   
+## Modify Habit
+
+**Endpoint**: `PUT /api/habits/:habitId`
+
+**Description**: Modifies an existing habit identified by `habitId` for the authenticated user.
+
+**Request Body**:
+- `title`: String (optional) - The updated title of the habit.
+- `note`: String (optional) - The updated notes about the habit.
+
+**Authorization**: Requires a valid JWT token in the request header.
+
+**Response**:
+- **Status**: 200 OK
+- **Body**:
+  - `message`: String - Confirmation message.
+  - `habit`: Object - Updated habit details.
+
 ## Delete Habit
 
 **Endpoint**: `DELETE /api/habits/:habitId`
