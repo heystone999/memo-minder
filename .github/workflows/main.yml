@@ -34,7 +34,7 @@ jobs:
     - name: Deploy test report to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.TOKEN_FOR_MEMO }}
         publish_dir: ./coverage
 
     - name: Display coverage report link
