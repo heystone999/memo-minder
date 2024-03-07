@@ -31,6 +31,23 @@ jobs:
         name: frontend-coverage-report
         path: client/memo-minder-web/coverage
 
+    - name: Debug log
+      run: |
+        cd client/memo-minder-web
+        ls -al
+
+    - name: Download coverage report artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: frontend-coverage-report
+        path: client/memo-minder-web/coverage
+
+    - name: Deploy coverage report to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.TOKEN_FOR_MEMO }}
+        publish_dir: client/memo-minder-web/coverage
+          
     - name: Deploy test report to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
