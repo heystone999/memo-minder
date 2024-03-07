@@ -35,10 +35,10 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.TOKEN_FOR_MEMO }}
-        publish_dir: ./coverage
+        publish_dir: client/memo-minder-web/coverage
 
     - name: Display coverage report link
-      run: echo "Coverage report is available at https://${{ github.repository }}/coverage/index.html"
+      run: echo "Coverage report is available at https://${{ github.repository }}/client/memo-minder-web/coverage/index.html"
 
   backend-build-and-test:
     runs-on: ubuntu-latest
