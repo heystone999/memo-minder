@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
@@ -48,4 +48,3 @@ jobs:
         annotations: none
         custom-title: Coverage report for backend
         test-script: npm test
-        coverage-file: report.json
