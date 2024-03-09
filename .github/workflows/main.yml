@@ -6,7 +6,12 @@ on:
       - develop
 
 jobs:
+
   frontend-build-and-test:
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
     runs-on: ubuntu-latest
 
     steps:
@@ -18,9 +23,14 @@ jobs:
       with:
         node-version: '18.x'
 
+    - name: Find current PR
+      id: findPr
+      uses: jwalton/gh-find-current-pr@v1
+
     - name: Jest coverage report
-      uses: ArtiomTr/jest-coverage-report-action@v2.3.0
+      uses: ArtiomTr/jest-coverage-report-action@v2
       with:
+        prnumber: ${{ steps.findPr.outputs.number }}
         working-directory: ./client/memo-minder-web
         github-token: ${{ secrets.TOKEN_FOR_MEMO }}
         annotations: none
