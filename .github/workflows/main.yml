@@ -47,4 +47,3 @@ jobs:
         github-token: ${{ secrets.TOKEN_FOR_MEMO }}
         annotations: none
         custom-title: Coverage report for backend
-        test-script: npm test
