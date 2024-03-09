@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import {
   createBrowserRouter,
@@ -15,7 +16,7 @@ import ShopArea from "./component/shopArea/ShopArea";
 import ChallengeArea from './component/challengeArea/ChallengeArea';
 import Popup from './component/popup/Popup';
 
-
+import {BASE_URL, STATUS_CODE, SERVER_API} from './utils/constants'
 // function to create default items for TaskArea
 const createDefaultItem = (content, options = {}) => ({
   id: Date.now(),
@@ -127,7 +128,64 @@ function App() {
   const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('todos')) || [defaultTodo]);
   const [rewards, setRewards] = useState(() => JSON.parse(localStorage.getItem('rewards')) || [defaultReward]); 
   
-  const addHabit = (habit) => {setHabits(prev => [...prev, habit])};
+  // TODO: 账号信息如何管理？全局变量？Context？props传 随用随取？
+  // TODO: task数据从server获取后 增删改的回调函数逻辑是否可以挪回组件内部
+  let validToken;
+
+  const login = async(username, password) => {
+    try {
+      const response = await axios.post(BASE_URL + SERVER_API.LOGIN, {
+        // TODO: delete the stub username/psw when login is integrated with backend
+        'username': username ?? 'Yue',
+        'password': password ?? 'yue@memominder'
+      });
+      console.debug('login success:', response.status);
+      return response?.data?.token;
+    } catch (error) {
+      return Promise.reject(error)
+    }
+  };
+
+  let retryCount = 0;
+
+  const addHabitToServer = async (habit) => {
+    try {
+      console.debug('addHabitToServer:', habit);
+      if (!habit?.content || !habit?.notes) {
+        console.warn('invalid habit, no need to post');
+        return;
+      }
+      if (!validToken) {
+        validToken = await login();   
+      }
+      const response = await axios.post(BASE_URL + SERVER_API.ADD_HABIT, {
+        'title': habit.content,
+        'type': habit.positive && habit.negative ? 'both' : !habit.positive && !habit.negative ? 'neutral' : habit.positive ? 'positive' : 'negative',
+        'note': habit.notes
+      }, {
+        headers: {
+          'Authorization': validToken,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.debug('post new habit success:', response.status);
+    } catch (error) {
+      if (error.response.status === STATUS_CODE.UNAUTHORIZED && retryCount < 1) {
+        validToken = null;
+        retryCount++;
+        addHabitToServer(habit);
+      } else {
+        retryCount = 0;
+      }
+      console.warn('post new habit error:', error);
+    }
+  };
+
+  const addHabit = (habit) => {
+    setHabits(prev => [...prev, habit])
+    addHabitToServer(habit);
+  };
+
   const addDaily = (daily) => {setDailies(prev => [...prev, daily])};
   const addTodo = (todo) => {setTodos(prev => [...prev, todo]);};
   const addReward = (reward) => {setRewards(prev => [...prev, reward]);};
