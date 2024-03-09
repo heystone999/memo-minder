@@ -23,6 +23,8 @@ jobs:
       with:
         working-directory: ./client/memo-minder-web
         github-token: ${{ secrets.TOKEN_FOR_MEMO }}
+        annotations: none
+        test-script: npm test
             
   backend-build-and-test:
     runs-on: ubuntu-latest
