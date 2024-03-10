@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import "./NavBar.css";
 import React, { useState } from "react";
 
-function Navbar({ coin, showTaskArea, showShop, showChallenge, showMilestones, handleTaskClick, handleShopClick, handleMilestonesClick, handleChallengeClick }) {
+function Navbar({ coin, showTaskArea, showShop, showChallenge, showMilestones, handleTaskClick, handleShopClick, handleChallengeClick, handleMilestonesClick }) {
   const [open, setOpen] = useState(false);
 
   const handleShopLinkClick = () => {

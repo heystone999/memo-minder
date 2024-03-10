@@ -268,7 +268,7 @@ function App() {
   };
   /*-Transfer for different Areas end-*/
 
-  const Layout = ({ showTaskArea, showShop, showChallenge, handleTaskClick, handleShopClick, handleChallengeClick, handleMilestonesClick }) => {
+  const Layout = ({ showTaskArea, showShop, showChallenge, showMilestones, handleTaskClick, handleShopClick, handleChallengeClick, handleMilestonesClick }) => {
     
     return (
         <div>
