@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import "./NavBar.css";
 import React, { useState } from "react";
 
-function Navbar({ coin, showTaskArea, showShop, showChallenge, handleTaskClick, handleShopClick, handleChallengeClick }) {
+function Navbar({ coin, showTaskArea, showShop, showChallenge, showMilestones, handleTaskClick, handleShopClick, handleMilestonesClick, handleChallengeClick }) {
   const [open, setOpen] = useState(false);
 
   const handleShopLinkClick = () => {
@@ -13,6 +13,12 @@ function Navbar({ coin, showTaskArea, showShop, showChallenge, handleTaskClick, 
   const handleChallengeLinkClick = () => {
     setOpen(false); 
     handleChallengeClick(); 
+    scrollToBottom(); // scroll to the end of the page
+  };
+
+  const handleMilestonesLinkClick = () => {
+    setOpen(false);
+    handleMilestonesClick();
     scrollToBottom(); // scroll to the end of the page
   };
 
@@ -39,6 +45,9 @@ function Navbar({ coin, showTaskArea, showShop, showChallenge, handleTaskClick, 
         </Link>
         <Link to="/" onClick={handleChallengeLinkClick} className={showChallenge ? "active" : ""}>
           <span>Challenges</span>
+        </Link>
+        <Link to="/" onClick={handleMilestonesLinkClick} className={showMilestones ? "active" : ""}>
+          <span>Milestones</span>
         </Link>
       </div>
       <div className="nav-middle"></div>

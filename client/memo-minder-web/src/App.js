@@ -15,6 +15,7 @@ import TaskArea from './component/taskArea/TaskArea'
 import ShopArea from "./component/shopArea/ShopArea";
 import ChallengeArea from './component/challengeArea/ChallengeArea';
 import Popup from './component/popup/Popup';
+import MilestonesArea from './component/milestonesArea/MilestonesArea';
 
 import {BASE_URL, STATUS_CODE, SERVER_API} from './utils/constants'
 // function to create default items for TaskArea
@@ -242,22 +243,32 @@ function App() {
   const [showTaskArea, setShowTaskArea] = useState(true);
   const [showShop, setShowShop] = useState(false);
   const [showChallenge, setShowChallenge] = useState(false);
+  const [showMilestones, setShowMilestones] = useState(false);
   const handleTaskClick = () => {
     setShowTaskArea(true);
     setShowShop(false);
+    setShowMilestones(false);
   };
   const handleShopClick = () => {
     setShowTaskArea(false);
     setShowShop(true);
+    setShowMilestones(false);
   };
   const handleChallengeClick = () => {
     setShowTaskArea(false);
     setShowShop(false);
     setShowChallenge(true);
+    setShowMilestones(false);
+  };
+  const handleMilestonesClick = () => {
+    setShowTaskArea(false);
+    setShowShop(false);
+    setShowChallenge(false);
+    setShowMilestones(true);
   };
   /*-Transfer for different Areas end-*/
 
-  const Layout = ({ showTaskArea, showShop, showChallenge, handleTaskClick, handleShopClick, handleChallengeClick }) => {
+  const Layout = ({ showTaskArea, showShop, showChallenge, handleTaskClick, handleShopClick, handleChallengeClick, handleMilestonesClick }) => {
     
     return (
         <div>
@@ -266,6 +277,7 @@ function App() {
                 handleTaskClick={handleTaskClick}
                 handleShopClick={handleShopClick}
                 handleChallengeClick={handleChallengeClick}
+                handleMilestonesClick={handleMilestonesClick}
                 coin={coin}
             />
             <div style={{ display: "flex", flexDirection: "column" }}>
@@ -302,9 +314,10 @@ function App() {
                       />
                   ) : showShop ? (
                       <ShopArea coin={coin} updateCoin={updateCoin} decreaseCoin={decreaseCoin}/>
-                  ) : (
+                  ) : showChallenge ? (
                       <ChallengeArea />
-                  )}
+                  ) : <MilestonesArea/>
+                }
               </div>
 
             </div>
@@ -336,9 +349,11 @@ function App() {
             showTaskArea={showTaskArea}
             showShop={showShop}
             showChallenge={showChallenge}
+            showMilestones={showMilestones}
             handleTaskClick={handleTaskClick}
             handleShopClick={handleShopClick}
             handleChallengeClick={handleChallengeClick}
+            handleMilestonesClick={handleMilestonesClick}
         />
         </ProtectedRoute>,
       children:[
