@@ -15,6 +15,9 @@
 - **Status**: 201 Created
 - **Body**:
   - `message`: String - Confirmation message.
+  - `username`: String - The username of the user.
+  - `email`: String - The email address of the user.
+  - `id`: String - userId.
 
 ## Login
 
@@ -31,3 +34,6 @@
 - **Body**:
   - `message`: String - Confirmation message.
   - `token`: String - JWT token for authentication.
+  - `username`: String - The username of the user.
+  - `email`: String - The email address of the user.
+  - `id`: String - userId.
