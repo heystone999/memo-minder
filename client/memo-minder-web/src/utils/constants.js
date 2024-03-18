@@ -1,3 +1,4 @@
+// constants.js
 export const BASE_URL = 'https://memo-minder.onrender.com';
 
 export const STATUS_CODE = {
@@ -8,5 +9,8 @@ export const STATUS_CODE = {
 
 export const SERVER_API = {
     LOGIN: '/api/login',
-    ADD_HABIT: '/api/habits'
+    ADD_HABIT: '/api/habits',
+    FETCH_HABIT: '/api/habits/user/:userId',
+    MODIFY_HABIT: '/api/habits/:habitId',
+    DELETE_HABIT: '/api/habits/:habitId',
 }

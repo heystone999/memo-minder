@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -16,8 +16,8 @@ import ShopArea from "./component/shopArea/ShopArea";
 import ChallengeArea from './component/challengeArea/ChallengeArea';
 import Popup from './component/popup/Popup';
 import MilestonesArea from './component/milestonesArea/MilestonesArea';
-
 import {BASE_URL, STATUS_CODE, SERVER_API} from './utils/constants'
+
 // function to create default items for TaskArea
 const createDefaultItem = (content, options = {}) => ({
   id: Date.now(),
@@ -119,25 +119,27 @@ function App() {
   Habit, Daily, To-do, reward
   */
   // initialize with default tasks and  add a new habit, daily, to-do, reward to the task lists
-  const defaultHabit = createDefaultItem('Your default habit', { positive: true, negative: true });
+  //const defaultHabit = createDefaultItem('Your default habit', { positive: true, negative: true });
   const defaultDaily = createDefaultItem('Your default daily', { completed: false });
   const defaultTodo = createDefaultItem('Your default to-do', { completed: false });
   const defaultReward = createDefaultItem('Your default reward', { price: 10});
 
-  const [habits, setHabits] = useState(() => JSON.parse(localStorage.getItem('habits')) || [defaultHabit]);
+  //const [habits, setHabits] = useState(() => JSON.parse(localStorage.getItem('habits')) || [defaultHabit]);
   const [dailies, setDailies] = useState(() => JSON.parse(localStorage.getItem('dailies')) || [defaultDaily]);
   const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('todos')) || [defaultTodo]);
   const [rewards, setRewards] = useState(() => JSON.parse(localStorage.getItem('rewards')) || [defaultReward]); 
   
-  // TODO: 账号信息如何管理？全局变量？Context？props传 随用随取？
-  // TODO: task数据从server获取后 增删改的回调函数逻辑是否可以挪回组件内部
-  let validToken;
+  const [habits, setHabits] = useState([]); 
 
+  // TODO: 账号信息如何管理？全局变量？Context？props传 随用随取？
+  // TODO: task数据从server获取后 增删改的回调函数逻辑是否回组件内部
+  let validToken;
+  
   const login = async(username, password) => {
     try {
       const response = await axios.post(BASE_URL + SERVER_API.LOGIN, {
         // TODO: delete the stub username/psw when login is integrated with backend
-        'username': username ?? 'Yue',
+        'username': username ?? 'yue',
         'password': password ?? 'yue@memominder'
       });
       console.debug('login success:', response.status);
@@ -147,8 +149,41 @@ function App() {
     }
   };
 
-  let retryCount = 0;
+    // 暂时用yue实例的id和token来测试 fetchHabits, updateHabit, 和 deleteHabit 功能
+    
+    const yueUserId = '65f85c5b9a50e568364f9856'; // 从Postman获取的id
+    // inside component
+    const fetchHabits = useCallback(async () => {
+      try {
+        const fetchHabitsUrl = `${BASE_URL}${SERVER_API.FETCH_HABIT.replace(':userId', yueUserId)}`;
+        if (!validToken) {
+          validToken = await login();   
+        }
+        const response = await axios.get(fetchHabitsUrl, {
+          headers: {
+            'Authorization': validToken,
+          },
+        });
+  
+        console.log('Fetched habits:', response.data);
+        // Assuming the habits are in response.data.habits
+        if (response.data && Array.isArray(response.data.habits)) {
+          setHabits(response.data.habits);
+          console.log('Habits state after update:', habits);
+        } else {
+          console.error('Data fetched is not in the expected format:', response.data);
+        }
+  
+      } catch (error) {
+        console.error('Failed to fetch habits:', error);
+      }
+    },[]);
+  
+    useEffect(() => {
+      fetchHabits();
+    }, [fetchHabits]);
 
+  let retryCount = 0;
   const addHabitToServer = async (habit) => {
     try {
       console.debug('addHabitToServer:', habit);
@@ -181,15 +216,86 @@ function App() {
       console.warn('post new habit error:', error);
     }
   };
-
   const addHabit = (habit) => {
     setHabits(prev => [...prev, habit])
     addHabitToServer(habit);
+    fetchHabits();
   };
 
   const addDaily = (daily) => {setDailies(prev => [...prev, daily])};
   const addTodo = (todo) => {setTodos(prev => [...prev, todo]);};
   const addReward = (reward) => {setRewards(prev => [...prev, reward]);};
+
+  //update habit
+  const updateHabitToServer = async (habitId, updatedHabit) => {
+    try {
+      console.debug('updateHabitToServer:', updatedHabit);
+      if (!updatedHabit?.content || !updatedHabit?.notes) {
+        console.warn('invalid habit update, missing content or notes');
+        return;
+      }
+      if (!validToken) {
+        validToken = await login();
+      }
+      const updateHabitsUrl = `${BASE_URL}${SERVER_API.MODIFY_HABIT.replace(':habitId', habitId)}`;
+      const response = await axios.put(updateHabitsUrl , {
+        'title': updatedHabit.content,
+        'type': updatedHabit.positive && updatedHabit.negative ? 'both' : !updatedHabit.positive && !updatedHabit.negative ? 'neutral' : updatedHabit.positive ? 'positive' : 'negative',
+        'note': updatedHabit.notes
+      }, {
+        headers: {
+          'Authorization': validToken,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.debug('update habit success:', response.status);
+    } catch (error) {
+      if (error.response && error.response.status === STATUS_CODE.UNAUTHORIZED && retryCount < 1) {
+        validToken = null;
+        retryCount++;
+        updateHabitToServer(habitId, updatedHabit); // Retry the update after re-login
+      } else {
+        retryCount = 0;
+        console.error('update habit error:', error);
+      }
+    }
+  };
+
+  const updateHabit = async (habitId, updatedHabit) => {
+    await updateHabitToServer(habitId, updatedHabit);
+    fetchHabits(); 
+  };
+
+  
+  //delete habit
+  const deleteHabitFromServer = async (habitId) => {
+    try {
+      console.debug('deleteHabitFromServer:', habitId);
+      if (!validToken) {
+        validToken = await login();
+      }
+      const deleteHabitsUrl = `${BASE_URL}${SERVER_API.DELETE_HABIT.replace(':habitId', habitId)}`;
+      const response = await axios.delete(deleteHabitsUrl, {
+        headers: {
+          'Authorization': validToken
+        }
+      });
+      console.debug('delete habit success:', response.status);
+    } catch (error) {
+      if (error.response && error.response.status === STATUS_CODE.UNAUTHORIZED && retryCount < 1) {
+        validToken = null;
+        retryCount++;
+        deleteHabitFromServer(habitId); // Retry the delete after re-login
+      } else {
+        retryCount = 0;
+        console.error('delete habit error:', error);
+      }
+    }
+  };
+  const deleteHabit = async (habitId) => {
+    await deleteHabitFromServer(habitId);
+    fetchHabits(); // 重新获取习惯列表以更新UI
+  };
 
   //update an existing habit, daily, to-do, reward
   const createUpdater = (setter) => (updatedItem) => {
@@ -202,7 +308,6 @@ function App() {
       });
     });
   };
-  const updateHabit = createUpdater(setHabits);
   const updateDaily = createUpdater(setDailies);
   const updateTodo = createUpdater(setTodos);
   const updateReward = createUpdater(setRewards);
@@ -211,24 +316,23 @@ function App() {
   const createDeleter = (setter) => (itemId) => {
     setter((prevItems) => prevItems.filter((item) => item.id !== itemId));
   };
-  const deleteHabit = createDeleter(setHabits);
   const deleteDaily = createDeleter(setDailies);
   const deleteTodo = createDeleter(setTodos);
   const deleteReward = createDeleter(setRewards);
 
   useEffect(() => {
     // save habits, dailies, todos, rewards to local storage whenever it changes
-    localStorage.setItem('habits', JSON.stringify(habits));
+    //localStorage.setItem('habits', JSON.stringify(habits));
     localStorage.setItem('dailies', JSON.stringify(dailies));
     localStorage.setItem('todos', JSON.stringify(todos));
     localStorage.setItem('rewards', JSON.stringify(rewards));
-  }, [habits, dailies, todos, rewards]); 
+  }, [dailies, todos, rewards]); 
 
   const clearStorageAndResetStates = () => {
     // clear all localStorage
     localStorage.clear();
     // update to default state
-    setHabits([defaultHabit]); 
+    setHabits(habits); 
     setDailies([defaultDaily]); 
     setTodos([defaultTodo]);
     setRewards([defaultReward]);

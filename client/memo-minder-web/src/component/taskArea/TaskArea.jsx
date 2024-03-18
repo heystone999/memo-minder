@@ -262,14 +262,14 @@ const TaskArea = ({
                         <div className="taskList">
                             {/* Individual Habit Item */}
                             {filteredHabits.map(habit => (
-                                <div className="habitItem" key={habit.id}>
+                                <div className="habitItem" key={habit._id}>
                                     {habit.positive && <button onClick={() => {
-                                        handlePositiveClick(habit.id);
+                                        handlePositiveClick(habit._id);
                                         
                                     }}>+</button>}
                                     <p onClick={() => handleItemClick(habit, 'Habit')}>{habit.content}</p>
                                     {habit.negative && <button onClick={() => {
-                                        handleNegativeClick(habit.id);
+                                        handleNegativeClick(habit._id);
                                         
                                     }}>-</button>}
                                 </div>
