@@ -16,8 +16,7 @@ const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 
 // set this to 1 if running a jest test
-const jest_test = 1
-
+const jest_test = 0
 if (jest_test) {
     mongoose.connect("mongodb+srv://stone:helsinki@cluster0.opxsuzi.mongodb.net/testMemo?retryWrites=true&w=majority");
 } else {
@@ -30,9 +29,9 @@ app.use(express.json())
 // app.use(express.static('build'))
 app.use(express.static(path.join(__dirname, 'build')));
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
-  });
+});
 
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
