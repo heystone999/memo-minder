@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import './TaskAreaDialog.css'; 
 
 const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
-  const [title, setTitle] = useState(item.content || '');
-  const [notes, setNotes] = useState(item.notes || '');
+  const [title, setTitle] = useState(item.title || '');
+  const [notes, setNotes] = useState(item.note || '');
   const [positive, setPositive] = useState(item.positive);
   const [negative, setNegative] = useState(item.negative);
   const [completed, setCompleted] = useState(item.completed);
@@ -22,14 +22,15 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
 
   useEffect(() => {
     // when item change the state will be updated
-    setTitle(item.content || '');
-    setNotes(item.notes || '');
+    setTitle(item.title || '');
+    setNotes(item.note || '');
     setPrice(item.price);
   }, [item]);
 
   const handleSave = () => {
     const updatedItem = {
       ...item,
+      habitId: item._id,
       content: title,
       notes,
     };
@@ -48,7 +49,13 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
   };
 
   const handleDelete = () => {
-    onDelete(item);
+    const deletedItem = {
+      ...item,
+      habitId: item._id,
+    };
+    onDelete(deletedItem);
+    console.log('Dialog - Habit to be delete:', deletedItem);
+    console.log('Dialog - HabitId to be delete:', deletedItem._id);
   };
 
   return (

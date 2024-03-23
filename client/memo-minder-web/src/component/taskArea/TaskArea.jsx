@@ -100,7 +100,8 @@ const TaskArea = ({
     const handleSaveItem = (updatedItem) => {
         switch (editingType) {
             case 'Habit':
-                onUpdateHabit(updatedItem);
+                const { habitId, ...rest } = updatedItem;
+                onUpdateHabit(habitId, rest);
                 break;
             case 'Daily':
                 onUpdateDaily(updatedItem);
@@ -122,7 +123,8 @@ const TaskArea = ({
     const handleDeleteItem = (itemToDelete) => {
         switch (editingType) {
             case 'Habit':
-                onDeleteHabit(itemToDelete.id);
+                const { habitId, ...rest } = itemToDelete;
+                onDeleteHabit(habitId);
                 break;
             case 'Daily':
                 onDeleteDaily(itemToDelete.id);

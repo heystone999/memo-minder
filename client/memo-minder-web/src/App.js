@@ -232,13 +232,11 @@ function App() {
   const updateHabitToServer = async (habitId, updatedHabit) => {
     try {
       console.debug('updateHabitToServer:', updatedHabit);
-      if (!updatedHabit?.content || !updatedHabit?.notes) {
-        console.warn('invalid habit update, missing content or notes');
-        return;
-      }
       if (!validToken) {
         validToken = await login();
       }
+      console.log('habit to be updated-old:',habitId)
+      console.log('habit to be updated-new:',updatedHabit)
       const updateHabitsUrl = `${BASE_URL}${SERVER_API.MODIFY_HABIT.replace(':habitId', habitId)}`;
       const response = await axios.put(updateHabitsUrl , {
         'title': updatedHabit.content,
@@ -276,6 +274,7 @@ function App() {
       if (!validToken) {
         validToken = await login();
       }
+      console.log('Habit to be delete:', habitId);
       const deleteHabitsUrl = `${BASE_URL}${SERVER_API.DELETE_HABIT.replace(':habitId', habitId)}`;
       const response = await axios.delete(deleteHabitsUrl, {
         headers: {
@@ -296,7 +295,7 @@ function App() {
   };
   const deleteHabit = async (habitId) => {
     await deleteHabitFromServer(habitId);
-    fetchHabits(); // 重新获取习惯列表以更新UI
+    fetchHabits();
   };
 
   //update an existing habit, daily, to-do, reward
