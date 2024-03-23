@@ -151,7 +151,7 @@ function App() {
 
     // 暂时用yue实例的id和token来测试 fetchHabits, updateHabit, 和 deleteHabit 功能
     
-    const yueUserId = '65f85c5b9a50e568364f9856'; // 从Postman获取的id
+    const yueUserId = '65f8ec123f2a091381b1e597'; // 从Postman获取的id
     // inside component
     const fetchHabits = useCallback(async () => {
       try {
@@ -166,6 +166,7 @@ function App() {
         });
   
         console.log('Fetched habits:', response.data);
+        console.log('Habits in response:', response.data.habits);
         // Assuming the habits are in response.data.habits
         if (response.data && Array.isArray(response.data.habits)) {
           setHabits(response.data.habits);
@@ -177,7 +178,7 @@ function App() {
       } catch (error) {
         console.error('Failed to fetch habits:', error);
       }
-    },[]);
+    },[validToken]);
   
     useEffect(() => {
       fetchHabits();
@@ -187,7 +188,8 @@ function App() {
   const addHabitToServer = async (habit) => {
     try {
       console.debug('addHabitToServer:', habit);
-      if (!habit?.content || !habit?.notes) {
+      //if (!habit?.content || !habit?.notes) {
+      if (!habit?.content) {
         console.warn('invalid habit, no need to post');
         return;
       }
@@ -332,7 +334,7 @@ function App() {
     // clear all localStorage
     localStorage.clear();
     // update to default state
-    setHabits(habits); 
+    // setHabits(habits); 
     setDailies([defaultDaily]); 
     setTodos([defaultTodo]);
     setRewards([defaultReward]);

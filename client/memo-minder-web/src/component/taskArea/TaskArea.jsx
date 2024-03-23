@@ -16,7 +16,7 @@ const TaskArea = ({
 
 }) => {
 
-
+    console.log('TaskArea habits prop:', habits);
     // handle with the inputs
     const [habitInput, setHabitInput] = useState('');
     const [dailyInput, setDailyInput] = useState('');
@@ -34,6 +34,7 @@ const TaskArea = ({
                     ...itemOptions
                 };
                 addItem(newItem);
+                console.log('New habits after adding:', newItem);
                 setInput('');
             }
         }
@@ -83,18 +84,6 @@ const TaskArea = ({
         setPopupMessage({ title, body, background_color });
         setShowPopup(true);
     };
-
-    // handle message indicating experience changes
-    /*
-    const [messages, setMessages] = useState([]);
-    const addMessage = (text, type) => {
-        const newMessage = { id: Date.now(), text, type };
-        setMessages(prevMessages => [...prevMessages, newMessage]);
-        setTimeout(() => {
-            setMessages(prevMessages => prevMessages.filter(msg => msg.id !== newMessage.id));
-        }, 5000);
-    };
-    */
 
     // handle within dialog
     const [editDialogVisible, setEditDialogVisible] = useState(false);
@@ -223,6 +212,9 @@ const TaskArea = ({
     const filteredDailies = filterItemsByTab(dailies, selectedDailyTab, dailyTabMap);
     const filteredTodos = filterItemsByTab(todos, selectedTodoTab, todoTabMap);
 
+    // Right before the return statement to log the filtered habits before rendering
+    console.log('Filtered habits before rendering:', filteredHabits);
+
     return (
         <div className="taskAreaContainer">
             <Popup show={showPopup} onClose={closePopup} message={popupMessage} />
@@ -261,19 +253,20 @@ const TaskArea = ({
                         {/* Habit List */}
                         <div className="taskList">
                             {/* Individual Habit Item */}
-                            {filteredHabits.map(habit => (
-                                <div className="habitItem" key={habit._id}>
-                                    {habit.positive && <button onClick={() => {
-                                        handlePositiveClick(habit._id);
-                                        
-                                    }}>+</button>}
-                                    <p onClick={() => handleItemClick(habit, 'Habit')}>{habit.content}</p>
-                                    {habit.negative && <button onClick={() => {
-                                        handleNegativeClick(habit._id);
-                                        
-                                    }}>-</button>}
-                                </div>
-                            ))}
+                            {filteredHabits.map(habit => {
+                                console.log('Rendering habit with key:', habit._id);
+                                return (
+                                    <div className="habitItem" key={habit._id}>
+                                      {(habit.type === 'positive' || habit.type === 'both') && (
+                                        <button onClick={() => handlePositiveClick(habit._id)}>+</button>
+                                      )}
+                                      <p onClick={() => handleItemClick(habit, 'Habit')}>{habit.title}</p>
+                                      {(habit.type === 'negative' || habit.type === 'both') && (
+                                        <button onClick={() => handleNegativeClick(habit._id)}>-</button>
+                                      )}
+                                    </div>
+                                  );
+                            })}
                             {/* Add more habit items here */}
                         </div>
                     </div>
