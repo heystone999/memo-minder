@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const app = require('../app');
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 const api = supertest(app);
 
@@ -16,6 +17,10 @@ describe('Login endpoint', () => {
       email: 'testemail@mail.com'
     });
     await user.save();
+  });
+
+  afterAll(async () => {
+    await mongoose.connection.close();
   });
 
   test('Login with correct credentials should return a token', async () => {
