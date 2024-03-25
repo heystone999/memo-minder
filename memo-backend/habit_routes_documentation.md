@@ -97,6 +97,6 @@
 - `title`: String - The title of the habit.
 - `note`: String (optional) - Additional notes about the habit.
 - `type`: String - The type of the habit (positive, negative, both, neutral).
-- `user`: String - The user ID to which the habit belongs.
 - `positiveCount`: Number (conditional) - The positive counter for the habit (available if type is positive or both).
 - `negativeCount`: Number (conditional) - The negative counter for the habit (available if type is negative or both).
+- `user`: String - The user ID to which the habit belongs.
