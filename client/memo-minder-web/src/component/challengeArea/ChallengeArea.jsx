@@ -16,6 +16,11 @@ const lightingAnimationFrames = ['lighting1.png', 'lighting2.png', 'lighting3.pn
 const bossImagesLeft = ['wolfgoleft1.png', 'wolfgoleft2.png'];
 const bossImagesRight = ['wolfgoright1.png', 'wolfgoright2.png'];
 
+// Define the level data
+const levels = [
+  { bossPosition: 95, bossHealth: 100, bossImages: bossImagesLeft }, // Level 1
+  // Define other levels here...
+];
 
 function ChallengeArea() {
   // initial state
@@ -48,14 +53,17 @@ function ChallengeArea() {
     setShowPopup(true);
   };
   // boss state
-  const [bossPosition, setBossPosition] = useState(95); // Initial boss position
-  const [bossHealth, setBossHealth] = useState(100); // 新增Boss血量状态
-  const [currentBossImage, setCurrentBossImage] = useState('wolfgoleft1.png');
+  const [currentLevel, setCurrentLevel] = useState(0); // Current level index
+  const [bossPosition, setBossPosition] = useState(levels[currentLevel].bossPosition); // Initial boss position
+  const [bossHealth, setBossHealth] = useState(levels[currentLevel].bossHealth); // Boss health state
+  const [currentBossImage, setCurrentBossImage] = useState(levels[currentLevel].bossImages[0]); // Initial boss image
   const bossImageIndex = useRef(0);
   // Add boss attack power
   const [bossAttackCooldown, setBossAttackCooldown] = useState(false); 
   const bossCooldownTime = 1000; 
-
+  // New state to track if the game has started
+  const [gameStarted, setGameStarted] = useState(false);
+  
   
   // Preload every pic
   useEffect(() => {
@@ -77,7 +85,7 @@ function ChallengeArea() {
       setCurrentImage(images[imageIndex.current % images.length]);
       imageIndex.current++;
     };
-    // apply demage to boss
+    // apply damage to boss
     const applyDamageToBoss = (damageAmount) => {
       setBossHealth((prevHealth) => Math.max(prevHealth - damageAmount, 0));
     };
@@ -228,7 +236,7 @@ function ChallengeArea() {
         if (lightingAnimationIndex.current >= lightingAnimationFrames.length) {
           setShowLighting(false);
           clearInterval(intervalId);
-          // check collison
+          // check collision
           if (CharacterAttackCollision(lightingPos, bossPosition)) {
             setBossHealth((prevHealth) => Math.max(prevHealth - 20, 0)); 
           }
@@ -244,13 +252,12 @@ function ChallengeArea() {
     return () => window.removeEventListener('click', handleMouseClick);
   }, [isMagicAttack, bossPosition, bossHealth]);
 
-
-
   // Boss Attack Collision detection function
   const BossAttackCollision = (distance) => {
     const collisionThreshold = 10; 
     return Math.abs(distance) <= collisionThreshold;
   };
+
   // Character Attack collision detection
   const CharacterAttackCollision = (lightingPosition, bossPosition) => {
     const gameArea = document.querySelector('.combat-background');
@@ -267,14 +274,16 @@ function ChallengeArea() {
     return distance <= collisionThreshold;
   };
 
-
-
   /* ------------- Boss Logic Start ------------ */
+  // Boss Logic with game start condition
   useEffect(() => {
-    const bossSpeed = 0.3; // boss move speed
+    // Only start boss logic if the game has started
+    if (!gameStarted) return;
+
+    const bossSpeed = 0.3; // Boss move speed
     const moveBoss = () => {
       const distance = bossPosition - position;
-      // update boss position
+      // Update boss position
       if (distance < -12) {
         setBossPosition(bossPosition => Math.min(bossPosition + bossSpeed, 100));
         setCurrentBossImage(bossImagesRight[bossImageIndex.current % bossImagesRight.length]);
@@ -283,13 +292,13 @@ function ChallengeArea() {
         setCurrentBossImage(bossImagesLeft[bossImageIndex.current % bossImagesLeft.length]);
       }
       bossImageIndex.current = (bossImageIndex.current + 1) % bossImagesLeft.length;
-      // set boss attack interval
+      // Set boss attack interval
       if (!bossAttackCooldown && BossAttackCollision(distance)) {
-        if (bossHealth > 0){
+        if (bossHealth > 0) {
           setHealth(prevHealth => Math.max(prevHealth - 5, 0));
           setBossAttackCooldown(true);
           setTimeout(() => {
-          setBossAttackCooldown(false);
+            setBossAttackCooldown(false);
           }, bossCooldownTime);
         }
       }
@@ -297,62 +306,93 @@ function ChallengeArea() {
 
     const intervalId = setInterval(moveBoss, 80);
 
-    return () => clearInterval(intervalId); 
-  }, [position, bossPosition, bossAttackCooldown, bossHealth]); 
+    return () => clearInterval(intervalId);
+  }, [position, bossPosition, bossAttackCooldown, bossHealth, gameStarted]); // Added gameStarted as a dependency
+
   /* ------------- Boss Logic End ------------- */
 
   // check victory
   useEffect(() => {
     if (bossHealth === 0) {
       showCustomPopup("Victory!", "Congratulations, you have defeated the boss!", "rgba(8,186,255, 0.7)");
+      // Move to the next level if available
+      if (currentLevel < levels.length - 1) {
+        setCurrentLevel(currentLevel  + 1);
+        setBossPosition(levels[currentLevel + 1].bossPosition);
+        setBossHealth(levels[currentLevel + 1].bossHealth);
+        setCurrentBossImage(levels[currentLevel + 1].bossImages[0]);
+      }
     }
-  }, [bossHealth]); 
-  
+  }, [bossHealth, currentLevel]);
 
   return (
     <div className="challenge-page">
-      <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
+      {!gameStarted ? (
+        // Initial screen layout
+        <div className="start-screen">
+          <h1>Challenge Area</h1>
+          <div className="select-boss">
+            <button>LEVEL 5 - WOLF <img src="wolf-icon.png" alt="" /></button>
+            <button>LEVEL 10 - CAT <img src="wolf-icon.png" alt="" /></button>
+          </div>
+          <div className="start-button">
+            <div className="challenge-info">
+              <p>Challenge Attempts 1/1</p>
+              <p>Level 5</p>
+            </div>
+            
+            <button onClick={() => setGameStarted(true)}>START</button>
+          </div>
+         
+        </div>
+      ) : (
+        // Game content
+        <>
       
-      <div className="combat-background">
-        {/* Character Health Bar */}
-        <div className="combat-health">
-          <img src="/heart.png" alt="" />
-          <div className="combat-health-bar">
-              <div className="combat-health-level" style={{ width: `${health}%` }}></div>
+          <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
+          <div className="combat-background">
+            {/* Character Health Bar */}
+            <div className="combat-health">
+              <img src="/heart.png" alt="" />
+              <div className="combat-health-bar">
+                  <div className="combat-health-level" style={{ width: `${health}%` }}></div>
+              </div>
+              <span>{health}/100</span>
+            </div>
+            {/* Boss Health Bar */}
+            <div className="boss-health">
+              <span>{bossHealth}/100</span>
+              <div className="boss-health-bar">
+                  <div className="boss-health-level" style={{ width: `${bossHealth}%` }}></div>
+              </div>
+              <img src="/wolf-icon.png" alt="" />
+            </div>
+            {/* Character */}
+            <div className="character" style={{ left: `${position}%`, backgroundImage: `url(${currentImage})` }}></div>
+            {/* Boss */}
+            {bossHealth > 0 &&(
+              <div className="boss" style={{ left: `${bossPosition}%`, backgroundImage: `url(${currentBossImage})` }}></div>
+            )}
+            
+            {/* Conditional rendering for the magic icon */}
+            {isMagicAttack && (
+              <img className="use-magic-icon" src="UseLighting.png" alt="Use Lighting" style={{ position: 'absolute', left: mousePosition.x, top: mousePosition.y, transform: 'translate(-50%, -51%)' }} />
+            )}
+            {/* Conditional rendering for the lighting animation */}
+            {showLighting && (
+              <img className="lighting" src={currentLightingImage} alt="Lighting Animation" style={{ position: 'absolute', left: lightingPosition.x, top: lightingPosition.y, transform: 'translate(-50%, -80%)' }} />
+            )}
           </div>
-          <span>{health}/100</span>
-        </div>
-        {/* Boss Health Bar */}
-        <div className="boss-health">
-          <span>{bossHealth}/100</span>
-          <div className="boss-health-bar">
-              <div className="boss-health-level" style={{ width: `${bossHealth}%` }}></div>
-          </div>
-          <img src="/wolf-icon.png" alt="" />
-        </div>
-        {/* Character */}
-        <div className="character" style={{ left: `${position}%`, backgroundImage: `url(${currentImage})` }}></div>
-        {/* Boss */}
-        {bossHealth > 0 &&(
-          <div className="boss" style={{ left: `${bossPosition}%`, backgroundImage: `url(${currentBossImage})` }}></div>
-        )}
-        
-        {/* Conditional rendering for the magic icon */}
-        {isMagicAttack && (
-          <img className="use-magic-icon" src="UseLighting.png" alt="Use Lighting" style={{ position: 'absolute', left: mousePosition.x, top: mousePosition.y, transform: 'translate(-50%, -51%)' }} />
-        )}
-        {/* Conditional rendering for the lighting animation */}
-        {showLighting && (
-          <img className="lighting" src={currentLightingImage} alt="Lighting Animation" style={{ position: 'absolute', left: lightingPosition.x, top: lightingPosition.y, transform: 'translate(-50%, -80%)' }} />
-        )}
-      </div>
-      <div className="explain-text">
+          <div className="explain-text">
             <span>Move Left <div className="keyboard-icon">A</div>/<div className="keyboard-icon">{"<"}-</div> Move Right <div className="keyboard-icon">D</div>/<div className="keyboard-icon">-{">"}</div></span>
             <span>Normal Attack <div className="keyboard-icon">7</div> Stick Attack <div className="keyboard-icon">8</div> Sword Attack <div className="keyboard-icon">9</div></span>
             <span>Open Magic State<div className="keyboard-icon">0</div>Magic Attack<div className="keyboard-icon">Mouse Click</div></span>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
-
 export default ChallengeArea;
+
+

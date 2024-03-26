@@ -10,7 +10,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/public/shop.png'); /* Ensure the path is correct */
+    background-image: url('/public/shop.png');
     background-size: cover;
     background-position: center;
     z-index: 1; /* Keeps the background behind other content */
