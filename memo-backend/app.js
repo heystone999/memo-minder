@@ -11,6 +11,7 @@ const loginRouter = require('./controllers/login')
 const habitsRouter = require('./controllers/habits');
 const dailiesRouter = require('./controllers/dailies');
 const todosRouter = require('./controllers/todos');
+const rewardsRouter = require('./controllers/rewards');
 
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
@@ -35,7 +36,10 @@ app.get('/', function (req, res) {
 
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
-app.use('/api/habits', habitsRouter);
+app.use('/api/habits', habitsRouter)
+app.use('/api/dailies', dailiesRouter)
+app.use('/api/todos', todosRouter)
+app.use('/api/rewards', rewardsRouter)
 
 app.use(middleware.errorHandler)
 
