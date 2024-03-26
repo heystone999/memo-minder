@@ -199,7 +199,7 @@
   right: 0;
   margin-bottom: 100px;
   margin-right: 40px;
-  color: rgb(255, 223, 95);
+  color: rgb(253, 214, 95);
   font-weight: 900;
   font-size: 1.1rem;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
@@ -229,6 +229,13 @@
 
 .start-screen button:hover {
   box-shadow: 0 0 10px rgba(255, 255, 255, 1);
+}
+.start-screen button:disabled{
+  background-color: rgb(171, 171, 171);
+  color: rgb(246, 246, 246);
+}
+.start-screen button:disabled:hover{
+  box-shadow: none;
 }
 .select-boss img{
   width: 80px;

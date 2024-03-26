@@ -25,7 +25,7 @@ const levels = [
   // Define other levels here...
 ];
 
-function ChallengeArea() {
+function ChallengeArea({ level }) {
   // initial state
   const [position, setPosition] = useState(5); 
   const [health, setHealth] = useState(100);
@@ -83,6 +83,10 @@ function ChallengeArea() {
       bossAttackPower: 10, 
     },
   };
+  const isWolfChallengeAvailable = level >= 5; // unlock wolf
+  const isCatChallengeAvailable = level >= 10; // unlock cat
+
+
   
   // New state to track if the game has started
   const [gameStarted, setGameStarted] = useState(false);
@@ -409,8 +413,12 @@ function ChallengeArea() {
         <div className="start-screen">
           <h1>Challenge Area</h1>
           <div className="select-boss">
-            <button onClick={() => setSelectedBoss("wolf")}>LEVEL 5 - WOLF <img src="wolf-icon.png" alt="" /></button>
-            <button onClick={() => setSelectedBoss("cat")}>LEVEL 10 - CAT <img src="cat-icon.png" alt="" /></button>
+            <button onClick={() => setSelectedBoss("wolf")}>
+              {level < 5 ? <img src="lock.png" alt="Locked" style={{marginRight: '5px'}} /> : ""}LEVEL 5  WOLF <img src="wolf-icon.png" alt="" />
+            </button>
+            <button onClick={() => setSelectedBoss("cat")}>
+              {level < 10 ? <img src="lock.png" alt="Locked" style={{marginRight: '5px'}} /> : ""}LEVEL 10  CAT <img src="cat-icon.png" alt="" />
+            </button>
           </div>
           {selectedBoss === "wolf" && (
             <div className="start-button">
@@ -418,7 +426,7 @@ function ChallengeArea() {
                 <p>Challenge Attempts {attempts.wolf.count}/1</p>
                 <p>Level 5</p>
               </div>
-              <button onClick={startChallenge} disabled={!isChallengeAvailable}>
+              <button onClick={startChallenge} disabled={!isChallengeAvailable || !isWolfChallengeAvailable}>
                 START
               </button>
               <img src="wolfgoleft1.png" alt="" />
@@ -426,6 +434,11 @@ function ChallengeArea() {
                 <div className="notice">
                   You have reached your daily challenge limit.<br/> 
                   Please try again tomorrow at 8 am.
+                </div>
+              )}
+              {!isWolfChallengeAvailable && (
+                <div className="notice">
+                  Reach level 5 to unlock Boss - Wolf.
                 </div>
               )}
             </div>
@@ -436,7 +449,7 @@ function ChallengeArea() {
                 <p>Challenge Attempts {attempts.cat.count}/1</p>
                 <p>Level 10</p>
               </div>
-              <button onClick={startChallenge} disabled={!isChallengeAvailable}>
+              <button onClick={startChallenge} disabled={!isChallengeAvailable || !isCatChallengeAvailable}>
                 START
               </button>
               <img src="catgoleft1.png" alt="" />
@@ -444,6 +457,11 @@ function ChallengeArea() {
                 <div className="notice">
                   You have reached your daily challenge limit.<br/> 
                   Please try again tomorrow at 8 am.
+                </div>
+              )}
+              {!isCatChallengeAvailable && (
+                <div className="notice">
+                  Reach level 10 to unlock Boss - Cat.
                 </div>
               )}
             </div>

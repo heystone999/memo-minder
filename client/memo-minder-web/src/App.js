@@ -420,7 +420,7 @@ function App() {
                   ) : showShop ? (
                       <ShopArea coin={coin} updateCoin={updateCoin} decreaseCoin={decreaseCoin}/>
                   ) : showChallenge ? (
-                      <ChallengeArea />
+                      <ChallengeArea level={level}/>
                   ) : <MilestonesArea/>
                 }
               </div>
