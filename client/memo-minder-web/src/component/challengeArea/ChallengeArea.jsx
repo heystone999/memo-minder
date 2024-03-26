@@ -13,12 +13,15 @@ const swordAttackRight = ['rightSword1.png', 'rightSword2.png', 'rightSword3.png
 const swordAttackLeft = ['leftSword1.png', 'leftSword2.png', 'leftSword3.png'];
 const lightingAnimationFrames = ['lighting1.png', 'lighting2.png', 'lighting3.png', 'lighting4.png', 'lighting5.png'];
 // Boss image
-const bossImagesLeft = ['wolfgoleft1.png', 'wolfgoleft2.png'];
-const bossImagesRight = ['wolfgoright1.png', 'wolfgoright2.png'];
+const wolfImagesLeft = ['wolfgoleft1.png', 'wolfgoleft2.png'];
+const wolfImagesRight = ['wolfgoright1.png', 'wolfgoright2.png'];
+const catImagesLeft = ['catgoleft1.png', 'catgoleft2.png'];
+const catImagesRight = ['catgoright1.png', 'catgoright2.png'];
+
 
 // Define the level data
 const levels = [
-  { bossPosition: 95, bossHealth: 100, bossImages: bossImagesLeft }, // Level 1
+  { bossPosition: 95, bossHealth: 100, bossImages: wolfImagesLeft }, // Level 1
   // Define other levels here...
 ];
 
@@ -61,68 +64,77 @@ function ChallengeArea() {
   // Add boss attack power
   const [bossAttackCooldown, setBossAttackCooldown] = useState(false); 
   const bossCooldownTime = 1000; 
+  // Define boss configurations
+  const bossConfigurations = {
+    wolf: {
+      bossPosition: 95,
+      bossHealth: 100,
+      bossImagesLeft: wolfImagesLeft,
+      bossImagesRight: wolfImagesRight,
+      bossSpeed: 0.3, 
+      bossAttackPower: 5, 
+    },
+    cat: {
+      bossPosition: 95, 
+      bossHealth: 100, 
+      bossImagesLeft: catImagesLeft,
+      bossImagesRight: catImagesRight,
+      bossSpeed: 0.5, 
+      bossAttackPower: 10, 
+    },
+  };
+  
   // New state to track if the game has started
   const [gameStarted, setGameStarted] = useState(false);
   const [isChallengeAvailable, setIsChallengeAvailable] = useState(false);
-
-  // Add state for tracking challenge attempts
+  // challenge attempt
+  const [selectedBoss, setSelectedBoss] = useState("wolf");
   const [attempts, setAttempts] = useState(() => {
-    // Retrieve attempts from localStorage or default to 1
     const savedAttempts = localStorage.getItem('challengeAttempts');
-    const attemptsData = savedAttempts ? JSON.parse(savedAttempts) : { count: 1, date: new Date().toDateString() };
-    // Check if it's a new day to reset attempts
-    if (new Date().toDateString() !== attemptsData.date) {
-      return { count: 1, date: new Date().toDateString() };
+    let attemptsData = savedAttempts ? JSON.parse(savedAttempts) : {};
+    // Ensure both 'wolf' and 'cat' keys exist with a default structure
+    const defaultAttemptStructure = { count: 1, date: new Date().toDateString() };
+    attemptsData.wolf = attemptsData.wolf || defaultAttemptStructure;
+    attemptsData.cat = attemptsData.cat || defaultAttemptStructure;
+    // Update if it's a new day
+    const today = new Date().toDateString();
+    if (attemptsData.wolf.date !== today) {
+      attemptsData.wolf = { count: 1, date: today };
+    }
+    if (attemptsData.cat.date !== today) {
+      attemptsData.cat = { count: 1, date: today };
     }
     return attemptsData;
   });
-  const maxAttempts = 1; // Maximum attempts allowed per day
   
+
+  /*---- set challenge attempts start ----*/
   useEffect(() => {
-    // Persist attempts to localStorage
     localStorage.setItem('challengeAttempts', JSON.stringify(attempts));
   }, [attempts]);
 
   const startChallenge = () => {
-    // Update logic to decrement attempts and set the last attempt date
-    if (attempts.count > 0) {
-      setAttempts(prev => ({ ...prev, count: prev.count - 1 }));
-      setGameStarted(true);
-    }
-  };
+  if (attempts[selectedBoss].count > 0) {
+    const selectedBossConfig = bossConfigurations[selectedBoss];
+    setBossPosition(selectedBossConfig.bossPosition);
+    setBossHealth(selectedBossConfig.bossHealth);
+    // Assuming the initial direction of the boss is always left; adjust as needed
+    setCurrentBossImage(selectedBossConfig.bossImagesLeft[0]);
 
-  // Check challenge availability based on attempts count instead of last attempt date
+    setAttempts(prev => ({
+      ...prev,
+      [selectedBoss]: { count: prev[selectedBoss].count - 1, date: new Date().toDateString() }
+    }));
+    setGameStarted(true);
+  }
+};
+
+
   useEffect(() => {
-    setIsChallengeAvailable(attempts.count > 0);
-  }, [attempts.count]);
-
-  // Check Challenge Availability
-  useEffect(() => {
-    const checkChallengeAvailability = () => {
-      const lastAttempt = localStorage.getItem('lastAttempt');
-      if (!lastAttempt) {
-        setIsChallengeAvailable(true);
-        return;
-      }
-
-      const lastAttemptDate = new Date(parseInt(lastAttempt));
-      const now = new Date();
-      const nextAvailableDate = new Date(lastAttemptDate);
-      nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
-      nextAvailableDate.setHours(8, 0, 0, 0); // Set to 8 AM on the next day
-
-      if (now >= nextAvailableDate) {
-        setIsChallengeAvailable(true);
-      } else {
-        setIsChallengeAvailable(false);
-      }
-    };
-
-    checkChallengeAvailability();
-    const intervalId = setInterval(checkChallengeAvailability, 60000); // Check every minute
-
-    return () => clearInterval(intervalId);
-  }, []);
+    // Checks if the challenge is available based on the selectedBoss
+    setIsChallengeAvailable(attempts[selectedBoss].count > 0);
+  }, [attempts, selectedBoss]);
+  /*---- set challenge attempts end ----*/
 
 
   // Preload every pic
@@ -131,7 +143,8 @@ function ChallengeArea() {
       ...swordAttackRight, ...swordAttackLeft,
       ...AttackRight, ...AttackLeft,
       ...stickAttackRight, ...stickAttackLeft,
-      ...bossImagesLeft, ...bossImagesRight].forEach(image => {
+      ...wolfImagesLeft, ...wolfImagesRight,
+      ...catImagesLeft, ...catImagesRight].forEach(image => {
       const img = new Image();
       img.src = image;
     });
@@ -342,26 +355,29 @@ function ChallengeArea() {
 
     const bossSpeed = 0.3; // Boss move speed
     const moveBoss = () => {
+      const selectedBossConfig = bossConfigurations[selectedBoss];
       const distance = bossPosition - position;
-      // Update boss position
-      if (distance < -12) {
-        setBossPosition(bossPosition => Math.min(bossPosition + bossSpeed, 100));
-        setCurrentBossImage(bossImagesRight[bossImageIndex.current % bossImagesRight.length]);
+
+      // Use bossSpeed from the configuration
+      if (distance < -10) {
+        setBossPosition(bossPosition => Math.min(bossPosition + selectedBossConfig.bossSpeed, 100));
+        setCurrentBossImage(selectedBossConfig.bossImagesRight[bossImageIndex.current % selectedBossConfig.bossImagesRight.length]);
       } else if (distance > 6) {
-        setBossPosition(bossPosition => Math.max(bossPosition - bossSpeed, 0));
-        setCurrentBossImage(bossImagesLeft[bossImageIndex.current % bossImagesLeft.length]);
+        setBossPosition(bossPosition => Math.max(bossPosition - selectedBossConfig.bossSpeed, 0));
+        setCurrentBossImage(selectedBossConfig.bossImagesLeft[bossImageIndex.current % selectedBossConfig.bossImagesLeft.length]);
       }
-      bossImageIndex.current = (bossImageIndex.current + 1) % bossImagesLeft.length;
+      bossImageIndex.current = (bossImageIndex.current + 1) % selectedBossConfig.bossImagesLeft.length;
       // Set boss attack interval
       if (!bossAttackCooldown && BossAttackCollision(distance)) {
         if (bossHealth > 0) {
-          setHealth(prevHealth => Math.max(prevHealth - 5, 0));
+          // Use bossAttackPower from the configuration
+          setHealth(prevHealth => Math.max(prevHealth - selectedBossConfig.bossAttackPower, 0));
           setBossAttackCooldown(true);
           setTimeout(() => {
             setBossAttackCooldown(false);
           }, bossCooldownTime);
         }
-      }
+      }      
     };
 
     const intervalId = setInterval(moveBoss, 80);
@@ -385,33 +401,54 @@ function ChallengeArea() {
     }
   }, [bossHealth, currentLevel]);
 
+
+
   return (
     <div className="challenge-page">
       {!gameStarted ? (
-        // Initial screen layout
         <div className="start-screen">
           <h1>Challenge Area</h1>
           <div className="select-boss">
-            <button>LEVEL 5 - WOLF <img src="wolf-icon.png" alt="" /></button>
-            <button>LEVEL 10 - CAT <img src="wolf-icon.png" alt="" /></button>
+            <button onClick={() => setSelectedBoss("wolf")}>LEVEL 5 - WOLF <img src="wolf-icon.png" alt="" /></button>
+            <button onClick={() => setSelectedBoss("cat")}>LEVEL 10 - CAT <img src="cat-icon.png" alt="" /></button>
           </div>
-          <div className="start-button">
-            <div className="challenge-info">
-            <p>Challenge Attempts {attempts.count}/{maxAttempts}</p>
-              <p>Level 5</p>
-            </div>
-            {/*- Start Button -*/}
-            <button onClick={startChallenge} disabled={!isChallengeAvailable}>
-              START
-            </button>
-            {attempts.count === 0 && (
-              <div className="notice">
-                You have reached your daily challenge limit.<br/> 
-                Please try again tomorrow at 8 am.
+          {selectedBoss === "wolf" && (
+            <div className="start-button">
+              <div className="challenge-info">
+                <p>Challenge Attempts {attempts.wolf.count}/1</p>
+                <p>Level 5</p>
               </div>
-            )}
-          </div>
-         
+              <button onClick={startChallenge} disabled={!isChallengeAvailable}>
+                START
+              </button>
+              <img src="wolfgoleft1.png" alt="" />
+              {attempts.wolf.count === 0 && (
+                <div className="notice">
+                  You have reached your daily challenge limit.<br/> 
+                  Please try again tomorrow at 8 am.
+                </div>
+              )}
+            </div>
+          )}
+          {selectedBoss === "cat" && (
+            <div className="start-button">
+              <div className="challenge-info">
+                <p>Challenge Attempts {attempts.cat.count}/1</p>
+                <p>Level 10</p>
+              </div>
+              <button onClick={startChallenge} disabled={!isChallengeAvailable}>
+                START
+              </button>
+              <img src="catgoleft1.png" alt="" />
+              {attempts.cat.count === 0 && (
+                <div className="notice">
+                  You have reached your daily challenge limit.<br/> 
+                  Please try again tomorrow at 8 am.
+                </div>
+              )}
+            </div>
+          )}
+          {/* Remaining component structure... */}
         </div>
       ) : (
 
@@ -431,9 +468,9 @@ function ChallengeArea() {
             <div className="boss-health">
               <span>{bossHealth}/100</span>
               <div className="boss-health-bar">
-                  <div className="boss-health-level" style={{ width: `${bossHealth}%` }}></div>
+                <div className="boss-health-level" style={{ width: `${bossHealth}%` }}></div>
               </div>
-              <img src="/wolf-icon.png" alt="" />
+              <img src={selectedBoss === "wolf" ? "/wolf-icon.png" : "/cat-icon.png"} alt={selectedBoss} />
             </div>
             {/* Character */}
             <div className="character" style={{ left: `${position}%`, backgroundImage: `url(${currentImage})` }}></div>
