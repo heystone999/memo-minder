@@ -123,7 +123,7 @@ const TaskArea = ({
     const handleDeleteItem = (itemToDelete) => {
         switch (editingType) {
             case 'Habit':
-                const { habitId, ...rest } = itemToDelete;
+                const { habitId} = itemToDelete;
                 onDeleteHabit(habitId);
                 break;
             case 'Daily':

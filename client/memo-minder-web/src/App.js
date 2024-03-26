@@ -95,6 +95,18 @@ function App() {
       return newCoin;
     });
   };
+  const WolfCoinReward = () => {
+    setCoin(prevCoin => {
+      const newCoin = prevCoin + 50;
+      return newCoin;
+    });
+  };
+  const CatCoinReward = () => {
+    setCoin(prevCoin => {
+      const newCoin = prevCoin + 80;
+      return newCoin;
+    });
+  };
   const decreaseCoin = (price) => {
     setCoin(prevCoin => {
       // let coin >= 0
@@ -420,7 +432,7 @@ function App() {
                   ) : showShop ? (
                       <ShopArea coin={coin} updateCoin={updateCoin} decreaseCoin={decreaseCoin}/>
                   ) : showChallenge ? (
-                      <ChallengeArea level={level}/>
+                      <ChallengeArea level={level} coin={coin} WolfCoinReward={WolfCoinReward} CatCoinReward={CatCoinReward}/>
                   ) : <MilestonesArea/>
                 }
               </div>

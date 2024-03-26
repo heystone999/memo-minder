@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import "./ChallengeArea.css";
 import Popup from '../popup/Popup';
 
@@ -17,15 +17,12 @@ const wolfImagesLeft = ['wolfgoleft1.png', 'wolfgoleft2.png'];
 const wolfImagesRight = ['wolfgoright1.png', 'wolfgoright2.png'];
 const catImagesLeft = ['catgoleft1.png', 'catgoleft2.png'];
 const catImagesRight = ['catgoright1.png', 'catgoright2.png'];
-
-
 // Define the level data
 const levels = [
   { bossPosition: 95, bossHealth: 100, bossImages: wolfImagesLeft }, // Level 1
-  // Define other levels here...
 ];
 
-function ChallengeArea({ level }) {
+function ChallengeArea({ level, WolfCoinReward, CatCoinReward }) {
   // initial state
   const [position, setPosition] = useState(5); 
   const [health, setHealth] = useState(100);
@@ -65,7 +62,7 @@ function ChallengeArea({ level }) {
   const [bossAttackCooldown, setBossAttackCooldown] = useState(false); 
   const bossCooldownTime = 1000; 
   // Define boss configurations
-  const bossConfigurations = {
+  const bossConfigurations = useMemo(() => ({
     wolf: {
       bossPosition: 95,
       bossHealth: 100,
@@ -82,12 +79,11 @@ function ChallengeArea({ level }) {
       bossSpeed: 0.5, 
       bossAttackPower: 10, 
     },
-  };
+  }), []);
+  // Condition for unlock boss
   const isWolfChallengeAvailable = level >= 5; // unlock wolf
   const isCatChallengeAvailable = level >= 10; // unlock cat
 
-
-  
   // New state to track if the game has started
   const [gameStarted, setGameStarted] = useState(false);
   const [isChallengeAvailable, setIsChallengeAvailable] = useState(false);
@@ -110,6 +106,7 @@ function ChallengeArea({ level }) {
     }
     return attemptsData;
   });
+ 
   
 
   /*---- set challenge attempts start ----*/
@@ -131,6 +128,7 @@ function ChallengeArea({ level }) {
     }));
     setGameStarted(true);
   }
+  setRewardGiven(false);
 };
 
 
@@ -345,71 +343,120 @@ function ChallengeArea({ level }) {
     const gameAreaWidth = gameArea.offsetWidth; 
     const gameAreaLeftEdge = gameArea.getBoundingClientRect().left; 
     const lightingPositionPercentage = ((lightingPosition.x - gameAreaLeftEdge) / gameAreaWidth) * 100;
-
     const collisionThreshold = 10;
     const distance = Math.abs(lightingPositionPercentage - bossPosition); 
     return distance <= collisionThreshold;
   };
 
   /* ------------- Boss Logic Start ------------ */
-  // Boss Logic with game start condition
-  useEffect(() => {
-    // Only start boss logic if the game has started
-    if (!gameStarted) return;
-
-    const bossSpeed = 0.3; // Boss move speed
-    const moveBoss = () => {
-      const selectedBossConfig = bossConfigurations[selectedBoss];
-      const distance = bossPosition - position;
-
-      // Use bossSpeed from the configuration
-      if (distance < -10) {
-        setBossPosition(bossPosition => Math.min(bossPosition + selectedBossConfig.bossSpeed, 100));
-        setCurrentBossImage(selectedBossConfig.bossImagesRight[bossImageIndex.current % selectedBossConfig.bossImagesRight.length]);
-      } else if (distance > 6) {
-        setBossPosition(bossPosition => Math.max(bossPosition - selectedBossConfig.bossSpeed, 0));
-        setCurrentBossImage(selectedBossConfig.bossImagesLeft[bossImageIndex.current % selectedBossConfig.bossImagesLeft.length]);
-      }
-      bossImageIndex.current = (bossImageIndex.current + 1) % selectedBossConfig.bossImagesLeft.length;
-      // Set boss attack interval
-      if (!bossAttackCooldown && BossAttackCollision(distance)) {
-        if (bossHealth > 0) {
-          // Use bossAttackPower from the configuration
-          setHealth(prevHealth => Math.max(prevHealth - selectedBossConfig.bossAttackPower, 0));
-          setBossAttackCooldown(true);
-          setTimeout(() => {
-            setBossAttackCooldown(false);
-          }, bossCooldownTime);
+    // Boss Logic with game start condition
+    useEffect(() => {
+      // Only start boss logic if the game has started
+      if (!gameStarted) return;
+      const moveBoss = () => {
+        const selectedBossConfig = bossConfigurations[selectedBoss];
+        const distance = bossPosition - position;
+        // Use bossSpeed from the configuration
+        if (distance < -10) {
+          setBossPosition(bossPosition => Math.min(bossPosition + selectedBossConfig.bossSpeed, 100));
+          setCurrentBossImage(selectedBossConfig.bossImagesRight[bossImageIndex.current % selectedBossConfig.bossImagesRight.length]);
+        } else if (distance > 6) {
+          setBossPosition(bossPosition => Math.max(bossPosition - selectedBossConfig.bossSpeed, 0));
+          setCurrentBossImage(selectedBossConfig.bossImagesLeft[bossImageIndex.current % selectedBossConfig.bossImagesLeft.length]);
         }
-      }      
-    };
-
-    const intervalId = setInterval(moveBoss, 80);
-
-    return () => clearInterval(intervalId);
-  }, [position, bossPosition, bossAttackCooldown, bossHealth, gameStarted]); // Added gameStarted as a dependency
-
+        bossImageIndex.current = (bossImageIndex.current + 1) % selectedBossConfig.bossImagesLeft.length;
+        // Set boss attack interval
+        if (!bossAttackCooldown && BossAttackCollision(distance)) {
+          if (bossHealth > 0) {
+            // Use bossAttackPower from the configuration
+            setHealth(prevHealth => Math.max(prevHealth - selectedBossConfig.bossAttackPower, 0));
+            setBossAttackCooldown(true);
+            setTimeout(() => {
+              setBossAttackCooldown(false);
+            }, bossCooldownTime);
+          }
+        }      
+      };
+      const intervalId = setInterval(moveBoss, 80);
+      return () => clearInterval(intervalId);
+  }, [position, bossPosition, bossAttackCooldown, bossHealth, gameStarted,bossConfigurations, selectedBoss]); 
   /* ------------- Boss Logic End ------------- */
 
-  // check victory
-  useEffect(() => {
-    if (bossHealth === 0) {
-      showCustomPopup("Victory!", "Congratulations, you have defeated the boss!", "rgba(8,186,255, 0.7)");
-      // Move to the next level if available
-      if (currentLevel < levels.length - 1) {
-        setCurrentLevel(currentLevel  + 1);
-        setBossPosition(levels[currentLevel + 1].bossPosition);
-        setBossHealth(levels[currentLevel + 1].bossHealth);
-        setCurrentBossImage(levels[currentLevel + 1].bossImages[0]);
-      }
-    }
-  }, [bossHealth, currentLevel]);
+  // Add a state to track if the reward has been given
+  const [rewardGiven, setRewardGiven] = useState(false);
 
+  useEffect(() => {
+    if (bossHealth === 0 && !rewardGiven && gameStarted) {
+      // Assume that you determine the reward based on the boss type here
+      const coinsRewarded = selectedBoss === "wolf" ? '50' : '80';
+      setReward(coinsRewarded); // Update the reward state with the coinsRewarded value
+  
+      // Then, call the appropriate reward function based on the boss type
+      if (selectedBoss === "wolf") {
+        WolfCoinReward();
+      } else if (selectedBoss === "cat") {
+        CatCoinReward();
+      }
+        setRewardGiven(true);
+    }
+  }, [bossHealth, rewardGiven, selectedBoss, WolfCoinReward, CatCoinReward, gameStarted]);
+  
+  
+  const [reward, setReward] = useState('');
+  useEffect(() => {
+    if (bossHealth <= 0) {
+      // Use the reward state to show the dynamic coin amount in the popup
+      setShowPopup(true);
+      setPopupMessage({
+        title: 'Victory!',
+        body: `Congratulations, you have defeated the ${selectedBoss} and earned ${reward} coins as your reward!`,
+        background_color: 'rgba(0, 255, 0, 0.7)'
+      });
+      setGameStarted(false);
+    }
+  }, [bossHealth, selectedBoss, reward]);
+  
+  
+
+  // check for player's defeat (health reaches 0)
+  useEffect(() => {
+    if (health <= 0) {
+      setGameStarted(false); 
+      setShowPopup(true); 
+      setPopupMessage({ 
+        title: 'Defeat',
+        body: 'You have been defeated! No rewards this time. Try again!',
+        background_color: 'rgba(243, 97, 105, 0.7)' 
+      });
+    }
+  }, [health]); // Depend on the health state
+
+  // Refresh challenge attempts function
+  useEffect(() => {
+    const resetAttempts = () => {
+      setAttempts({
+        wolf: { count: 1, date: new Date().toDateString() },
+        cat: { count: 1, date: new Date().toDateString() }
+      });
+    };
+    // calculate the time difference to 8 am
+    const now = new Date();
+    let tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + (now.getHours() >= 8 ? 1 : 0));
+    tomorrow.setHours(8, 0, 0, 0); // set as 8 am
+    const msUntilReset = tomorrow - now;
+    // refresh challenge attempts 
+    const timer = setTimeout(resetAttempts, msUntilReset);
+    return () => clearTimeout(timer);
+  }, []);
 
 
   return (
     <div className="challenge-page">
+      <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
+      {/* Rest of the game and UI */}
       {!gameStarted ? (
+        <>
         <div className="start-screen">
           <h1>Challenge Area</h1>
           <div className="select-boss">
@@ -419,6 +466,11 @@ function ChallengeArea({ level }) {
             <button onClick={() => setSelectedBoss("cat")}>
               {level < 10 ? <img src="lock.png" alt="Locked" style={{marginRight: '5px'}} /> : ""}LEVEL 10  CAT <img src="cat-icon.png" alt="" />
             </button>
+          </div>
+          
+          {/* Display the coins here */}
+          <div className="display-coins">
+            Reward: {reward} coins
           </div>
           {selectedBoss === "wolf" && (
             <div className="start-button">
@@ -466,51 +518,51 @@ function ChallengeArea({ level }) {
               )}
             </div>
           )}
-          {/* Remaining component structure... */}
         </div>
+      </>
       ) : (
+      // ------- Game content -------- //
+      <>
+        <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
+        <div className="combat-background">
+          {/* Character Health Bar */}
+          <div className="combat-health">
+            <img src="/heart.png" alt="" />
+            <div className="combat-health-bar">
+                <div className="combat-health-level" style={{ width: `${health}%` }}></div>
+            </div>
+            <span>{health}/100</span>
+          </div>
+          {/* Boss Health Bar */}
+          <div className="boss-health">
+            <span>{bossHealth}/100</span>
+            <div className="boss-health-bar">
+              <div className="boss-health-level" style={{ width: `${bossHealth}%` }}></div>
+            </div>
+            <img src={selectedBoss === "wolf" ? "/wolf-icon.png" : "/cat-icon.png"} alt={selectedBoss} />
+          </div>
 
-        // ------- Game content -------- //
-        <>
-          <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
-          <div className="combat-background">
-            {/* Character Health Bar */}
-            <div className="combat-health">
-              <img src="/heart.png" alt="" />
-              <div className="combat-health-bar">
-                  <div className="combat-health-level" style={{ width: `${health}%` }}></div>
-              </div>
-              <span>{health}/100</span>
-            </div>
-            {/* Boss Health Bar */}
-            <div className="boss-health">
-              <span>{bossHealth}/100</span>
-              <div className="boss-health-bar">
-                <div className="boss-health-level" style={{ width: `${bossHealth}%` }}></div>
-              </div>
-              <img src={selectedBoss === "wolf" ? "/wolf-icon.png" : "/cat-icon.png"} alt={selectedBoss} />
-            </div>
-            {/* Character */}
-            <div className="character" style={{ left: `${position}%`, backgroundImage: `url(${currentImage})` }}></div>
-            {/* Boss */}
-            {bossHealth > 0 &&(
-              <div className="boss" style={{ left: `${bossPosition}%`, backgroundImage: `url(${currentBossImage})` }}></div>
-            )}
-            
-            {/* Conditional rendering for the magic icon */}
-            {isMagicAttack && (
-              <img className="use-magic-icon" src="UseLighting.png" alt="Use Lighting" style={{ position: 'absolute', left: mousePosition.x, top: mousePosition.y, transform: 'translate(-50%, -51%)' }} />
-            )}
-            {/* Conditional rendering for the lighting animation */}
-            {showLighting && (
-              <img className="lighting" src={currentLightingImage} alt="Lighting Animation" style={{ position: 'absolute', left: lightingPosition.x, top: lightingPosition.y, transform: 'translate(-50%, -80%)' }} />
-            )}
-          </div>
-          <div className="explain-text">
-            <span>Move Left <div className="keyboard-icon">A</div>/<div className="keyboard-icon">{"<"}-</div> Move Right <div className="keyboard-icon">D</div>/<div className="keyboard-icon">-{">"}</div></span>
-            <span>Normal Attack <div className="keyboard-icon">7</div> Stick Attack <div className="keyboard-icon">8</div> Sword Attack <div className="keyboard-icon">9</div></span>
-            <span>Open Magic State<div className="keyboard-icon">0</div>Magic Attack<div className="keyboard-icon">Mouse Click</div></span>
-          </div>
+          {/* Character */}
+          <div className="character" style={{ left: `${position}%`, backgroundImage: `url(${currentImage})` }}></div>
+          {/* Boss */}
+          {bossHealth > 0 &&(
+            <div className="boss" style={{ left: `${bossPosition}%`, backgroundImage: `url(${currentBossImage})` }}></div>
+          )}
+          
+          {/* Conditional rendering for the magic icon */}
+          {isMagicAttack && (
+            <img className="use-magic-icon" src="UseLighting.png" alt="Use Lighting" style={{ position: 'absolute', left: mousePosition.x, top: mousePosition.y, transform: 'translate(-50%, -51%)' }} />
+          )}
+          {/* Conditional rendering for the lighting animation */}
+          {showLighting && (
+            <img className="lighting" src={currentLightingImage} alt="Lighting Animation" style={{ position: 'absolute', left: lightingPosition.x, top: lightingPosition.y, transform: 'translate(-50%, -80%)' }} />
+          )}
+        </div>
+        <div className="explain-text">
+          <span>Move Left <div className="keyboard-icon">A</div>/<div className="keyboard-icon">{"<"}-</div> Move Right <div className="keyboard-icon">D</div>/<div className="keyboard-icon">-{">"}</div></span>
+          <span>Normal Attack <div className="keyboard-icon">7</div> Stick Attack <div className="keyboard-icon">8</div> Sword Attack <div className="keyboard-icon">9</div></span>
+          <span>Open Magic State<div className="keyboard-icon">0</div>Magic Attack<div className="keyboard-icon">Mouse Click</div></span>
+        </div>
         </>
       )}
     </div>
