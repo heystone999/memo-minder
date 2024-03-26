@@ -3,11 +3,16 @@ const bcrypt = require('bcrypt')
 const app = require('../app')
 const User = require('../models/user')
 const api = supertest(app)
+const mongoose = require('mongoose');
 
 describe('User endpoints', () => {
   beforeEach(async () => {
     await User.deleteMany({})
   })
+
+  afterAll(async () => {
+    await mongoose.connection.close();
+  });
 
   test('GET /api/users returns all users', async () => {
     await User.create({ username: 'user1', email: '123456@qq.com', passwordHash: 'hashedPassword' })
@@ -48,4 +53,6 @@ describe('User endpoints', () => {
 
     await api.post('/api/users').send(newUser).expect(400)
   })
+
+
 })

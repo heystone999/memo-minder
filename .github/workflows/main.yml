@@ -46,5 +46,5 @@ jobs:
         working-directory: ./memo-backend
         github-token: ${{ secrets.TOKEN_FOR_MEMO }}
         annotations: none
-        test-script: npm test --ci
+        test-script: npm test --detectOpenHandles
         custom-title: Coverage report for backend
