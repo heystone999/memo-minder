@@ -63,8 +63,68 @@ function ChallengeArea() {
   const bossCooldownTime = 1000; 
   // New state to track if the game has started
   const [gameStarted, setGameStarted] = useState(false);
+  const [isChallengeAvailable, setIsChallengeAvailable] = useState(false);
+
+  // Add state for tracking challenge attempts
+  const [attempts, setAttempts] = useState(() => {
+    // Retrieve attempts from localStorage or default to 1
+    const savedAttempts = localStorage.getItem('challengeAttempts');
+    const attemptsData = savedAttempts ? JSON.parse(savedAttempts) : { count: 1, date: new Date().toDateString() };
+    // Check if it's a new day to reset attempts
+    if (new Date().toDateString() !== attemptsData.date) {
+      return { count: 1, date: new Date().toDateString() };
+    }
+    return attemptsData;
+  });
+  const maxAttempts = 1; // Maximum attempts allowed per day
   
-  
+  useEffect(() => {
+    // Persist attempts to localStorage
+    localStorage.setItem('challengeAttempts', JSON.stringify(attempts));
+  }, [attempts]);
+
+  const startChallenge = () => {
+    // Update logic to decrement attempts and set the last attempt date
+    if (attempts.count > 0) {
+      setAttempts(prev => ({ ...prev, count: prev.count - 1 }));
+      setGameStarted(true);
+    }
+  };
+
+  // Check challenge availability based on attempts count instead of last attempt date
+  useEffect(() => {
+    setIsChallengeAvailable(attempts.count > 0);
+  }, [attempts.count]);
+
+  // Check Challenge Availability
+  useEffect(() => {
+    const checkChallengeAvailability = () => {
+      const lastAttempt = localStorage.getItem('lastAttempt');
+      if (!lastAttempt) {
+        setIsChallengeAvailable(true);
+        return;
+      }
+
+      const lastAttemptDate = new Date(parseInt(lastAttempt));
+      const now = new Date();
+      const nextAvailableDate = new Date(lastAttemptDate);
+      nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
+      nextAvailableDate.setHours(8, 0, 0, 0); // Set to 8 AM on the next day
+
+      if (now >= nextAvailableDate) {
+        setIsChallengeAvailable(true);
+      } else {
+        setIsChallengeAvailable(false);
+      }
+    };
+
+    checkChallengeAvailability();
+    const intervalId = setInterval(checkChallengeAvailability, 60000); // Check every minute
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+
   // Preload every pic
   useEffect(() => {
     [...imagesRight, ...imagesLeft, 
@@ -337,18 +397,26 @@ function ChallengeArea() {
           </div>
           <div className="start-button">
             <div className="challenge-info">
-              <p>Challenge Attempts 1/1</p>
+            <p>Challenge Attempts {attempts.count}/{maxAttempts}</p>
               <p>Level 5</p>
             </div>
-            
-            <button onClick={() => setGameStarted(true)}>START</button>
+            {/*- Start Button -*/}
+            <button onClick={startChallenge} disabled={!isChallengeAvailable}>
+              START
+            </button>
+            {attempts.count === 0 && (
+              <div className="notice">
+                You have reached your daily challenge limit.<br/> 
+                Please try again tomorrow at 8 am.
+              </div>
+            )}
           </div>
          
         </div>
       ) : (
-        // Game content
+
+        // ------- Game content -------- //
         <>
-      
           <Popup show={showPopup} onClose={() => setShowPopup(false)} message={popupMessage} />
           <div className="combat-background">
             {/* Character Health Bar */}
