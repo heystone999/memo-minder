@@ -47,6 +47,12 @@ function ChallengeArea({ level, WolfCoinReward, CatCoinReward }) {
   const [lightingPosition, setLightingPosition] = useState({ x: 0, y: 0 });
   const [currentLightingImage, setCurrentLightingImage] = useState('');
   const lightingAnimationIndex = useRef(0);
+  // Collision detection function
+  const isBossInRange = () => {
+    const distance = Math.abs(bossPosition - position);
+    const attackRange = 10; // Adjust this value based on your game's scale
+    return distance <= attackRange;
+  };
   // popup
   const showCustomPopup = (title, body, background_color) => {
     setPopupMessage({ title, body, background_color });
@@ -115,22 +121,28 @@ function ChallengeArea({ level, WolfCoinReward, CatCoinReward }) {
   }, [attempts]);
 
   const startChallenge = () => {
-  if (attempts[selectedBoss].count > 0) {
-    const selectedBossConfig = bossConfigurations[selectedBoss];
-    setBossPosition(selectedBossConfig.bossPosition);
-    setBossHealth(selectedBossConfig.bossHealth);
-    // Assuming the initial direction of the boss is always left; adjust as needed
-    setCurrentBossImage(selectedBossConfig.bossImagesLeft[0]);
-
-    setAttempts(prev => ({
-      ...prev,
-      [selectedBoss]: { count: prev[selectedBoss].count - 1, date: new Date().toDateString() }
-    }));
-    setGameStarted(true);
-  }
-  setRewardGiven(false);
-};
-
+    if (attempts[selectedBoss].count > 0) {
+      const selectedBossConfig = bossConfigurations[selectedBoss];
+      setBossPosition(selectedBossConfig.bossPosition);
+      setBossHealth(selectedBossConfig.bossHealth);
+      setCurrentBossImage(selectedBossConfig.bossImagesLeft[0]);
+      setAttempts(prev => ({
+        ...prev,
+        [selectedBoss]: { count: prev[selectedBoss].count - 1, date: new Date().toDateString() }
+      }));
+      setGameStarted(true);
+      // Determine the reward based on the boss before the challenge starts
+      const initialReward = selectedBoss === "wolf" ? '50' : '80';
+      setReward(initialReward); // Set initial reward based on selected boss
+    }
+  };
+  // Adjust useEffect for boss selection to update reward accordingly
+  useEffect(() => {
+    // Update the reward based on selectedBoss whenever it changes
+    const newReward = selectedBoss === "wolf" ? '50' : '80';
+    setReward(newReward);
+  }, [selectedBoss]);
+  
 
   useEffect(() => {
     // Checks if the challenge is available based on the selectedBoss
@@ -188,7 +200,7 @@ function ChallengeArea({ level, WolfCoinReward, CatCoinReward }) {
                 const attackImages = direction === 'right' ? swordAttackRight : swordAttackLeft;
                 setCurrentImage(attackImages[imageIndex.current % attackImages.length]);
                 imageIndex.current++;
-                if (imageIndex.current === attackImages.length) {
+                if (imageIndex.current === attackImages.length && isBossInRange()) {
                   clearInterval(attackAnimationInterval);
                   attackAnimationInterval = null;
                   applyDamageToBoss(15); 
@@ -207,7 +219,7 @@ function ChallengeArea({ level, WolfCoinReward, CatCoinReward }) {
                 const attackImages = direction === 'right' ? stickAttackRight : stickAttackLeft;
                 setCurrentImage(attackImages[imageIndex.current % attackImages.length]);
                 imageIndex.current++;
-                if (imageIndex.current === attackImages.length) {
+                if (imageIndex.current === attackImages.length && isBossInRange()) {
                   clearInterval(attackAnimationInterval);
                   attackAnimationInterval = null;
                   applyDamageToBoss(10); 
@@ -225,7 +237,7 @@ function ChallengeArea({ level, WolfCoinReward, CatCoinReward }) {
               const attackImages = direction === 'right' ? AttackRight : AttackLeft;
               setCurrentImage(attackImages[imageIndex.current % attackImages.length]);
               imageIndex.current++;
-              if (imageIndex.current === attackImages.length) {
+              if (imageIndex.current === attackImages.length && isBossInRange()) {
                 clearInterval(attackAnimationInterval);
                 attackAnimationInterval = null;
                 applyDamageToBoss(5); 
