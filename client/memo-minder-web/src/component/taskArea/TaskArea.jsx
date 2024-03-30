@@ -227,9 +227,6 @@ const TaskArea = ({
         <div className="taskAreaContainer">
             <Popup show={showPopup} onClose={closePopup} message={popupMessage} />
             <div className="controlButton">
-                <div className="clearButtonContainer">
-                    <button onClick={onClear} className="clearButton">Clear and Reset</button>
-                </div>
                 <TaskButton 
                     onAddHabit={onAddHabit}
                     onAddDaily={onAddDaily}
@@ -359,11 +356,8 @@ const TaskArea = ({
                 </div>
 
                 {/* Rewards Section */}
-                <div className="taskAreaSection">
+                <div className="rewardAreaSection">
                     <h2>Rewards</h2>
-                    <div className="taskAreaNav">
-                        <button>All</button>
-                    </div>
                     <div className="contentContainer">
                         <div className="rewardInputContainer">
                             <input
