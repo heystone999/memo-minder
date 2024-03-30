@@ -104,13 +104,16 @@ const TaskArea = ({
                 onUpdateHabit(habitId, rest);
                 break;
             case 'Daily':
-                onUpdateDaily(updatedItem);
+                const { dailyId, ...restdaily } = updatedItem;
+                onUpdateDaily(dailyId, restdaily);
                 break;
             case 'To-Do':
-                onUpdateTodo(updatedItem);
+                const { todoId, ...resttodo } = updatedItem;
+                onUpdateTodo(todoId, resttodo);
                 break;
             case 'Reward':
-                onUpdateReward(updatedItem);
+                const { rewardId, ...restreward } = updatedItem;
+                onUpdateReward(rewardId, restreward);
                 break;
             default:
                 // Handle unknown type if necessary
@@ -127,13 +130,16 @@ const TaskArea = ({
                 onDeleteHabit(habitId);
                 break;
             case 'Daily':
-                onDeleteDaily(itemToDelete.id);
+                const { dailyId} = itemToDelete;
+                onDeleteDaily(dailyId);
                 break;
             case 'To-Do':
-                onDeleteTodo(itemToDelete.id);
+                const { todoId} = itemToDelete;
+                onDeleteTodo(todoId);
                 break;
             case 'Reward':
-                onDeleteReward(itemToDelete.id);
+                const { rewardId} = itemToDelete;
+                onDeleteReward(rewardId);
                 break;
             default:
                 // Handle unknown type if necessary
@@ -296,10 +302,10 @@ const TaskArea = ({
                         {/* Daily List */}
                         <div className="taskList">
                             {filteredDailies.map(daily => (
-                                <div className={`dailyItem ${daily.completed ? 'completed' : ''}`} key={daily.id}>
+                                <div className={`dailyItem ${daily.completed ? 'completed' : ''}`} key={daily._id}>
                                     <button onClick={(e) => {
                                         e.stopPropagation();  // prevent
-                                        daily.completed ? markDailyAsIncomplete(daily.id) : markDailyAsCompleted(daily.id);
+                                        daily.completed ? markDailyAsIncomplete(daily._id) : markDailyAsCompleted(daily._id);
                                         
 
                                     }}>
@@ -336,10 +342,10 @@ const TaskArea = ({
                         {/* To Do List */}
                         <div className="taskList">
                             {filteredTodos.map(todo => (
-                                <div className={`todoItem ${todo.completed ? 'completed' : ''}`} key={todo.id}>
+                                <div className={`todoItem ${todo.completed ? 'completed' : ''}`} key={todo._id}>
                                     <button onClick={(e) => {
                                         e.stopPropagation();
-                                        todo.completed ? markTodoAsIncomplete(todo.id) : markTodoAsCompleted(todo.id);
+                                        todo.completed ? markTodoAsIncomplete(todo._id) : markTodoAsCompleted(todo._id);
                                         
                                     }}>
                                         {todo.completed ? '-' : '+'}
@@ -371,8 +377,8 @@ const TaskArea = ({
                         </div>
                         <div className="taskList">
                             {rewards.map(reward => (
-                                <div className="rewardItem" key={reward.id}>
-                                    <button onClick={() => handlePayReward(reward.id)}>
+                                <div className="rewardItem" key={reward._id}>
+                                    <button onClick={() => handlePayReward(reward._id)}>
                                         {reward.price} coins
                                     </button>
                                     <p onClick={() => 

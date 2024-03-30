@@ -130,23 +130,19 @@ function App() {
   TaskArea:
   Habit, Daily, To-do, reward
   */
-  // initialize with default tasks and  add a new habit, daily, to-do, reward to the task lists
-  //const defaultHabit = createDefaultItem('Your default habit', { positive: true, negative: true });
-  const defaultDaily = createDefaultItem('Your default daily', { completed: false });
-  const defaultTodo = createDefaultItem('Your default to-do', { completed: false });
-  const defaultReward = createDefaultItem('Your default reward', { price: 10});
-
-  //const [habits, setHabits] = useState(() => JSON.parse(localStorage.getItem('habits')) || [defaultHabit]);
-  const [dailies, setDailies] = useState(() => JSON.parse(localStorage.getItem('dailies')) || [defaultDaily]);
-  const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('todos')) || [defaultTodo]);
-  const [rewards, setRewards] = useState(() => JSON.parse(localStorage.getItem('rewards')) || [defaultReward]); 
   
   const [habits, setHabits] = useState([]); 
+  const [dailies, setDailies] = useState([]);
+  const [todos, setTodos] = useState([]);
+  const [rewards, setRewards] = useState([]); 
 
   // TODO: 账号信息如何管理？全局变量？Context？props传 随用随取？
   // TODO: task数据从server获取后 增删改的回调函数逻辑是否回组件内部
   let validToken;
-  
+  // 暂时用yue实例的id和token来测试
+  const yueUserId = '65f8ec123f2a091381b1e597'; // 从Postman获取的id
+  let retryCount = 0;
+
   const login = async(username, password) => {
     try {
       const response = await axios.post(BASE_URL + SERVER_API.LOGIN, {
@@ -161,10 +157,7 @@ function App() {
     }
   };
 
-    // 暂时用yue实例的id和token来测试 fetchHabits, updateHabit, 和 deleteHabit 功能
-    
-    const yueUserId = '65f8ec123f2a091381b1e597'; // 从Postman获取的id
-    // inside component
+    // habit component
     const fetchHabits = useCallback(async () => {
       try {
         const fetchHabitsUrl = `${BASE_URL}${SERVER_API.FETCH_HABIT.replace(':userId', yueUserId)}`;
@@ -195,52 +188,46 @@ function App() {
     useEffect(() => {
       fetchHabits();
     }, [fetchHabits]);
-
-  let retryCount = 0;
-  const addHabitToServer = async (habit) => {
-    try {
-      console.debug('addHabitToServer:', habit);
-      //if (!habit?.content || !habit?.notes) {
-      if (!habit?.content) {
-        console.warn('invalid habit, no need to post');
-        return;
-      }
-      if (!validToken) {
-        validToken = await login();   
-      }
-      const response = await axios.post(BASE_URL + SERVER_API.ADD_HABIT, {
-        'title': habit.content,
-        'type': habit.positive && habit.negative ? 'both' : !habit.positive && !habit.negative ? 'neutral' : habit.positive ? 'positive' : 'negative',
-        'note': habit.notes
-      }, {
-        headers: {
-          'Authorization': validToken,
-          'Content-Type': 'application/json'
+  
+    const addHabitToServer = async (habit) => {
+      try {
+        console.debug('addHabitToServer:', habit);
+        //if (!habit?.content || !habit?.notes) {
+        if (!habit?.content) {
+          console.warn('invalid habit, no need to post');
+          return;
         }
-      });
-      console.debug('post new habit success:', response.status);
-    } catch (error) {
-      if (error.response.status === STATUS_CODE.UNAUTHORIZED && retryCount < 1) {
-        validToken = null;
-        retryCount++;
-        addHabitToServer(habit);
-      } else {
-        retryCount = 0;
+        if (!validToken) {
+          validToken = await login();   
+        }
+        const response = await axios.post(BASE_URL + SERVER_API.ADD_HABIT, {
+          'title': habit.content,
+          'type': habit.positive && habit.negative ? 'both' : !habit.positive && !habit.negative ? 'neutral' : habit.positive ? 'positive' : 'negative',
+          'note': habit.notes
+        }, {
+          headers: {
+            'Authorization': validToken,
+            'Content-Type': 'application/json'
+          }
+        });
+        console.debug('post new habit success:', response.status);
+      } catch (error) {
+        if (error.response.status === STATUS_CODE.UNAUTHORIZED && retryCount < 1) {
+          validToken = null;
+          retryCount++;
+          addHabitToServer(habit);
+        } else {
+          retryCount = 0;
+        }
+        console.warn('post new habit error:', error);
       }
-      console.warn('post new habit error:', error);
-    }
-  };
-  const addHabit = (habit) => {
-    setHabits(prev => [...prev, habit])
-    addHabitToServer(habit);
-    fetchHabits();
-  };
+    };
+    const addHabit = (habit) => {
+      setHabits(prev => [...prev, habit])
+      addHabitToServer(habit);
+      fetchHabits();
+    };
 
-  const addDaily = (daily) => {setDailies(prev => [...prev, daily])};
-  const addTodo = (todo) => {setTodos(prev => [...prev, todo]);};
-  const addReward = (reward) => {setRewards(prev => [...prev, reward]);};
-
-  //update habit
   const updateHabitToServer = async (habitId, updatedHabit) => {
     try {
       console.debug('updateHabitToServer:', updatedHabit);
@@ -278,7 +265,6 @@ function App() {
     fetchHabits(); 
   };
 
-  
   //delete habit
   const deleteHabitFromServer = async (habitId) => {
     try {
@@ -310,45 +296,369 @@ function App() {
     fetchHabits();
   };
 
-  //update an existing habit, daily, to-do, reward
-  const createUpdater = (setter) => (updatedItem) => {
-    setter((prevItems) => {
-      return prevItems.map((item) => {
-        if (item.id === updatedItem.id) {
-          return updatedItem;
+    // daily component
+    const fetchDailies = useCallback(async () => {
+      try {
+        // Assuming SERVER_API.FETCH_DAILIES is the correct endpoint for fetching dailies
+        const fetchDailiesUrl = `${BASE_URL}${SERVER_API.FETCH_DAILY.replace(':userId', yueUserId)}`;
+        if (!validToken) {
+          validToken = await login();   
         }
-        return item;
-      });
+        const response = await axios.get(fetchDailiesUrl, {
+          headers: {
+            'Authorization': validToken,
+          },
+        });
+    
+        console.log('Fetched dailies:', response.data);
+        // check response.data.dailies
+        console.log('Dailies in response:', response.data.dailies);
+        // Assuming the dailies are in response.data.dailies
+        if (response.data && Array.isArray(response.data.dailies)) {
+          setDailies(response.data.dailies); 
+          console.log('Dailies state after update:', dailies);
+        } else {
+          console.error('Data fetched is not in the expected format:', response.data);
+        }
+    
+      } catch (error) {
+        console.error('Failed to fetch dailies:', error);
+      }
+    }, [validToken]);
+    
+    useEffect(() => {
+      fetchDailies();
+    }, [fetchDailies]); 
+
+    // Add Daily to the server
+    const addDailyToServer = async (daily) => {
+      try {
+        console.debug('addDailyToServer:', daily);
+        if (!daily?.content) {
+          console.warn('Invalid daily, no need to post');
+          return;
+        }
+        if (!validToken) {
+          validToken = await login();   
+        }
+        const response = await axios.post(`${BASE_URL}${SERVER_API.ADD_DAILY}`, {
+          'title': daily.content,
+          'note': daily.notes // Adjust according to the actual structure of a daily
+          // Include other necessary fields
+        }, {
+          headers: {
+            'Authorization': validToken,
+            'Content-Type': 'application/json'
+          }
+        });
+        console.debug('Post new daily success:', response.status);
+      } catch (error) {
+        console.warn('Post new daily error:', error);
+        // Include error handling logic here
+      }
+    };
+
+    const addDaily = (daily) => {
+      setDailies(prev => [...prev, daily]);
+      addDailyToServer(daily);
+      fetchDailies();
+    };
+
+    // Update Daily on the server
+    const updateDailyToServer = async (dailyId, updatedDaily) => {
+      try {
+        console.debug('updateDailyToServer:', updatedDaily);
+        if (!validToken) {
+          validToken = await login();
+        }
+        const updateDailiesUrl = `${BASE_URL}${SERVER_API.MODIFY_DAILY.replace(':dailyId', dailyId)}`;
+        const response = await axios.put(updateDailiesUrl, {
+          'title': updatedDaily.content,
+          'note': updatedDaily.notes // Adjust according to the actual structure of a daily
+          // Include other necessary fields
+        }, {
+          headers: {
+            'Authorization': validToken,
+            'Content-Type': 'application/json'
+          }
+        });
+        console.debug('Update daily success:', response.status);
+      } catch (error) {
+        console.error('Update daily error:', error);
+        // Include error handling logic here
+      }
+    };
+
+    const updateDaily = async (dailyId, updatedDaily) => {
+      await updateDailyToServer(dailyId, updatedDaily);
+      fetchDailies(); 
+    };
+
+    // Delete Daily from the server
+    const deleteDailyFromServer = async (dailyId) => {
+      try {
+        console.debug('deleteDailyFromServer:', dailyId);
+        if (!validToken) {
+          validToken = await login();
+        }
+        const deleteDailiesUrl = `${BASE_URL}${SERVER_API.DELETE_DAILY.replace(':dailyId', dailyId)}`;
+        const response = await axios.delete(deleteDailiesUrl, {
+          headers: {
+            'Authorization': validToken
+          }
+        });
+        console.debug('Delete daily success:', response.status);
+      } catch (error) {
+        console.error('Delete daily error:', error);
+        // Include error handling logic here
+      }
+    };
+
+    const deleteDaily = async (dailyId) => {
+      await deleteDailyFromServer(dailyId);
+      fetchDailies();
+    };
+
+    // todo component
+    const fetchTodos = useCallback(async () => {
+      try {
+        // Replace .FETCH_HABIT with the correct endpoint for fetching todos, if different
+        const fetchTodosUrl = `${BASE_URL}${SERVER_API.FETCH_TODOS.replace(':userId', yueUserId)}`;
+        if (!validToken) {
+          validToken = await login();   
+        }
+        const response = await axios.get(fetchTodosUrl, {
+          headers: {
+            'Authorization': validToken,
+          },
+        });
+    
+        console.log('Fetched todos:', response.data);
+        // Replace 'habits' with the correct property that holds the todos, if different
+        console.log('Todos in response:', response.data.todos);
+        // Assuming the todos are in response.data.todos
+        if (response.data && Array.isArray(response.data.todos)) {
+          setTodos(response.data.todos); // Use the appropriate state updater for todos
+          console.log('Todos state after update:', todos); // Log the updated todos state
+        } else {
+          console.error('Data fetched is not in the expected format:', response.data);
+        }
+    
+      } catch (error) {
+        console.error('Failed to fetch todos:', error);
+      }
+    }, [validToken]); 
+    
+    useEffect(() => {
+      fetchTodos();
+    }, [fetchTodos]); // Update the useEffect hook to call fetchTodos
+    // Add Todo to the server
+const addTodoToServer = async (todo) => {
+  try {
+    console.debug('addTodoToServer:', todo);
+    if (!todo?.content) {
+      console.warn('Invalid todo, no need to post');
+      return;
+    }
+    if (!validToken) {
+      validToken = await login();   
+    }
+    const response = await axios.post(`${BASE_URL}${SERVER_API.ADD_TODOS}`, {
+      'title': todo.content,
+      'note': todo.notes // Adjust according to the actual structure of a todo
+      // Include other necessary fields like 'completed', 'deadline', etc.
+    }, {
+      headers: {
+        'Authorization': validToken,
+        'Content-Type': 'application/json'
+      }
     });
-  };
-  const updateDaily = createUpdater(setDailies);
-  const updateTodo = createUpdater(setTodos);
-  const updateReward = createUpdater(setRewards);
+    console.debug('Post new todo success:', response.status);
+  } catch (error) {
+    console.warn('Post new todo error:', error);
+  }
+};
 
-  // delete an existing habit, daily, to-do, reward
-  const createDeleter = (setter) => (itemId) => {
-    setter((prevItems) => prevItems.filter((item) => item.id !== itemId));
-  };
-  const deleteDaily = createDeleter(setDailies);
-  const deleteTodo = createDeleter(setTodos);
-  const deleteReward = createDeleter(setRewards);
+const addTodo = (todo) => {
+  setTodos(prev => [...prev, todo]);
+  addTodoToServer(todo);
+  fetchTodos();
+};
 
+// Update Todo on the server
+const updateTodoToServer = async (todoId, updatedTodo) => {
+  try {
+    console.debug('updateTodoToServer:', updatedTodo);
+    if (!validToken) {
+      validToken = await login();
+    }
+    const updateTodosUrl = `${BASE_URL}${SERVER_API.MODIFY_TODOS.replace(':todoId', todoId)}`;
+    const response = await axios.put(updateTodosUrl, {
+      'title': updatedTodo.content,
+      'note': updatedTodo.notes // Adjust according to the actual structure of a todo
+    }, {
+      headers: {
+        'Authorization': validToken,
+        'Content-Type': 'application/json'
+      }
+    });
+    console.debug('Update todo success:', response.status);
+  } catch (error) {
+    console.error('Update todo error:', error);
+  }
+};
+
+const updateTodo = async (todoId, updatedTodo) => {
+  await updateTodoToServer(todoId, updatedTodo);
+  fetchTodos(); 
+};
+
+// Delete Todo from the server
+const deleteTodoFromServer = async (todoId) => {
+  try {
+    console.debug('deleteTodoFromServer:', todoId);
+    if (!validToken) {
+      validToken = await login();
+    }
+    const deleteTodosUrl = `${BASE_URL}${SERVER_API.DELETE_TODOS.replace(':todoId', todoId)}`;
+    const response = await axios.delete(deleteTodosUrl, {
+      headers: {
+        'Authorization': validToken
+      }
+    });
+    console.debug('Delete todo success:', response.status);
+  } catch (error) {
+    console.error('Delete todo error:', error);
+  }
+};
+
+const deleteTodo = async (todoId) => {
+  await deleteTodoFromServer(todoId);
+  fetchTodos();
+};
+
+  // reward component
+  const fetchRewards = useCallback(async () => {
+    try {
+      // Replace .FETCH_TODOS with the correct endpoint for fetching rewards
+      const fetchRewardsUrl = `${BASE_URL}${SERVER_API.FETCH_REWARD.replace(':userId', yueUserId)}`;
+      if (!validToken) {
+        validToken = await login();
+      }
+      const response = await axios.get(fetchRewardsUrl, {
+        headers: {
+          'Authorization': validToken,
+        },
+      });
+  
+      console.log('Fetched rewards:', response.data);
+      // Replace 'todos' with the correct property that holds the rewards, if it's different
+      console.log('Rewards in response:', response.data.rewards);
+      // Assuming the rewards are in response.data.rewards
+      if (response.data && Array.isArray(response.data.rewards)) {
+        setRewards(response.data.rewards); // Use the appropriate state updater for rewards
+        console.log('Rewards state after update:', rewards); // Log the updated rewards state
+      } else {
+        console.error('Data fetched is not in the expected format:', response.data);
+      }
+  
+    } catch (error) {
+      console.error('Failed to fetch rewards:', error);
+    }
+  }, [validToken]); // Add dependencies to the dependency array
+  
   useEffect(() => {
-    // save habits, dailies, todos, rewards to local storage whenever it changes
-    //localStorage.setItem('habits', JSON.stringify(habits));
-    localStorage.setItem('dailies', JSON.stringify(dailies));
-    localStorage.setItem('todos', JSON.stringify(todos));
-    localStorage.setItem('rewards', JSON.stringify(rewards));
-  }, [dailies, todos, rewards]); 
+    fetchRewards();
+  }, [fetchRewards]);
+  
+  const addRewardToServer = async (reward) => {
+    try {
+      console.debug('addRewardToServer:', reward);
+      if (!reward?.content) {
+        console.warn('Invalid reward, no need to post');
+        return;
+      }
+      if (!validToken) {
+        validToken = await login();   
+      }
+      const response = await axios.post(`${BASE_URL}${SERVER_API.ADD_REWARD}`, {
+        'title': reward.content,
+        'note': reward.notes // Adjust according to the actual structure of a reward
+      }, {
+        headers: {
+          'Authorization': validToken,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.debug('Post new reward success:', response.status);
+    } catch (error) {
+      console.warn('Post new reward error:', error);
+    }
+  };
+  
+  const addReward = (reward) => {
+    setRewards(prev => [...prev, reward]);
+    addRewardToServer(reward);
+    fetchRewards();
+  };
+  
+  // Update Reward on the server
+  const updateRewardToServer = async (rewardId, updatedReward) => {
+    try {
+      console.debug('updateRewardToServer:', updatedReward);
+      if (!validToken) {
+        validToken = await login();
+      }
+      const updateRewardsUrl = `${BASE_URL}${SERVER_API.MODIFY_REWARD.replace(':rewardId', rewardId)}`;
+      const response = await axios.put(updateRewardsUrl, {
+        'title': updatedReward.content,
+        'note': updatedReward.notes // Adjust according to the actual structure of a reward
+      }, {
+        headers: {
+          'Authorization': validToken,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.debug('Update reward success:', response.status);
+    } catch (error) {
+      console.error('Update reward error:', error);
+    }
+  };
+  
+  const updateReward = async (rewardId, updatedReward) => {
+    await updateRewardToServer(rewardId, updatedReward);
+    fetchRewards(); 
+  };
+  
+  // Delete Reward from the server
+  const deleteRewardFromServer = async (rewardId) => {
+    try {
+      console.debug('deleteRewardFromServer:', rewardId);
+      if (!validToken) {
+        validToken = await login();
+      }
+      const deleteRewardsUrl = `${BASE_URL}${SERVER_API.DELETE_REWARD.replace(':rewardId', rewardId)}`;
+      const response = await axios.delete(deleteRewardsUrl, {
+        headers: {
+          'Authorization': validToken
+        }
+      });
+      console.debug('Delete reward success:', response.status);
+    } catch (error) {
+      console.error('Delete reward error:', error);
+    }
+  };
+  
+  const deleteReward = async (rewardId) => {
+    await deleteRewardFromServer(rewardId);
+    fetchRewards();
+  };
+
 
   const clearStorageAndResetStates = () => {
     // clear all localStorage
     localStorage.clear();
     // update to default state
-    // setHabits(habits); 
-    setDailies([defaultDaily]); 
-    setTodos([defaultTodo]);
-    setRewards([defaultReward]);
     setHealth(100);
     setExperience(0);
     setCoin(0);
