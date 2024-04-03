@@ -98,6 +98,12 @@ input[type="text"] {
     padding-right: 5px; 
 }
 
+.rewardList {
+    max-height: 240px; 
+    overflow-y: auto; 
+    padding-right: 5px; 
+}
+
 
 /* Styles specific to Habits section */
 .habitItem {

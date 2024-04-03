@@ -343,7 +343,10 @@ function App() {
         }
         const response = await axios.post(`${BASE_URL}${SERVER_API.ADD_DAILY}`, {
           'title': daily.content,
-          'note': daily.notes // Adjust according to the actual structure of a daily
+          'note': daily.notes,
+          "startDate": daily.startDate,
+          "repeats": daily.repeats,
+          "repeatEvery": daily.repeatEvery
           // Include other necessary fields
         }, {
           headers: {
@@ -465,7 +468,8 @@ const addTodoToServer = async (todo) => {
     }
     const response = await axios.post(`${BASE_URL}${SERVER_API.ADD_TODOS}`, {
       'title': todo.content,
-      'note': todo.notes // Adjust according to the actual structure of a todo
+      'note': todo.notes,
+      'dueDate': todo.dueDate
       // Include other necessary fields like 'completed', 'deadline', etc.
     }, {
       headers: {
@@ -557,7 +561,7 @@ const deleteTodo = async (todoId) => {
       // Assuming the rewards are in response.data.rewards
       if (response.data && Array.isArray(response.data.rewards)) {
         setRewards(response.data.rewards); // Use the appropriate state updater for rewards
-        console.log('Rewards state after update:', rewards); // Log the updated rewards state
+        console.log('Rewards state after update:', response.data.rewards); // Log the updated rewards state
       } else {
         console.error('Data fetched is not in the expected format:', response.data);
       }
@@ -583,7 +587,8 @@ const deleteTodo = async (todoId) => {
       }
       const response = await axios.post(`${BASE_URL}${SERVER_API.ADD_REWARD}`, {
         'title': reward.content,
-        'note': reward.notes // Adjust according to the actual structure of a reward
+        'note': reward.notes, // Adjust according to the actual structure of a reward
+        'cost': reward.price
       }, {
         headers: {
           'Authorization': validToken,

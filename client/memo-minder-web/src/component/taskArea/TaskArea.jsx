@@ -41,8 +41,10 @@ const TaskArea = ({
     };
 
     const handleHabitKeyPress = handleItemKeyPress(habitInput, setHabitInput, onAddHabit, { positive: true, negative: true });
-    const handleDailyKeyPress = handleItemKeyPress(dailyInput, setDailyInput, onAddDaily, { completed: false });
-    const handleTodoKeyPress = handleItemKeyPress(todoInput, setTodoInput, onAddTodo, { completed: false });
+    let currentDate = new Date();
+    const handleDailyKeyPress = handleItemKeyPress(dailyInput, setDailyInput, onAddDaily, { startDate: currentDate.toLocaleDateString(), repeats: "daily", "repeatEvery": "1", completed: false });
+    currentDate.setDate(currentDate.getDate() + 7);
+    const handleTodoKeyPress = handleItemKeyPress(todoInput, setTodoInput, onAddTodo, { dueDate: currentDate.toLocaleDateString(), completed: false });
     const handleRewardKeyPress = handleItemKeyPress(rewardInput, setRewardInput, onAddReward, {price: 10});
    
     // handle habit button
@@ -65,7 +67,7 @@ const TaskArea = ({
 
     const handlePayReward = (rewardId) => {
         const reward = rewards.find(p => p.id === rewardId);
-        if (coin >= reward.price){
+        if (coin >= reward?.price){
             decreaseCoin(reward.price);
             showCustomPopup("Purchase Successful", `You have successfully purchased: ${reward.content}.`, "rgba(8,186,255, 0.7)"); 
         } else {
@@ -221,7 +223,7 @@ const TaskArea = ({
     const filteredTodos = filterItemsByTab(todos, selectedTodoTab, todoTabMap);
 
     // Right before the return statement to log the filtered habits before rendering
-    console.log('Filtered habits before rendering:', filteredHabits);
+    console.debug('Filtered habits before rendering:', filteredHabits);
 
     return (
         <div className="taskAreaContainer">
@@ -259,7 +261,7 @@ const TaskArea = ({
                         <div className="taskList">
                             {/* Individual Habit Item */}
                             {filteredHabits.map(habit => {
-                                console.log('Rendering habit with key:', habit._id);
+                                console.debug('Rendering habit with key:', habit._id);
                                 return (
                                     <div className="habitItem" key={habit._id}>
                                       {(habit.type === 'positive' || habit.type === 'both') && (
@@ -309,7 +311,7 @@ const TaskArea = ({
                                         {daily.completed ? '-' : '+'}
                                     </button>
                                     {/* text edit */}
-                                    <p onClick={() => handleItemClick(daily, 'Daily')}>{daily.content}</p>
+                                    <p onClick={() => handleItemClick(daily, 'Daily')}>{daily.title}</p>
                                 </div>
                             ))}
                         </div>
@@ -348,7 +350,7 @@ const TaskArea = ({
                                         {todo.completed ? '-' : '+'}
                                         
                                     </button>
-                                    <p onClick={() => handleItemClick(todo, 'To-Do')}>{todo.content}</p>
+                                    <p onClick={() => handleItemClick(todo, 'To-Do')}>{todo.title}</p>
                                 </div>
                             ))}
                         </div>
@@ -369,16 +371,15 @@ const TaskArea = ({
                                 className="rewardInput"
                             />
                         </div>
-                        <div className="taskList">
+                        <div className="rewardList">
                             {rewards.map(reward => (
                                 <div className="rewardItem" key={reward._id}>
                                     <button onClick={() => handlePayReward(reward._id)}>
-                                        {reward.price} coins
+                                        {reward.cost} coins
                                     </button>
                                     <p onClick={() => 
-                                        handleItemClick(reward, 'Reward')}>{reward.content}
+                                        handleItemClick(reward, 'Reward')}>{reward.title}
                                     </p>
-                                    
                                 </div>
                             ))}
                         </div>
