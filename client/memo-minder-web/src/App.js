@@ -511,6 +511,13 @@ const deleteTodo = async (todoId) => {
     fetchRewards();
   }, [fetchRewards]);
 
+  const onLogin = () => {
+    authInfo = getAuthInfo();
+    token = authInfo?.token;
+    id = authInfo?.id;
+    fetchTodos();
+  };
+
   const addRewardToServer = async (reward) => {
     try {
       console.debug('addRewardToServer:', reward);
@@ -728,7 +735,7 @@ const deleteTodo = async (todoId) => {
     },
     {
       path: "/login",
-      element: <Login/>
+      element: <Login handleLoginSuccess={onLogin}/>
     },
     {
       path: "/register",

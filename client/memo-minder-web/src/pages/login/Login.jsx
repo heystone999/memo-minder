@@ -5,7 +5,7 @@ import './login.css';
 import { BASE_URL, STATUS_CODE, SERVER_API } from '../../utils/constants';
 import { setAuthInfo, clearAuthInfo } from '../../utils/auth'
 
-export const Login = (props) => {
+export const Login = ({handleLoginSuccess}) => {
     clearAuthInfo();
     const [email, setEmail] = useState('');
     const [pass, setPass] = useState('');
@@ -24,8 +24,8 @@ export const Login = (props) => {
             if (response?.data?.token && response?.data?.id && response?.data?.username) {
                 console.debug('sign in success:', response.status);
                 setAuthInfo(response.data.username, response.data.token, response.data.id)
+                handleLoginSuccess();
                 navigate("/");
-                console.debug('after navigate');
             }
         } catch (error) {
             console.warn('sign in error:', error);
