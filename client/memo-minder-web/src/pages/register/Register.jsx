@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, {useState} from "react"
 import './register.css';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {BASE_URL, STATUS_CODE, SERVER_API} from '../../utils/constants'
 
 export const Register = (props) => {
@@ -10,6 +10,7 @@ export const Register = (props) => {
     const [name, setName] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
     const [passwordsMatch, setPasswordsMatch] = useState(true);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) =>{
         e.preventDefault();
@@ -32,6 +33,7 @@ export const Register = (props) => {
             'email': email
           });
           console.debug('sign up success:', response.status);
+          navigate("/Login");
         } catch (error) {
           console.warn('sign up error:', error);
         }

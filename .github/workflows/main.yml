@@ -26,7 +26,7 @@ jobs:
         github-token: ${{ secrets.TOKEN_FOR_MEMO }}
         annotations: none
         test-script: npm test
-        custom-title: Coverage report for fronend
+        custom-title: Coverage report for frontend
             
   backend-build-and-test:
     runs-on: ubuntu-latest
