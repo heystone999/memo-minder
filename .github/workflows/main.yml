@@ -20,7 +20,7 @@ jobs:
         node-version: '18.x'
 
     - name: Jest coverage report
-      uses: ArtiomTr/jest-coverage-report-action@v2
+      uses: ArtiomTr/jest-coverage-report-action@v2.2.7
       with:
         working-directory: ./client/memo-minder-web
         github-token: ${{ secrets.TOKEN_FOR_MEMO }}
