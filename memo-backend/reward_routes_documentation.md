@@ -64,6 +64,21 @@
 - **Body**:
   - `message`: String - Confirmation message.
 
+
+## Complete Reward
+
+**Endpoint**: `PUT /api/rewards/:rewardId/complete`
+
+**Description**: Marks a reward identified by rewardId as completed for the authenticated user.
+
+**Authorization**: Requires a valid JWT token in the request header.
+
+**Response**:
+- **Status**: 200 OK
+- **Body**:
+  - `message`: String - Confirmation message.
+  - `reward`: Object - Details of the completed reward.
+
 ## Reward Object
 
 - `_id`: String - Unique identifier for the reward.
@@ -71,3 +86,4 @@
 - `note`: String (optional) - Additional notes about the reward.
 - `cost`: Number - The cost of the reward in coins.
 - `user`: String - The user ID to which the reward belongs.
+- `completed`: Boolean - Indicates whether the reward is completed.

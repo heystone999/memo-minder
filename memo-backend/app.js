@@ -12,6 +12,7 @@ const habitsRouter = require('./controllers/habits');
 const dailiesRouter = require('./controllers/dailies');
 const todosRouter = require('./controllers/todos');
 const rewardsRouter = require('./controllers/rewards');
+const historiesRouter = require('./controllers/histories');
 const profilesRouter = require('./controllers/profiles');
 const shopRouter = require('./controllers/shop')
 
@@ -42,6 +43,7 @@ app.use('/api/habits', habitsRouter)
 app.use('/api/dailies', dailiesRouter)
 app.use('/api/todos', todosRouter)
 app.use('/api/rewards', rewardsRouter)
+app.use('/api/history', historiesRouter)
 app.use('/api/profiles', profilesRouter)
 app.use('/api/shop', shopRouter)
 

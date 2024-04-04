@@ -68,6 +68,20 @@
 - **Body**:
   - `message`: String - Confirmation message.
 
+## Complete Daily
+
+**Endpoint**: `PUT /api/dailies/:dailyId/complete`
+
+**Description**: Marks a daily identified by `dailyId` as completed for the authenticated user.
+
+**Authorization**: Requires a valid JWT token in the request header.
+
+**Response**:
+- **Status**: 200 OK
+- **Body**:
+  - `message`: String - Confirmation message.
+  - `daily`: Object - Updated daily details with `completed` set to `true`.
+
 ## Daily Object
 
 - `_id`: String - Unique identifier for the daily.
@@ -76,4 +90,5 @@
 - `startDate`: Date - The start date of the daily.
 - `repeats`: String - Frequency of the daily (daily, weekly, monthly, yearly).
 - `repeatEvery`: Number - Repeat interval for the daily.
+- `completed`: Boolean - Indicates whether the daily is completed.
 - `user`: String - The user ID to which the habit belongs.

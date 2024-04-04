@@ -14,7 +14,11 @@ const rewardSchema = new mongoose.Schema({
   cost: {
     type: Number,
     required: true,
-    min: 0 // Assuming cost cannot be negative
+    min: 0
+  },
+  completed: {
+    type: Boolean,
+    default: false // Defaults to false when a reward is created
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -25,4 +29,4 @@ const rewardSchema = new mongoose.Schema({
 
 const Reward = mongoose.model('Reward', rewardSchema);
 
-module.exports = Reward;
+module.exports = Reward;  

@@ -52,6 +52,12 @@ router.post('/', verifyToken, async (req, res) => {
     // Save the habit object to the database
     await habit.save();
 
+    await History.findOneAndUpdate(
+      { user: userId },
+      { $inc: { habitsAdded: 1 } },
+      { upsert: true }
+    );
+
     res.status(201).json({ message: 'Habit added successfully', habit });
   } catch (error) {
     console.error(error);
@@ -151,6 +157,12 @@ router.put('/:habitId/increment/positive', verifyToken, async (req, res) => {
     // Increment the positive counter
     habit.positiveCount += 1;
     await habit.save();
+
+    await History.findOneAndUpdate(
+      { user: userId },
+      { $inc: { habitsCompleted: 1 } },
+      { upsert: true }
+    );
 
     res.status(200).json({ message: 'Positive counter incremented successfully', habit });
   } catch (error) {

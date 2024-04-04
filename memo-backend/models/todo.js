@@ -15,6 +15,10 @@ const todoSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  completed: {
+    type: Boolean,
+    default: false // By default, todos are not completed
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
