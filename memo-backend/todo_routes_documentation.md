@@ -64,6 +64,20 @@
 - **Body**:
   - `message`: String - Confirmation message.
 
+## Complete Todo
+
+**Endpoint**: `PUT /api/todos/:todoId/complete`
+
+**Description**: Marks a todo identified by `todoId` as completed for the authenticated user.
+
+**Authorization**: Requires a valid JWT token in the request header.
+
+**Response**:
+- **Status**: 200 OK
+- **Body**:
+  - `message`: String - Confirmation message.
+  - `todo`: Object - Updated todo details with `completed` set to `true`.
+
 ## Todo Object
 
 - `_id`: String - Unique identifier for the todo.
@@ -71,3 +85,4 @@
 - `note`: String (optional) - Additional notes about the todo.
 - `dueDate`: Date (optional) - The due date of the todo.
 - `user`: String - The user ID to which the habit belongs.
+- `completed`: Boolean - Indicates whether the todo is completed.

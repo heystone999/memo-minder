@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
+const Profile = require('../models/profile')
 
 
 usersRouter.get('/', async (request, response) => {
@@ -34,7 +35,23 @@ usersRouter.post('/', async (request, response) => {
   })
 
   const savedUser = await user.save()
+
+  // create profile
+  const initialProfile = new Profile({
+    userId: savedUser._id,
+    health: 100,
+    level: 1,
+    experience: 0,
+    coins: 0,
+  })
+
+  const savedProfile = await initialProfile.save();
+
   response.status(201).json(savedUser)
+  // response.status(201).json({
+  //   user: savedUser,
+  //   profile: savedProfile
+  // })
 })
 
 

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Todo = require('../models/todo');
+const History = require('../models/history');
 
 // Middleware function to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -37,6 +38,12 @@ router.post('/', verifyToken, async (req, res) => {
     });
 
     await todo.save();
+
+    await History.findOneAndUpdate(
+      { user: userId }, // Find the user's history
+      { $inc: { todosAdded: 1 } }, // Increment the todosAdded field by 1
+      { upsert: true } // Create a new history entry if it doesn't exist
+    );
 
     res.status(201).json({ message: 'Todo added successfully', todo });
   } catch (error) {
@@ -108,6 +115,43 @@ router.delete('/:todoId', verifyToken, async (req, res) => {
 
     await Todo.findByIdAndDelete(todoId);
     res.status(200).json({ message: 'Todo deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Route to mark a todo as completed
+router.put('/:todoId/complete', verifyToken, async (req, res) => {
+  try {
+    const todoId = req.params.todoId;
+    const userId = req.user.id;
+
+    // Find the todo by ID and user
+    const todo = await Todo.findOne({ _id: todoId, user: userId });
+    if (!todo) {
+      return res.status(404).json({ message: 'Todo not found' });
+    }
+
+    // Check if the todo is already completed
+    if (todo.completed) {
+      return res.status(400).json({ message: 'Todo is already completed' });
+    }
+    
+    // Update the todo status to completed
+    todo.completed = true;
+    
+    // Save the updated todo
+    await todo.save();
+
+    // Update the user's history
+    await History.findOneAndUpdate(
+      { user: userId },
+      { $inc: { todosCompleted: 1 } }, // Increment the todosCompleted field by 1
+      { upsert: true }
+    );
+
+    res.status(200).json({ message: 'Todo marked as completed', todo });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
