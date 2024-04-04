@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import "./Header.css";
+import { getAuthInfo } from '../../utils/auth'
 
 const defaultProducts = [
   { id: 'stick', name: 'Stick', price: 15, imgSrc: '/stick.png', soldSrc: '/stick.png' },
@@ -10,7 +11,7 @@ const defaultProducts = [
 const Header = ({ health, experience, level, products = defaultProducts }) => {
     const [boughtProducts, setBoughtProducts] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
-
+    const [username, setUserName] = useState(getAuthInfo()?.username);
     useEffect(() => {
         // update state
         const updateBoughtProducts = () => {
@@ -54,7 +55,7 @@ const Header = ({ health, experience, level, products = defaultProducts }) => {
                     }
                 </div>
                 <div className="user-character-info">
-                    <div className="username">Ray</div>
+                    <div className="username">{username}</div>
                     <div className="user-data">
                         {/*- Health Bar -*/}
                         <div className="health">

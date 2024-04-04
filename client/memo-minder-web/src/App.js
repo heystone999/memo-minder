@@ -17,6 +17,8 @@ import ChallengeArea from './component/challengeArea/ChallengeArea';
 import Popup from './component/popup/Popup';
 import MilestonesArea from './component/milestonesArea/MilestonesArea';
 import {BASE_URL, STATUS_CODE, SERVER_API} from './utils/constants'
+import { getAuthInfo, clearAuthInfo } from './utils/auth'
+
 
 // function to create default items for TaskArea
 const createDefaultItem = (content, options = {}) => ({
@@ -31,6 +33,13 @@ function App() {
   limitation to get access to home page 
   before login (change to false to apply)
   */
+
+  console.debug('App');
+
+  let authInfo = getAuthInfo();
+  let token = authInfo?.token;
+  let id = authInfo?.id;
+
   const currentUser = true;
 
   /* Popup */
@@ -130,43 +139,19 @@ function App() {
   TaskArea:
   Habit, Daily, To-do, reward
   */
-  
   const [habits, setHabits] = useState([]); 
   const [dailies, setDailies] = useState([]);
   const [todos, setTodos] = useState([]);
   const [rewards, setRewards] = useState([]); 
 
-  // TODO: 账号信息如何管理？全局变量？Context？props传 随用随取？
-  // TODO: task数据从server获取后 增删改的回调函数逻辑是否回组件内部
-  let validToken;
-  // 暂时用yue实例的id和token来测试
-  const yueUserId = '65f8ec123f2a091381b1e597'; // 从Postman获取的id
-  let retryCount = 0;
-
-  const login = async(username, password) => {
-    try {
-      const response = await axios.post(BASE_URL + SERVER_API.LOGIN, {
-        // TODO: delete the stub username/psw when login is integrated with backend
-        'username': username ?? 'yue',
-        'password': password ?? 'yue@memominder'
-      });
-      console.debug('login success:', response.status);
-      return response?.data?.token;
-    } catch (error) {
-      return Promise.reject(error)
-    }
-  };
-
+  // TODO: task数据从server获取后 增删改的回调函数逻辑是否回组件内部 来不及了不改了
     // habit component
     const fetchHabits = useCallback(async () => {
       try {
-        const fetchHabitsUrl = `${BASE_URL}${SERVER_API.FETCH_HABIT.replace(':userId', yueUserId)}`;
-        if (!validToken) {
-          validToken = await login();   
-        }
+        const fetchHabitsUrl = `${BASE_URL}${SERVER_API.FETCH_HABIT.replace(':userId', id)}`;
         const response = await axios.get(fetchHabitsUrl, {
           headers: {
-            'Authorization': validToken,
+            'Authorization': token,
           },
         });
   
@@ -183,7 +168,7 @@ function App() {
       } catch (error) {
         console.error('Failed to fetch habits:', error);
       }
-    },[validToken]);
+    },[token]);
   
     useEffect(() => {
       fetchHabits();
@@ -197,29 +182,22 @@ function App() {
           console.warn('invalid habit, no need to post');
           return;
         }
-        if (!validToken) {
-          validToken = await login();   
-        }
         const response = await axios.post(BASE_URL + SERVER_API.ADD_HABIT, {
           'title': habit.content,
           'type': habit.positive && habit.negative ? 'both' : !habit.positive && !habit.negative ? 'neutral' : habit.positive ? 'positive' : 'negative',
           'note': habit.notes
         }, {
           headers: {
-            'Authorization': validToken,
+            'Authorization': token,
             'Content-Type': 'application/json'
           }
         });
         console.debug('post new habit success:', response.status);
       } catch (error) {
-        if (error.response.status === STATUS_CODE.UNAUTHORIZED && retryCount < 1) {
-          validToken = null;
-          retryCount++;
-          addHabitToServer(habit);
-        } else {
-          retryCount = 0;
-        }
         console.warn('post new habit error:', error);
+        if (error.response.status === STATUS_CODE.UNAUTHORIZED) {
+          Navigate("/Login");
+        }
       }
     };
     const addHabit = (habit) => {
@@ -231,9 +209,6 @@ function App() {
   const updateHabitToServer = async (habitId, updatedHabit) => {
     try {
       console.debug('updateHabitToServer:', updatedHabit);
-      if (!validToken) {
-        validToken = await login();
-      }
       console.log('habit to be updated-old:',habitId)
       console.log('habit to be updated-new:',updatedHabit)
       const updateHabitsUrl = `${BASE_URL}${SERVER_API.MODIFY_HABIT.replace(':habitId', habitId)}`;
@@ -243,19 +218,14 @@ function App() {
         'note': updatedHabit.notes
       }, {
         headers: {
-          'Authorization': validToken,
+          'Authorization': token,
           'Content-Type': 'application/json'
         }
       });
       console.debug('update habit success:', response.status);
     } catch (error) {
-      if (error.response && error.response.status === STATUS_CODE.UNAUTHORIZED && retryCount < 1) {
-        validToken = null;
-        retryCount++;
-        updateHabitToServer(habitId, updatedHabit); // Retry the update after re-login
-      } else {
-        retryCount = 0;
-        console.error('update habit error:', error);
+      if (error.response.status === STATUS_CODE.UNAUTHORIZED) {
+        Navigate("/Login");
       }
     }
   };
@@ -269,25 +239,18 @@ function App() {
   const deleteHabitFromServer = async (habitId) => {
     try {
       console.debug('deleteHabitFromServer:', habitId);
-      if (!validToken) {
-        validToken = await login();
-      }
       console.log('Habit to be delete:', habitId);
       const deleteHabitsUrl = `${BASE_URL}${SERVER_API.DELETE_HABIT.replace(':habitId', habitId)}`;
       const response = await axios.delete(deleteHabitsUrl, {
         headers: {
-          'Authorization': validToken
+          'Authorization': token
         }
       });
       console.debug('delete habit success:', response.status);
     } catch (error) {
-      if (error.response && error.response.status === STATUS_CODE.UNAUTHORIZED && retryCount < 1) {
-        validToken = null;
-        retryCount++;
-        deleteHabitFromServer(habitId); // Retry the delete after re-login
-      } else {
-        retryCount = 0;
-        console.error('delete habit error:', error);
+      console.error('delete habit error:', error);
+      if (error.response.status === STATUS_CODE.UNAUTHORIZED) {
+        Navigate("/Login");
       }
     }
   };
@@ -300,13 +263,10 @@ function App() {
     const fetchDailies = useCallback(async () => {
       try {
         // Assuming SERVER_API.FETCH_DAILIES is the correct endpoint for fetching dailies
-        const fetchDailiesUrl = `${BASE_URL}${SERVER_API.FETCH_DAILY.replace(':userId', yueUserId)}`;
-        if (!validToken) {
-          validToken = await login();   
-        }
+        const fetchDailiesUrl = `${BASE_URL}${SERVER_API.FETCH_DAILY.replace(':userId', id)}`;
         const response = await axios.get(fetchDailiesUrl, {
           headers: {
-            'Authorization': validToken,
+            'Authorization': token,
           },
         });
     
@@ -324,7 +284,7 @@ function App() {
       } catch (error) {
         console.error('Failed to fetch dailies:', error);
       }
-    }, [validToken]);
+    }, [token]);
     
     useEffect(() => {
       fetchDailies();
@@ -338,9 +298,6 @@ function App() {
           console.warn('Invalid daily, no need to post');
           return;
         }
-        if (!validToken) {
-          validToken = await login();   
-        }
         const response = await axios.post(`${BASE_URL}${SERVER_API.ADD_DAILY}`, {
           'title': daily.content,
           'note': daily.notes,
@@ -350,7 +307,7 @@ function App() {
           // Include other necessary fields
         }, {
           headers: {
-            'Authorization': validToken,
+            'Authorization': token,
             'Content-Type': 'application/json'
           }
         });
@@ -371,9 +328,6 @@ function App() {
     const updateDailyToServer = async (dailyId, updatedDaily) => {
       try {
         console.debug('updateDailyToServer:', updatedDaily);
-        if (!validToken) {
-          validToken = await login();
-        }
         const updateDailiesUrl = `${BASE_URL}${SERVER_API.MODIFY_DAILY.replace(':dailyId', dailyId)}`;
         const response = await axios.put(updateDailiesUrl, {
           'title': updatedDaily.content,
@@ -381,7 +335,7 @@ function App() {
           // Include other necessary fields
         }, {
           headers: {
-            'Authorization': validToken,
+            'Authorization': token,
             'Content-Type': 'application/json'
           }
         });
@@ -401,13 +355,10 @@ function App() {
     const deleteDailyFromServer = async (dailyId) => {
       try {
         console.debug('deleteDailyFromServer:', dailyId);
-        if (!validToken) {
-          validToken = await login();
-        }
         const deleteDailiesUrl = `${BASE_URL}${SERVER_API.DELETE_DAILY.replace(':dailyId', dailyId)}`;
         const response = await axios.delete(deleteDailiesUrl, {
           headers: {
-            'Authorization': validToken
+            'Authorization': token
           }
         });
         console.debug('Delete daily success:', response.status);
@@ -426,13 +377,10 @@ function App() {
     const fetchTodos = useCallback(async () => {
       try {
         // Replace .FETCH_HABIT with the correct endpoint for fetching todos, if different
-        const fetchTodosUrl = `${BASE_URL}${SERVER_API.FETCH_TODOS.replace(':userId', yueUserId)}`;
-        if (!validToken) {
-          validToken = await login();   
-        }
+        const fetchTodosUrl = `${BASE_URL}${SERVER_API.FETCH_TODOS.replace(':userId', id)}`;
         const response = await axios.get(fetchTodosUrl, {
           headers: {
-            'Authorization': validToken,
+            'Authorization': token,
           },
         });
     
@@ -450,7 +398,7 @@ function App() {
       } catch (error) {
         console.error('Failed to fetch todos:', error);
       }
-    }, [validToken]); 
+    }, [token]); 
     
     useEffect(() => {
       fetchTodos();
@@ -463,9 +411,6 @@ const addTodoToServer = async (todo) => {
       console.warn('Invalid todo, no need to post');
       return;
     }
-    if (!validToken) {
-      validToken = await login();   
-    }
     const response = await axios.post(`${BASE_URL}${SERVER_API.ADD_TODOS}`, {
       'title': todo.content,
       'note': todo.notes,
@@ -473,7 +418,7 @@ const addTodoToServer = async (todo) => {
       // Include other necessary fields like 'completed', 'deadline', etc.
     }, {
       headers: {
-        'Authorization': validToken,
+        'Authorization': token,
         'Content-Type': 'application/json'
       }
     });
@@ -493,16 +438,13 @@ const addTodo = (todo) => {
 const updateTodoToServer = async (todoId, updatedTodo) => {
   try {
     console.debug('updateTodoToServer:', updatedTodo);
-    if (!validToken) {
-      validToken = await login();
-    }
     const updateTodosUrl = `${BASE_URL}${SERVER_API.MODIFY_TODOS.replace(':todoId', todoId)}`;
     const response = await axios.put(updateTodosUrl, {
       'title': updatedTodo.content,
       'note': updatedTodo.notes // Adjust according to the actual structure of a todo
     }, {
       headers: {
-        'Authorization': validToken,
+        'Authorization': token,
         'Content-Type': 'application/json'
       }
     });
@@ -521,13 +463,10 @@ const updateTodo = async (todoId, updatedTodo) => {
 const deleteTodoFromServer = async (todoId) => {
   try {
     console.debug('deleteTodoFromServer:', todoId);
-    if (!validToken) {
-      validToken = await login();
-    }
     const deleteTodosUrl = `${BASE_URL}${SERVER_API.DELETE_TODOS.replace(':todoId', todoId)}`;
     const response = await axios.delete(deleteTodosUrl, {
       headers: {
-        'Authorization': validToken
+        'Authorization': token
       }
     });
     console.debug('Delete todo success:', response.status);
@@ -545,13 +484,10 @@ const deleteTodo = async (todoId) => {
   const fetchRewards = useCallback(async () => {
     try {
       // Replace .FETCH_TODOS with the correct endpoint for fetching rewards
-      const fetchRewardsUrl = `${BASE_URL}${SERVER_API.FETCH_REWARD.replace(':userId', yueUserId)}`;
-      if (!validToken) {
-        validToken = await login();
-      }
+      const fetchRewardsUrl = `${BASE_URL}${SERVER_API.FETCH_REWARD.replace(':userId', id)}`;
       const response = await axios.get(fetchRewardsUrl, {
         headers: {
-          'Authorization': validToken,
+          'Authorization': token,
         },
       });
   
@@ -569,12 +505,12 @@ const deleteTodo = async (todoId) => {
     } catch (error) {
       console.error('Failed to fetch rewards:', error);
     }
-  }, [validToken]); // Add dependencies to the dependency array
+  }, [token]); // Add dependencies to the dependency array
   
   useEffect(() => {
     fetchRewards();
   }, [fetchRewards]);
-  
+
   const addRewardToServer = async (reward) => {
     try {
       console.debug('addRewardToServer:', reward);
@@ -582,16 +518,13 @@ const deleteTodo = async (todoId) => {
         console.warn('Invalid reward, no need to post');
         return;
       }
-      if (!validToken) {
-        validToken = await login();   
-      }
       const response = await axios.post(`${BASE_URL}${SERVER_API.ADD_REWARD}`, {
         'title': reward.content,
         'note': reward.notes, // Adjust according to the actual structure of a reward
         'cost': reward.price
       }, {
         headers: {
-          'Authorization': validToken,
+          'Authorization': token,
           'Content-Type': 'application/json'
         }
       });
@@ -611,16 +544,13 @@ const deleteTodo = async (todoId) => {
   const updateRewardToServer = async (rewardId, updatedReward) => {
     try {
       console.debug('updateRewardToServer:', updatedReward);
-      if (!validToken) {
-        validToken = await login();
-      }
       const updateRewardsUrl = `${BASE_URL}${SERVER_API.MODIFY_REWARD.replace(':rewardId', rewardId)}`;
       const response = await axios.put(updateRewardsUrl, {
         'title': updatedReward.content,
         'note': updatedReward.notes // Adjust according to the actual structure of a reward
       }, {
         headers: {
-          'Authorization': validToken,
+          'Authorization': token,
           'Content-Type': 'application/json'
         }
       });
@@ -639,13 +569,10 @@ const deleteTodo = async (todoId) => {
   const deleteRewardFromServer = async (rewardId) => {
     try {
       console.debug('deleteRewardFromServer:', rewardId);
-      if (!validToken) {
-        validToken = await login();
-      }
       const deleteRewardsUrl = `${BASE_URL}${SERVER_API.DELETE_REWARD.replace(':rewardId', rewardId)}`;
       const response = await axios.delete(deleteRewardsUrl, {
         headers: {
-          'Authorization': validToken
+          'Authorization': token
         }
       });
       console.debug('Delete reward success:', response.status);

@@ -17,7 +17,15 @@ const Milestone = ({ leftImage, subscript, text, rightImage, completedCount, tot
                 </div>
                 <div className="progress-text">{progressText}</div>
             </div>
-            <img src={rightImage} alt="" className="icon right-icon" />
+            <img
+                src={rightImage}
+                alt=""
+                className="icon right-icon"
+                style={{
+                    filter: progressPercentage < 100 ? 'grayscale(100%)' : 'none'
+                }}
+            />
+            {/* <img src={rightImage} alt="" className="icon right-icon" /> */}
         </div>
     );
 };
@@ -29,40 +37,56 @@ const MilestonesArea = () => {
     // TODO: 后续用云侧数据替换
     const milestonesData = [
         {
+            leftImage: '/warrior.png',
+            subscript: 'Warrior',
+            text: 'First victory in a challenge',
+            rightImage: 'crystal5.png',
+            completedCount: 1,
+            totalCount: 1
+        },
+        {
+            leftImage: '/daily.png',
+            subscript: '3 Perfect Days',
+            text: 'Completed all active Dailies on 3 days',
+            rightImage: '/crystal6.png',
+            completedCount: 0,
+            totalCount: 3
+        },
+        {
             leftImage: '/habit.png',
-            subscript: 'x10',
+            subscript: 'Habit Planner',
             text: 'Add 10 Habits',
-            rightImage: '/crystal0.png',
+            rightImage: '/crystal7.png',
             completedCount: 1,
             totalCount: 10
         },
         {
             leftImage: '/daily.png',
-            subscript: 'x10',
+            subscript: 'Daily Planner',
             text: 'Add 10 Dailies',
-            rightImage: '/crystal4.png',
+            rightImage: '/crystal8.png',
             completedCount: 0,
             totalCount: 10
         },
         {
             leftImage: '/todo.png',
-            subscript: 'x10',
+            subscript: 'Todo Planner',
             text: 'Add 10 Todo\'s',
-            rightImage: '/crystal2.png',
+            rightImage: '/crystal9.png',
             completedCount: 2,
             totalCount: 10
         },
         {
             leftImage: '/reward.png',
-            subscript: 'x10',
+            subscript: 'Daydreamer',
             text: 'Add 10 Rewards',
-            rightImage: '/crystal3.png',
+            rightImage: '/crystal10.png',
             completedCount: 3,
             totalCount: 10
         },
         {
             leftImage: '/habit.png',
-            subscript: '3+',
+            subscript: 'Habit Champion',
             text: 'Complete 3 Habits',
             rightImage: 'crystal0.png',
             completedCount: 1,
@@ -70,15 +94,15 @@ const MilestonesArea = () => {
         },
         {
             leftImage: '/daily.png',
-            subscript: '3+',
+            subscript: 'Daily Champion',
             text: 'Complete 3 Dailies',
-            rightImage: '/crystal4.png',
+            rightImage: '/crystal12.png',
             completedCount: 0,
             totalCount: 3
         },
         {
             leftImage: '/todo.png',
-            subscript: '3+',
+            subscript: 'Todo Champion',
             text: 'Complete 3 Todo\'s',
             rightImage: '/crystal2.png',
             completedCount: 2,
@@ -86,26 +110,10 @@ const MilestonesArea = () => {
         },
         {
             leftImage: '/reward.png',
-            subscript: '3+',
+            subscript: 'Fulfilled Dreamer',
             text: 'Gain 3 Rewards',
             rightImage: '/crystal3.png',
             completedCount: 3,
-            totalCount: 3
-        },
-        {
-            leftImage: '/habit.png',
-            subscript: '3+',
-            text: 'Add 3 Habit',
-            rightImage: 'crystal0.png',
-            completedCount: 1,
-            totalCount: 3
-        },
-        {
-            leftImage: '/daily.png',
-            subscript: '3 Perfect Days',
-            text: 'Completed all active Dailies on 3 days',
-            rightImage: '/crystal4.png',
-            completedCount: 0,
             totalCount: 3
         },
     ];

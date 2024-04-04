@@ -8,6 +8,7 @@ export const STATUS_CODE = {
 };
 
 export const SERVER_API = {
+    REGISTER: '/api/users',
     LOGIN: '/api/login',
     ADD_HABIT: '/api/habits',
     FETCH_HABIT: '/api/habits/user/:userId',

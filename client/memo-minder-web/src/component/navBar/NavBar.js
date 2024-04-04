@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import "./NavBar.css";
 import React, { useState } from "react";
+import { getAuthInfo } from '../../utils/auth'
 
 function Navbar({ coin, showTaskArea, showShop, showChallenge, showMilestones, handleTaskClick, handleShopClick, handleChallengeClick, handleMilestonesClick }) {
   const [open, setOpen] = useState(false);
+  const [username, setUserName] = useState(getAuthInfo()?.username);
 
   const handleShopLinkClick = () => {
     setOpen(false); 
@@ -66,7 +68,7 @@ function Navbar({ coin, showTaskArea, showShop, showChallenge, showMilestones, h
               setOpen(!open);
             }}
           />
-          <span className="user-name">Ray</span>
+          <span className="user-name">{username}</span>
         </div>
       </div>
       {/* User dropdown menu */}

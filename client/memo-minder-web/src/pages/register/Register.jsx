@@ -1,6 +1,8 @@
+import axios from 'axios';
 import React, {useState} from "react"
 import './register.css';
 import { Link } from "react-router-dom";
+import {BASE_URL, STATUS_CODE, SERVER_API} from '../../utils/constants'
 
 export const Register = (props) => {
     const [email, setEmail] = useState('');
@@ -9,7 +11,7 @@ export const Register = (props) => {
     const [confirmPass, setConfirmPass] = useState('');
     const [passwordsMatch, setPasswordsMatch] = useState(true);
 
-    const handleSubmit = (e) =>{
+    const handleSubmit = async (e) =>{
         e.preventDefault();
 
         if (!passwordsMatch) {
@@ -18,7 +20,22 @@ export const Register = (props) => {
           }
 
         console.log(email);
+
+        signUp();
     }
+
+    const signUp = async () => {
+        try {
+          const response = await axios.post(BASE_URL + SERVER_API.REGISTER, {
+            'username': name,
+            'password': confirmPass,
+            'email': email
+          });
+          console.debug('sign up success:', response.status);
+        } catch (error) {
+          console.warn('sign up error:', error);
+        }
+      };
 
     const handleConfirmPassChange = (e) => {
         const confirmPassword = e.target.value;
