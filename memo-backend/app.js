@@ -45,6 +45,11 @@ app.use('/api/rewards', rewardsRouter)
 app.use('/api/profiles', profilesRouter)
 app.use('/api/shop', shopRouter)
 
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'))
+})
+
 app.use(middleware.errorHandler)
 
 module.exports = app
