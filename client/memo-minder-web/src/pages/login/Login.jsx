@@ -38,8 +38,8 @@ export const Login = ({handleLoginSuccess}) => {
             <div className="auth-form-container" >
                 <h2>Login</h2>
                 <form className="login-form" onSubmit={handleSubmit}>
-                    <label htmlFor="email">Email / User Name</label>
-                    <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your Email/ User Name" id="email" name="email" />
+                    <label htmlFor="email">User Name</label>
+                    <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your User Name" id="email" name="email" />
                     <label htmlFor="password">Password</label>
                     <input value={pass} onChange={(e) => setPass(e.target.value)} type="password" placeholder="********" id="password" name="password" />
                     <button className="login-btn" type="submit">Log In</button>

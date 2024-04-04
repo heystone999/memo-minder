@@ -65,10 +65,11 @@ const TaskArea = ({
         console.log('After updateHealth called');
     };
 
-    const handlePayReward = (rewardId) => {
-        const reward = rewards.find(p => p.id === rewardId);
-        if (coin >= reward?.price){
-            decreaseCoin(reward.price);
+    const handlePayReward = (reward) => {
+        // const reward = rewards.find(p => p.id === rewardId);
+        console.warn('handlePayReward: ', reward);
+        if (coin >= reward?.cost){
+            decreaseCoin(reward.cost);
             showCustomPopup("Purchase Successful", `You have successfully purchased: ${reward.content}.`, "rgba(8,186,255, 0.7)"); 
         } else {
             showCustomPopup ("Purchase Failed", "You do not have enough coins.", "rgba(243, 97, 105, 0.7)");
@@ -374,7 +375,7 @@ const TaskArea = ({
                         <div className="rewardList">
                             {rewards.map(reward => (
                                 <div className="rewardItem" key={reward._id}>
-                                    <button onClick={() => handlePayReward(reward._id)}>
+                                    <button onClick={() => handlePayReward(reward)}>
                                         {reward.cost} coins
                                     </button>
                                     <p onClick={() => 
