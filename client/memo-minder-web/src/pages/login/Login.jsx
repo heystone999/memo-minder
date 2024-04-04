@@ -26,7 +26,6 @@ export const Login = (props) => {
                 setAuthInfo(response.data.username, response.data.token, response.data.id)
                 navigate("/");
                 console.debug('after navigate');
-
             }
         } catch (error) {
             console.warn('sign in error:', error);

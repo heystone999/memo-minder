@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback} from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
-  Navigate,
+  Navigate
 } from "react-router-dom";
 import './App.css';
 import Navbar from './component/navBar/NavBar';
@@ -40,7 +40,7 @@ function App() {
   let token = authInfo?.token;
   let id = authInfo?.id;
 
-  const currentUser = true;
+  // const currentUser = !!authInfo;
 
   /* Popup */
   const [showPopup, setShowPopup] = useState(false);
@@ -196,7 +196,7 @@ function App() {
       } catch (error) {
         console.warn('post new habit error:', error);
         if (error.response.status === STATUS_CODE.UNAUTHORIZED) {
-          Navigate("/Login");
+          // Navigate("/Login");
         }
       }
     };
@@ -225,7 +225,7 @@ function App() {
       console.debug('update habit success:', response.status);
     } catch (error) {
       if (error.response.status === STATUS_CODE.UNAUTHORIZED) {
-        Navigate("/Login");
+        // Navigate("/Login");
       }
     }
   };
@@ -250,7 +250,7 @@ function App() {
     } catch (error) {
       console.error('delete habit error:', error);
       if (error.response.status === STATUS_CODE.UNAUTHORIZED) {
-        Navigate("/Login");
+        // Navigate("/Login");
       }
     }
   };
@@ -691,7 +691,7 @@ const deleteTodo = async (todoId) => {
   /* -- prevent to access home page before login start -- */
   /* -- 要用的时候把上面那个currentUser改成false就ok -- */
   const ProtectedRoute = ({children}) =>{
-    if(!currentUser){
+    if(!getAuthInfo()){
       return <Navigate to="/login"/>
     }
     return children
