@@ -8,12 +8,19 @@ const profileSchema = new mongoose.Schema({
   },
   health: {
     type: Number,
+    default: 100,
   },
   level: {
     type: Number,
+    default: 1,
   },
-  coin: {
+  experience: {
     type: Number,
+    default: 0,
+  },
+  coins: {
+    type: Number,
+    default: 0,
   },
 })
 
