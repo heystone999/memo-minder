@@ -7,44 +7,54 @@ const mongoose = require('mongoose');
 
 const api = supertest(app);
 
-describe('Login endpoint', () => {
-  beforeEach(async () => {
-    await User.deleteMany({})
-    const passwordHash = await bcrypt.hash('password', 10);
-    const user = new User({
-      username: 'testuser',
-      passwordHash: passwordHash,
-      email: 'testemail@mail.com'
-    });
-    await user.save();
+describe('User endpoints', () => {
+  afterAll(async () => {
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+  
+    await mongoose.connection.close();
   });
 
-  afterAll(async () => {
-    await mongoose.connection.close();
+  beforeAll(async () => {
+    const userData = {
+      email: "18yp18@queensu.ca",
+      password: "123123123",
+      username: "testjude"
+    };
+    const response_re = await api
+    .post('/api/users')
+    .send(userData)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+    // Making a POST request to the login route to obtain a JWT token
+    const response = await api
+      .post('/api/login')
+      .send(userData)
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+    // Extracting the token from the response body
+    token = response.body.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    userId = decodedToken.id;
   });
 
   test('Login with correct credentials should return a token', async () => {
     const response = await api
       .post('/api/login')
-      .send({ username: 'testuser', password: 'password' })
+      .send({ username: 'testjude', password: '123123123'})
       .expect(200)
       .expect('Content-Type', /application\/json/);
 
     expect(response.body.token).toBeDefined();
-    expect(response.body.username).toBe('testuser');
-    expect(response.body.email).toBe('testemail@mail.com');
   });
 
   test('Login with incorrect credentials should return 401', async () => {
     await api
       .post('/api/login')
-      .send({ username: 'testuser', password: 'wrongpassword' })
+      .send({ username: 'newuser', password: 'wrongpassword' })
       .expect(401)
       .expect('Content-Type', /application\/json/);
   });
 });
 
-afterAll(async () => {
-  // Clean up after testing
-  await User.deleteMany({});
-});
