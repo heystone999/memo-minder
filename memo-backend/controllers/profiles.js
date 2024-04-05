@@ -34,14 +34,14 @@ profilesRouter.get('/:userId', verifyToken, async (request, response) => {
 
 
 profilesRouter.post('/', verifyToken, async (request, response) => {
-  const { userId, health, level, coins } = request.body;
+  const { userId, health, level, experience, coins } = request.body;
   const existingProfile = await Profile.findOne({ userId });
 
   if (existingProfile) {
-    return res.status(400).json({ error: 'Profile already exists for this user' });
+    return response.status(400).json({ error: 'Profile already exists for this user' });
   }
 
-  const profile = new Profile({ userId, health, level, coins });
+  const profile = new Profile({ userId, health, level, experience, coins });
   const savedProfile = await profile.save();
   response.status(201).json(savedProfile);
 });
@@ -49,9 +49,9 @@ profilesRouter.post('/', verifyToken, async (request, response) => {
 
 profilesRouter.put('/:userId', verifyToken, async (request, response) => {
   const { userId } = request.params;
-  const { health, level, coins } = request.body;
+  const { health, level, experience, coins } = request.body;
 
-  const updatedProfile = await Profile.findOneAndUpdate({ userId }, { health, level, coins }, { new: true });
+  const updatedProfile = await Profile.findOneAndUpdate({ userId }, { health, level, experience, coins }, { new: true });
 
   if (updatedProfile) {
     response.json(updatedProfile);
