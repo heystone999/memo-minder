@@ -19,7 +19,7 @@ const shopRouter = require('./controllers/shop')
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 
-if (config.TEST = 1){
+if (config.TEST == 1){
     mongoose.connect(config.TEST_MONGODB_URI);
     console.log("running in test mongodb uri")
 } else {
