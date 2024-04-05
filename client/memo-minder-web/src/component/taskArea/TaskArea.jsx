@@ -184,7 +184,9 @@ const TaskArea = ({
     const handleCompleteClick = (id) => {
         setCompletedItems(prev => {
             const newSet = new Set(prev);
-            newSet.add(id);
+            if (!newSet.has(id)) {
+                newSet.add(id);
+            }
             return newSet;
         });
     };
@@ -359,7 +361,7 @@ const TaskArea = ({
                                       }}>
                                       +
                                     </button>
-                                    <p onClick={() => handleItemClick(daily, 'Daily')} 
+                                    <p 
                                        style={{ textDecoration: isCompleted ? 'line-through' : 'none' }}>
                                         {daily.title}
                                     </p>
@@ -409,7 +411,7 @@ const TaskArea = ({
                                       }}>
                                       +
                                     </button>
-                                    <p onClick={() => handleItemClick(todo, 'Todo')} 
+                                    <p 
                                        style={{ textDecoration: isCompleted ? 'line-through' : 'none' }}>
                                         {todo.title}
                                     </p>
