@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import './MilestonesArea.css';
+import { BASE_URL, SERVER_API } from '../../utils/constants';
+import { getAuthInfo } from '../../utils/auth';
+
 const Milestone = ({ leftImage, subscript, text, rightImage, completedCount, totalCount }) => {
+    if (completedCount > totalCount) {
+        completedCount = totalCount;
+    }
     const progressText = `${completedCount}/${totalCount}`;
     const progressPercentage = (completedCount / totalCount) * 100;
 
@@ -25,7 +32,6 @@ const Milestone = ({ leftImage, subscript, text, rightImage, completedCount, tot
                     filter: progressPercentage < 100 ? 'grayscale(100%)' : 'none'
                 }}
             />
-            {/* <img src={rightImage} alt="" className="icon right-icon" /> */}
         </div>
     );
 };
@@ -33,13 +39,41 @@ const Milestone = ({ leftImage, subscript, text, rightImage, completedCount, tot
 
 const MilestonesArea = () => {
     const [currentPage, setCurrentPage] = useState(0);
+    const [dailiesAdded, setDailiesAdded] = useState(0);
+    const [habitsAdded, setHabitsAdded] = useState(0);
+    const [rewardsAdded, setRewardsAdded] = useState(0);
+    const [todosAdded, setTodosAdded] = useState(0);
 
-    // TODO: 后续用云侧数据替换
+    useEffect(() => {
+        const queryHistory = async () => {
+            console.debug('queryHistory');
+            try {
+                let auth = getAuthInfo();
+                let id = auth.id;
+                console.warn(SERVER_API.QUERY_HISTORY + id);
+                const response = await axios.get(BASE_URL + SERVER_API.QUERY_HISTORY + id, {
+                    'userId': id
+                });
+                let history = response?.data?.history;
+                if (history) {
+                    setDailiesAdded(history.dailiesAdded);
+                    setHabitsAdded(history.habitsAdded);
+                    setRewardsAdded(history.rewardsAdded);
+                    setTodosAdded(history.todosAdded);
+                }
+            } catch (error) {
+                console.warn('query history error:', error);
+            }
+        }
+
+        queryHistory();
+    }, []); // Empty dependency array ensures that this effect runs only once after the initial render
+
     const milestonesData = [
         {
             leftImage: '/warrior.png',
             subscript: 'Warrior',
-            text: 'First victory in a challenge',
+            text: 'Fight once',
             rightImage: 'crystal5.png',
             completedCount: 1,
             totalCount: 1
@@ -57,7 +91,7 @@ const MilestonesArea = () => {
             subscript: 'Habit Planner',
             text: 'Add 10 Habits',
             rightImage: '/crystal7.png',
-            completedCount: 1,
+            completedCount: habitsAdded,
             totalCount: 10
         },
         {
@@ -65,7 +99,7 @@ const MilestonesArea = () => {
             subscript: 'Daily Planner',
             text: 'Add 10 Dailies',
             rightImage: '/crystal8.png',
-            completedCount: 0,
+            completedCount: dailiesAdded,
             totalCount: 10
         },
         {
@@ -73,7 +107,7 @@ const MilestonesArea = () => {
             subscript: 'Todo Planner',
             text: 'Add 10 Todo\'s',
             rightImage: '/crystal9.png',
-            completedCount: 2,
+            completedCount: todosAdded,
             totalCount: 10
         },
         {
@@ -81,41 +115,41 @@ const MilestonesArea = () => {
             subscript: 'Daydreamer',
             text: 'Add 10 Rewards',
             rightImage: '/crystal10.png',
-            completedCount: 3,
+            completedCount: rewardsAdded,
             totalCount: 10
         },
-        {
-            leftImage: '/habit.png',
-            subscript: 'Habit Champion',
-            text: 'Complete 3 Habits',
-            rightImage: 'crystal0.png',
-            completedCount: 1,
-            totalCount: 3
-        },
-        {
-            leftImage: '/daily.png',
-            subscript: 'Daily Champion',
-            text: 'Complete 3 Dailies',
-            rightImage: '/crystal12.png',
-            completedCount: 0,
-            totalCount: 3
-        },
-        {
-            leftImage: '/todo.png',
-            subscript: 'Todo Champion',
-            text: 'Complete 3 Todo\'s',
-            rightImage: '/crystal2.png',
-            completedCount: 2,
-            totalCount: 3
-        },
-        {
-            leftImage: '/reward.png',
-            subscript: 'Fulfilled Dreamer',
-            text: 'Gain 3 Rewards',
-            rightImage: '/crystal3.png',
-            completedCount: 3,
-            totalCount: 3
-        },
+        // {
+        //     leftImage: '/habit.png',
+        //     subscript: 'Habit Champion',
+        //     text: 'Complete 3 Habits',
+        //     rightImage: 'crystal0.png',
+        //     completedCount: 1,
+        //     totalCount: 3
+        // },
+        // {
+        //     leftImage: '/daily.png',
+        //     subscript: 'Daily Champion',
+        //     text: 'Complete 3 Dailies',
+        //     rightImage: '/crystal12.png',
+        //     completedCount: 0,
+        //     totalCount: 3
+        // },
+        // {
+        //     leftImage: '/todo.png',
+        //     subscript: 'Todo Champion',
+        //     text: 'Complete 3 Todo\'s',
+        //     rightImage: '/crystal2.png',
+        //     completedCount: 2,
+        //     totalCount: 3
+        // },
+        // {
+        //     leftImage: '/reward.png',
+        //     subscript: 'Fulfilled Dreamer',
+        //     text: 'Gain 3 Rewards',
+        //     rightImage: '/crystal3.png',
+        //     completedCount: 3,
+        //     totalCount: 3
+        // },
     ];
 
     const milestonesPerPage = 8;

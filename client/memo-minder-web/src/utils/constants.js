@@ -29,4 +29,6 @@ export const SERVER_API = {
     FETCH_REWARD: '/api/rewards/user/:userId',
     MODIFY_REWARD: '/api/rewards/:Id',
     DELETE_REWARD: '/api/rewards/:Id',
+
+    QUERY_HISTORY: '/api/history/',
 }
