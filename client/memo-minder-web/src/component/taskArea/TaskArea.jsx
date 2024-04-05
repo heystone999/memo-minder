@@ -1,7 +1,7 @@
 // TaskArea.jsx
 import './TaskArea.css';
 import TaskButton from '../taskButton/TaskButton';
-import React, { useState} from 'react';
+import React, { useState, useEffect} from 'react';
 import TaskAreaDialog from './TaskAreaDialog';
 import Popup from '../popup/Popup';
 
@@ -12,7 +12,6 @@ const TaskArea = ({
     onAddDaily, onUpdateDaily, onDeleteDaily,
     onAddTodo, onUpdateTodo, onDeleteTodo,
     onAddReward, onUpdateReward, onDeleteReward,
-    onClear,
 
 }) => {
 
@@ -47,7 +46,7 @@ const TaskArea = ({
     const handleTodoKeyPress = handleItemKeyPress(todoInput, setTodoInput, onAddTodo, { dueDate: currentDate.toLocaleDateString(), completed: false });
     const handleRewardKeyPress = handleItemKeyPress(rewardInput, setRewardInput, onAddReward, {price: 10});
    
-    // handle habit button
+    // 有bug
     const handlePositiveClick = (habitId) => {
         console.log(`handlePositiveClick called with habitId: ${habitId}`);
         // add logic to increase gold and experience
@@ -55,8 +54,18 @@ const TaskArea = ({
         updateCoin(); 
         updateLevel(); 
         console.log('After updateLevel called');
+        const habit = habits.find(h => h._id === habitId);
+        console.log('habit:', habit);
+        const updatedHabit = {
+            ...habit,
+            habitId: habit._id,
+            positiveCount: (habit.positiveCount || 0) + 1
+        };
+        console.log('updated habit:', updatedHabit);
+        console.log('habitID:', habitId);
+        onUpdateHabit(habitId, updatedHabit);
+        console.log('onUpdateHabit');
     };
-
     const handleNegativeClick = (habitId) => {
         console.log(`handleNegativeClick called with habitId: ${habitId}`);
         // add logic to decrease health
@@ -103,18 +112,22 @@ const TaskArea = ({
         switch (editingType) {
             case 'Habit':
                 const { habitId, ...rest } = updatedItem;
+                console.log("updatedItem",updatedItem);
                 onUpdateHabit(habitId, rest);
                 break;
             case 'Daily':
                 const { dailyId, ...restdaily } = updatedItem;
+                console.log("updatedItem",updatedItem);
                 onUpdateDaily(dailyId, restdaily);
                 break;
             case 'To-Do':
                 const { todoId, ...resttodo } = updatedItem;
+                console.log("updatedItem",updatedItem);
                 onUpdateTodo(todoId, resttodo);
                 break;
             case 'Reward':
                 const { rewardId, ...restreward } = updatedItem;
+                console.log("updatedItem",updatedItem);
                 onUpdateReward(rewardId, restreward);
                 break;
             default:
@@ -261,7 +274,6 @@ const TaskArea = ({
                         <div className="taskList">
                             {/* Individual Habit Item */}
                             {filteredHabits.map(habit => {
-                                console.debug('Rendering habit with key:', habit._id);
                                 return (
                                     <div className="habitItem" key={habit._id}>
                                       {(habit.type === 'positive' || habit.type === 'both') && (

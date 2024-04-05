@@ -25,27 +25,50 @@ const TaskAreaDialog = ({ item, type, onClose, onSave, onDelete }) => {
     setTitle(item.title || '');
     setNotes(item.note || '');
     setPrice(item.price);
+    setPositive(item.positive);
+    setNegative(item.negative);
+    setCompleted(item.completed);
   }, [item]);
 
   const handleSave = () => {
-    const updatedItem = {
-      ...item,
-      habitId: item._id,
-      content: title,
-      notes,
-    };
-
     if (type === 'Habit') {
+      const updatedItem = {
+        ...item,
+        habitId: item._id,
+        content: title,
+        notes,
+      };
       updatedItem.positive = positive;
       updatedItem.negative = negative;
+      onSave(updatedItem);
     } 
-    else if ((type === 'Daily') || (type === 'To-Do')) {
-      updatedItem.completed = completed;
+    else if (type === 'Daily') {
+      const updatedItem = {
+        ...item,
+        dailyId: item._id,
+        content: title,
+        notes,
+      };
+      onSave(updatedItem);
+    }
+    else if (type === 'To-Do') {
+      const updatedItem = {
+        ...item,
+        todoId: item._id,
+        content: title,
+        notes,
+      };
+      onSave(updatedItem);
     }
     else if (type === 'Reward'){
-      updatedItem.price = price;
+      const updatedItem = {
+        ...item,
+        rewardId: item._id,
+        content: title,
+        notes,
+      };
+      onSave(updatedItem);
     }
-    onSave(updatedItem);
   };
 
   const handleDelete = () => {

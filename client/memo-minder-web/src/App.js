@@ -20,13 +20,6 @@ import {BASE_URL, STATUS_CODE, SERVER_API} from './utils/constants'
 import { getAuthInfo, clearAuthInfo } from './utils/auth'
 
 
-// function to create default items for TaskArea
-const createDefaultItem = (content, options = {}) => ({
-  id: Date.now(),
-  content,
-  ...options,
-});
-
 
 function App() {
   /* 
@@ -215,7 +208,7 @@ function App() {
       const response = await axios.put(updateHabitsUrl , {
         'title': updatedHabit.content,
         'type': updatedHabit.positive && updatedHabit.negative ? 'both' : !updatedHabit.positive && !updatedHabit.negative ? 'neutral' : updatedHabit.positive ? 'positive' : 'negative',
-        'note': updatedHabit.notes
+        'note': updatedHabit.notes,
       }, {
         headers: {
           'Authorization': token,
@@ -331,8 +324,10 @@ function App() {
         const updateDailiesUrl = `${BASE_URL}${SERVER_API.MODIFY_DAILY.replace(':dailyId', dailyId)}`;
         const response = await axios.put(updateDailiesUrl, {
           'title': updatedDaily.content,
-          'note': updatedDaily.notes // Adjust according to the actual structure of a daily
-          // Include other necessary fields
+          'note': updatedDaily.notes,
+          "startDate": updatedDaily.startDate,
+          "repeats": updatedDaily.repeats,
+          "repeatEvery": updatedDaily.repeatEvery
         }, {
           headers: {
             'Authorization': token,
@@ -441,7 +436,8 @@ const updateTodoToServer = async (todoId, updatedTodo) => {
     const updateTodosUrl = `${BASE_URL}${SERVER_API.MODIFY_TODOS.replace(':todoId', todoId)}`;
     const response = await axios.put(updateTodosUrl, {
       'title': updatedTodo.content,
-      'note': updatedTodo.notes // Adjust according to the actual structure of a todo
+      'note': updatedTodo.notes,
+      'dueDate': updatedTodo.dueDate
     }, {
       headers: {
         'Authorization': token,
@@ -554,7 +550,8 @@ const deleteTodo = async (todoId) => {
       const updateRewardsUrl = `${BASE_URL}${SERVER_API.MODIFY_REWARD.replace(':rewardId', rewardId)}`;
       const response = await axios.put(updateRewardsUrl, {
         'title': updatedReward.content,
-        'note': updatedReward.notes // Adjust according to the actual structure of a reward
+        'note': updatedReward.notes,
+        'cost': updatedReward.price
       }, {
         headers: {
           'Authorization': token,
