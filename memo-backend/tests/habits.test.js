@@ -3,6 +3,7 @@ const app = require('../app')
 const api = supertest(app)
 const User = require('../models/user');
 const Habit = require('../models/habit');
+const History = require('../models/history');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
@@ -15,6 +16,7 @@ describe('Habit routes', () => {
   afterAll(async () => {
     // Delete all dailies associated with the user
     await Habit.deleteMany({ user: userId });
+    await History.findOneAndDelete({ user: userId });
 
     // Delete the user
     await User.findByIdAndDelete(userId);

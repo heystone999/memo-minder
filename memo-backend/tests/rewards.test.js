@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const Reward = require('../models/reward');
 const User = require('../models/user');
+const History = require('../models/history');
 
 describe('Reward routes', () => {
   let token;
@@ -14,6 +15,7 @@ describe('Reward routes', () => {
   afterAll(async () => {
     // Delete all rewards associated with the user
     await Reward.deleteMany({ user: userId });
+    await History.findOneAndDelete({ user: userId });
 
     // Delete the user
     await User.findByIdAndDelete(userId);

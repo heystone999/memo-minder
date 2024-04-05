@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const Todo = require('../models/todo');
 const User = require('../models/user');
+const History = require('../models/history');
 
 describe('Todo routes', () => {
   let token;
@@ -14,6 +15,7 @@ describe('Todo routes', () => {
   afterAll(async () => {
     // Delete all todos associated with the user
     await Todo.deleteMany({ user: userId });
+    await History.findOneAndDelete({ user: userId });
 
     // Delete the user
     await User.findByIdAndDelete(userId);
