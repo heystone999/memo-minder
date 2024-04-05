@@ -5,6 +5,9 @@ import { BASE_URL, SERVER_API } from '../../utils/constants';
 import { getAuthInfo } from '../../utils/auth';
 
 const Milestone = ({ leftImage, subscript, text, rightImage, completedCount, totalCount }) => {
+    if (completedCount > totalCount) {
+        completedCount = totalCount;
+    }
     const progressText = `${completedCount}/${totalCount}`;
     const progressPercentage = (completedCount / totalCount) * 100;
 
@@ -70,7 +73,7 @@ const MilestonesArea = () => {
         {
             leftImage: '/warrior.png',
             subscript: 'Warrior',
-            text: 'First victory in a challenge',
+            text: 'Fight once',
             rightImage: 'crystal5.png',
             completedCount: 1,
             totalCount: 1
@@ -115,38 +118,38 @@ const MilestonesArea = () => {
             completedCount: rewardsAdded,
             totalCount: 10
         },
-        {
-            leftImage: '/habit.png',
-            subscript: 'Habit Champion',
-            text: 'Complete 3 Habits',
-            rightImage: 'crystal0.png',
-            completedCount: 1,
-            totalCount: 3
-        },
-        {
-            leftImage: '/daily.png',
-            subscript: 'Daily Champion',
-            text: 'Complete 3 Dailies',
-            rightImage: '/crystal12.png',
-            completedCount: 0,
-            totalCount: 3
-        },
-        {
-            leftImage: '/todo.png',
-            subscript: 'Todo Champion',
-            text: 'Complete 3 Todo\'s',
-            rightImage: '/crystal2.png',
-            completedCount: 2,
-            totalCount: 3
-        },
-        {
-            leftImage: '/reward.png',
-            subscript: 'Fulfilled Dreamer',
-            text: 'Gain 3 Rewards',
-            rightImage: '/crystal3.png',
-            completedCount: 3,
-            totalCount: 3
-        },
+        // {
+        //     leftImage: '/habit.png',
+        //     subscript: 'Habit Champion',
+        //     text: 'Complete 3 Habits',
+        //     rightImage: 'crystal0.png',
+        //     completedCount: 1,
+        //     totalCount: 3
+        // },
+        // {
+        //     leftImage: '/daily.png',
+        //     subscript: 'Daily Champion',
+        //     text: 'Complete 3 Dailies',
+        //     rightImage: '/crystal12.png',
+        //     completedCount: 0,
+        //     totalCount: 3
+        // },
+        // {
+        //     leftImage: '/todo.png',
+        //     subscript: 'Todo Champion',
+        //     text: 'Complete 3 Todo\'s',
+        //     rightImage: '/crystal2.png',
+        //     completedCount: 2,
+        //     totalCount: 3
+        // },
+        // {
+        //     leftImage: '/reward.png',
+        //     subscript: 'Fulfilled Dreamer',
+        //     text: 'Gain 3 Rewards',
+        //     rightImage: '/crystal3.png',
+        //     completedCount: 3,
+        //     totalCount: 3
+        // },
     ];
 
     const milestonesPerPage = 8;
