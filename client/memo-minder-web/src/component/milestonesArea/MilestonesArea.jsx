@@ -129,7 +129,7 @@ const MilestonesArea = () => {
         {
             leftImage: '/reward.png',
             subscript: 'Daydreamer',
-            text: 'Add 3 Rewards',
+            text: 'Add  Rewards',
             rightImage: '/crystal10.png',
             completedCount: rewardsAdded,
             totalCount: 3
