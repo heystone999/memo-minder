@@ -12,13 +12,12 @@ const shopItemSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  currency: {
-    type: String,
-    enum: ['coin', 'token'],
+  price: {
+    type: Number,
     required: true
   },
-  price: {
-    type: Number
+  unlockLevel: {
+    type: Number, default: 0
   },
   attack: {
     type: Number,
