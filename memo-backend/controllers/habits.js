@@ -194,7 +194,7 @@ router.put('/:habitId/increment/negative', verifyToken, async (req, res) => {
     // update profile
     const updatedProfile = await updateProfileAfterTaskCompletion(userId, 'badHabit')
     // return updatedProfile
-    res.status(200).json({ message: 'Positive counter incremented successfully', habit, profile: updatedProfile });
+    res.status(200).json({ message: 'Negative counter incremented successfully', habit, profile: updatedProfile });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
