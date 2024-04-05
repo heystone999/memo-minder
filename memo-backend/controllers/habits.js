@@ -3,21 +3,23 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Habit = require('../models/habit');
+const updateProfileAfterTaskCompletion = require('../utils/profileHelpers')
+
 
 
 // Middleware function to verify JWT token
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization;
   if (!token) {
-      return res.status(401).json({ message: 'Missing authorization token' });
+    return res.status(401).json({ message: 'Missing authorization token' });
   }
 
   try {
-      const decoded = jwt.verify(token, process.env.SECRET); // Use process.env.SECRET
-      req.user = decoded; // Attach user information to request object
-      next(); // Move to the next middleware
+    const decoded = jwt.verify(token, process.env.SECRET); // Use process.env.SECRET
+    req.user = decoded; // Attach user information to request object
+    next(); // Move to the next middleware
   } catch (error) {
-      return res.status(403).json({ message: 'Invalid or expired token' });
+    return res.status(403).json({ message: 'Invalid or expired token' });
   }
 };
 
@@ -41,13 +43,13 @@ router.post('/', verifyToken, async (req, res) => {
 
     // Create the habit object
     const habit = new Habit({
-        title,
-        type,
-        user: userId
+      title,
+      type,
+      user: userId
     });
     // Add optional note if provided
     if (note) {
-        habit.note = note;
+      habit.note = note;
     }
     // Save the habit object to the database
     await habit.save();
@@ -123,21 +125,21 @@ router.put('/:habitId', verifyToken, async (req, res) => {
 // Route to delete a habit
 router.delete('/:habitId', verifyToken, async (req, res) => {
   try {
-      const habitId = req.params.habitId;
-      const userId = req.user.id; // Extract user ID from token
+    const habitId = req.params.habitId;
+    const userId = req.user.id; // Extract user ID from token
 
-      // Ensure that the requested habit belongs to the authenticated user
-      const habit = await Habit.findOne({ _id: habitId, user: userId });
-      if (!habit) {
-          return res.status(404).json({ message: 'Habit not found' });
-      }
+    // Ensure that the requested habit belongs to the authenticated user
+    const habit = await Habit.findOne({ _id: habitId, user: userId });
+    if (!habit) {
+      return res.status(404).json({ message: 'Habit not found' });
+    }
 
-      // Delete the habit
-      await Habit.findByIdAndDelete(habitId);
-      res.status(200).json({ message: 'Habit deleted successfully' });
+    // Delete the habit
+    await Habit.findByIdAndDelete(habitId);
+    res.status(200).json({ message: 'Habit deleted successfully' });
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
@@ -164,7 +166,10 @@ router.put('/:habitId/increment/positive', verifyToken, async (req, res) => {
       { upsert: true }
     );
 
-    res.status(200).json({ message: 'Positive counter incremented successfully', habit });
+    // update profile
+    const updatedProfile = await updateProfileAfterTaskCompletion(userId, 'goodHabit')
+    // return updatedProfile
+    res.status(200).json({ message: 'Positive counter incremented successfully', habit, profile: updatedProfile });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
@@ -187,7 +192,10 @@ router.put('/:habitId/increment/negative', verifyToken, async (req, res) => {
     habit.negativeCount += 1;
     await habit.save();
 
-    res.status(200).json({ message: 'Negative counter incremented successfully', habit });
+    // update profile
+    const updatedProfile = await updateProfileAfterTaskCompletion(userId, 'badHabit')
+    // return updatedProfile
+    res.status(200).json({ message: 'Positive counter incremented successfully', habit, profile: updatedProfile });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });

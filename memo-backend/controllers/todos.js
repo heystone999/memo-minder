@@ -3,6 +3,8 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Todo = require('../models/todo');
 const History = require('../models/history');
+const updateProfileAfterTaskCompletion = require('../utils/profileHelpers')
+
 
 // Middleware function to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -137,10 +139,10 @@ router.put('/:todoId/complete', verifyToken, async (req, res) => {
     if (todo.completed) {
       return res.status(400).json({ message: 'Todo is already completed' });
     }
-    
+
     // Update the todo status to completed
     todo.completed = true;
-    
+
     // Save the updated todo
     await todo.save();
 
@@ -151,7 +153,10 @@ router.put('/:todoId/complete', verifyToken, async (req, res) => {
       { upsert: true }
     );
 
-    res.status(200).json({ message: 'Todo marked as completed', todo });
+    // update profile
+    const updatedProfile = await updateProfileAfterTaskCompletion(userId, 'todo');
+
+    res.status(200).json({ message: 'Todo marked as completed', todo, updatedProfile });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });

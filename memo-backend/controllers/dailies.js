@@ -3,6 +3,8 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Daily = require('../models/daily');
+const updateProfileAfterTaskCompletion = require('../utils/profileHelpers')
+
 
 // Middleware function to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -56,7 +58,7 @@ router.post('/', verifyToken, async (req, res) => {
       { $inc: { dailiesAdded: 1 } }, // Increment the dailiesAdded field by 1
       { upsert: true }
     );
-    
+
     res.status(201).json({ message: 'Daily habit added successfully', daily });
   } catch (error) {
     console.error(error);
@@ -66,19 +68,19 @@ router.post('/', verifyToken, async (req, res) => {
 
 // Route to fetch all dailies for a specific user
 router.get('/user/:userId', verifyToken, async (req, res) => {
-    try {
-      const userId = req.params.userId;
-      if (userId !== req.user.id) {
-        return res.status(403).json({ message: 'You are not authorized to access this resource' });
-      }
-      // Find all dailies for the specified user
-      const dailies = await Daily.find({ user: userId });
-      res.status(200).json({ dailies });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+  try {
+    const userId = req.params.userId;
+    if (userId !== req.user.id) {
+      return res.status(403).json({ message: 'You are not authorized to access this resource' });
     }
-  });
+    // Find all dailies for the specified user
+    const dailies = await Daily.find({ user: userId });
+    res.status(200).json({ dailies });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // Route to modify a daily habit (update title, note, repeats, and repeatEvery)
 router.put('/:dailyId', verifyToken, async (req, res) => {
@@ -173,7 +175,10 @@ router.put('/:dailyId/complete', verifyToken, async (req, res) => {
       { upsert: true }
     );
 
-    res.status(200).json({ message: 'Daily habit marked as completed', daily });
+    // update profile
+    const updatedProfile = await updateProfileAfterTaskCompletion(userId, 'daily');
+
+    res.status(200).json({ message: 'Daily habit marked as completed', daily, updatedProfile });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
