@@ -54,7 +54,7 @@
 /* Styles for all sections */
 .taskAreaNav {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     background-color: white;
     padding: 10px;
     margin-bottom: 20px;

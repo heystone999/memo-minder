@@ -20,7 +20,6 @@ import {BASE_URL, STATUS_CODE, SERVER_API} from './utils/constants'
 import { getAuthInfo, clearAuthInfo } from './utils/auth'
 
 
-
 function App() {
   /* 
   limitation to get access to home page 
@@ -207,7 +206,7 @@ function App() {
       const updateHabitsUrl = `${BASE_URL}${SERVER_API.MODIFY_HABIT.replace(':habitId', habitId)}`;
       const response = await axios.put(updateHabitsUrl , {
         'title': updatedHabit.content,
-        'type': updatedHabit.positive && updatedHabit.negative ? 'both' : !updatedHabit.positive && !updatedHabit.negative ? 'neutral' : updatedHabit.positive ? 'positive' : 'negative',
+        'type': updatedHabit.type,
         'note': updatedHabit.notes,
       }, {
         headers: {
@@ -215,6 +214,7 @@ function App() {
           'Content-Type': 'application/json'
         }
       });
+      console.log("after update", response)
       console.debug('update habit success:', response.status);
     } catch (error) {
       if (error.response.status === STATUS_CODE.UNAUTHORIZED) {
@@ -325,9 +325,10 @@ function App() {
         const response = await axios.put(updateDailiesUrl, {
           'title': updatedDaily.content,
           'note': updatedDaily.notes,
-          "startDate": updatedDaily.startDate,
-          "repeats": updatedDaily.repeats,
-          "repeatEvery": updatedDaily.repeatEvery
+          'startDate': updatedDaily.startDate,
+          'repeats': updatedDaily.repeats,
+          'repeatEvery': updatedDaily.repeatEvery,
+          'completed': updatedDaily.completed
         }, {
           headers: {
             'Authorization': token,

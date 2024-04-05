@@ -1,7 +1,7 @@
 // TaskArea.jsx
 import './TaskArea.css';
 import TaskButton from '../taskButton/TaskButton';
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskAreaDialog from './TaskAreaDialog';
 import Popup from '../popup/Popup';
 
@@ -11,11 +11,14 @@ const TaskArea = ({
     onAddHabit, onUpdateHabit, onDeleteHabit,
     onAddDaily, onUpdateDaily, onDeleteDaily,
     onAddTodo, onUpdateTodo, onDeleteTodo,
-    onAddReward, onUpdateReward, onDeleteReward,
+    onAddReward, onUpdateReward, onDeleteReward
 
 }) => {
 
-    console.log('TaskArea habits prop:', habits);
+    //console.log('TaskArea habits prop:', habits);
+    //console.log('TaskArea dailies prop:', dailies);
+    //console.log('TaskArea todos prop:', todos);
+    //console.log('TaskArea rewards prop:', rewards);
     // handle with the inputs
     const [habitInput, setHabitInput] = useState('');
     const [dailyInput, setDailyInput] = useState('');
@@ -54,6 +57,7 @@ const TaskArea = ({
         updateCoin(); 
         updateLevel(); 
         console.log('After updateLevel called');
+        /*
         const habit = habits.find(h => h._id === habitId);
         console.log('habit:', habit);
         const updatedHabit = {
@@ -65,6 +69,7 @@ const TaskArea = ({
         console.log('habitID:', habitId);
         onUpdateHabit(habitId, updatedHabit);
         console.log('onUpdateHabit');
+        */
     };
     const handleNegativeClick = (habitId) => {
         console.log(`handleNegativeClick called with habitId: ${habitId}`);
@@ -164,7 +169,27 @@ const TaskArea = ({
         setEditDialogVisible(false);
     };
 
-    // daily and to-do tasks completion
+    // 1. 初始化状态
+    const [completedItems, setCompletedItems] = useState(() => {
+        const saved = localStorage.getItem('completedItems');
+        return saved ? new Set(JSON.parse(saved)) : new Set();
+    });
+
+    // 2. 当completedItems变化时，更新本地存储
+    useEffect(() => {
+        localStorage.setItem('completedItems', JSON.stringify([...completedItems]));
+    }, [completedItems]);
+
+    // 处理完成点击
+    const handleCompleteClick = (id) => {
+        setCompletedItems(prev => {
+            const newSet = new Set(prev);
+            newSet.add(id);
+            return newSet;
+        });
+    };
+      
+/* daily and to-do tasks completion
     const toggleItemCompletion = (items, updateItem) => (id, completed) => {
         // Find the item to update
         const itemToUpdate = items.find(item => item.id === id);
@@ -176,7 +201,7 @@ const TaskArea = ({
     const toggleDailyCompletion = toggleItemCompletion(dailies, onUpdateDaily);
     const toggleTodoCompletion = toggleItemCompletion(todos, onUpdateTodo);
     
-    //handle marking a daily as due or completed
+    //handle marking a daily as completed or not
     const markDailyAsCompleted = (dailyId) => {
         toggleDailyCompletion(dailyId, true);
         updateLevel();
@@ -185,7 +210,7 @@ const TaskArea = ({
     const markDailyAsIncomplete = (dailyId) => {
         toggleDailyCompletion(dailyId, false);
     };
-    // handle marking a to-do as scheduled or completed
+    // handle marking a to-do as completed or not
     const markTodoAsCompleted = (todoId) => {
         toggleTodoCompletion(todoId, true);
         updateLevel();
@@ -194,7 +219,8 @@ const TaskArea = ({
     const markTodoAsIncomplete = (todoId) => {
         toggleTodoCompletion(todoId, false);
     };
-
+    */
+    /* set Selected Tab
     const [selectedHabitTab, setSelectedHabitTab] = useState('All');
     const [selectedDailyTab, setSelectedDailyTab] = useState('All');
     const [selectedTodoTab, setSelectedTodoTab] = useState('All');
@@ -238,6 +264,7 @@ const TaskArea = ({
 
     // Right before the return statement to log the filtered habits before rendering
     console.debug('Filtered habits before rendering:', filteredHabits);
+    */
 
     return (
         <div className="taskAreaContainer">
@@ -256,9 +283,9 @@ const TaskArea = ({
                     <h2>Habits</h2>
                     {/* First version: Weak/ Strong features change to Good/Bad habits*/}
                     <div className="taskAreaNav">
-                        <button onClick={() => setSelectedHabitTab ("All")}>All</button>
-                        <button onClick={() => setSelectedHabitTab ("Good Habits")}>Good</button> 
-                        <button onClick={() => setSelectedHabitTab ("Bad Habits")}>Bad</button>
+                        <button >All Habit Tasks</button>
+                        {/*<button onClick={() => setSelectedHabitTab ("Good Habits")}>Good</button>*/} 
+                        {/*<button onClick={() => setSelectedHabitTab ("Bad Habits")}>Bad</button>*/}
                     </div>
                     <div className="contentContainer">
                         <div className="habitInputContainer">
@@ -274,7 +301,8 @@ const TaskArea = ({
                         {/* Habit List */}
                         <div className="taskList">
                             {/* Individual Habit Item */}
-                            {filteredHabits.map(habit => {
+                            {habits.map(habit => {
+                                //console.debug('Rendering habit with key:', habit._id);
                                 return (
                                     <div className="habitItem" key={habit._id}>
                                       {(habit.type === 'positive' || habit.type === 'both') && (
@@ -296,9 +324,9 @@ const TaskArea = ({
                 <div className="taskAreaSection">
                     <h2>Dailies</h2>
                     <div className="taskAreaNav">
-                        <button onClick={() => setSelectedDailyTab('All')}>All</button>
-                        <button onClick={() => setSelectedDailyTab('Due')}>Due</button>
-                        <button onClick={() => setSelectedDailyTab('Completed')}>Completed</button>
+                        <button >All Daily Tasks</button>
+                        {/*<button onClick={() => setSelectedDailyTab('Due')}>Due</button>*/}
+                        {/*<button onClick={() => setSelectedDailyTab('Completed')}>Completed</button>*/}
                     </div>
                     <div className="contentContainer">
                         <div className="dailyInputContainer">
@@ -313,20 +341,30 @@ const TaskArea = ({
                         </div>
                         {/* Daily List */}
                         <div className="taskList">
-                            {filteredDailies.map(daily => (
-                                <div className={`dailyItem ${daily.completed ? 'completed' : ''}`} key={daily._id}>
-                                    <button onClick={(e) => {
-                                        e.stopPropagation();  // prevent
-                                        daily.completed ? markDailyAsIncomplete(daily._id) : markDailyAsCompleted(daily._id);
-                                        
-
-                                    }}>
-                                        {daily.completed ? '-' : '+'}
+                            {dailies.map(daily => {
+                                console.debug('Rendering daily with key:', daily._id);
+                                const isCompleted = completedItems.has(daily._id);
+                                return (
+                                    <div className={`dailyItem ${isCompleted ? 'completed' : ''}`} key={daily._id}>
+                                  
+                                    <button 
+                                      onClick={(e) => {
+                                          e.stopPropagation(); 
+                                          handleCompleteClick(daily._id); 
+                                      }}
+                                      disabled={isCompleted} 
+                                      style={{ 
+                                          opacity: isCompleted ? 0.5 : 1, 
+                                          cursor: isCompleted ? 'not-allowed' : 'pointer'
+                                      }}>
+                                      +
                                     </button>
-                                    {/* text edit */}
-                                    <p onClick={() => handleItemClick(daily, 'Daily')}>{daily.title}</p>
+                                    <p onClick={() => handleItemClick(daily, 'Daily')} 
+                                       style={{ textDecoration: isCompleted ? 'line-through' : 'none' }}>
+                                        {daily.title}
+                                    </p>
                                 </div>
-                            ))}
+                            )})}
                         </div>
                     </div>
                 </div>
@@ -335,9 +373,9 @@ const TaskArea = ({
                 <div className="taskAreaSection">
                     <h2>To Do Lists</h2>
                     <div className="taskAreaNav">
-                        <button onClick={() => setSelectedTodoTab('All')}>All</button>
-                        <button onClick={() => setSelectedTodoTab('Scheduled')}>Scheduled</button>
-                        <button onClick={() => setSelectedTodoTab('Completed')}>Completed</button>
+                        <button>All To-Do Lists</button>
+                        {/*<button onClick={() => setSelectedTodoTab('Scheduled')}>Scheduled</button>*/}
+                        {/*<button onClick={() => setSelectedTodoTab('Completed')}>Completed</button>*/}
                     </div>
                     <div className="contentContainer">
                         <div className="todoInputContainer">
@@ -353,19 +391,30 @@ const TaskArea = ({
 
                         {/* To Do List */}
                         <div className="taskList">
-                            {filteredTodos.map(todo => (
-                                <div className={`todoItem ${todo.completed ? 'completed' : ''}`} key={todo._id}>
-                                    <button onClick={(e) => {
-                                        e.stopPropagation();
-                                        todo.completed ? markTodoAsIncomplete(todo._id) : markTodoAsCompleted(todo._id);
-                                        
-                                    }}>
-                                        {todo.completed ? '-' : '+'}
-                                        
+                            {todos.map(todo => {
+                                console.debug('Rendering daily with key:', todo._id);
+                                const isCompleted = completedItems.has(todo._id);
+                                return (
+                                    <div className={`todoItem ${isCompleted ? 'completed' : ''}`} key={todo._id}>
+                                  
+                                    <button 
+                                      onClick={(e) => {
+                                          e.stopPropagation(); 
+                                          handleCompleteClick(todo._id); 
+                                      }}
+                                      disabled={isCompleted} 
+                                      style={{ 
+                                          opacity: isCompleted ? 0.5 : 1, 
+                                          cursor: isCompleted ? 'not-allowed' : 'pointer'
+                                      }}>
+                                      +
                                     </button>
-                                    <p onClick={() => handleItemClick(todo, 'To-Do')}>{todo.title}</p>
+                                    <p onClick={() => handleItemClick(todo, 'Todo')} 
+                                       style={{ textDecoration: isCompleted ? 'line-through' : 'none' }}>
+                                        {todo.title}
+                                    </p>
                                 </div>
-                            ))}
+                            )})}
                         </div>
                     </div>
                 </div>
@@ -373,6 +422,9 @@ const TaskArea = ({
                 {/* Rewards Section */}
                 <div className="rewardAreaSection">
                     <h2>Rewards</h2>
+                    <div className="taskAreaNav">
+                        <button >Customizable Rewards</button>
+                    </div>
                     <div className="contentContainer">
                         <div className="rewardInputContainer">
                             <input
@@ -385,16 +437,17 @@ const TaskArea = ({
                             />
                         </div>
                         <div className="rewardList">
-                            {rewards.map(reward => (
+                            {rewards.map(reward => {
+                                console.debug('Rendering reward with key:', reward._id);
+                                return (
                                 <div className="rewardItem" key={reward._id}>
                                     <button onClick={() => handlePayReward(reward)}>
                                         {reward.cost} coins
                                     </button>
-                                    <p onClick={() => 
-                                        handleItemClick(reward, 'Reward')}>{reward.title}
+                                    <p>{reward.title}
                                     </p>
                                 </div>
-                            ))}
+                            )})}
                         </div>
                     </div> 
                 </div>
@@ -403,7 +456,7 @@ const TaskArea = ({
             {editDialogVisible && editingItem && (
                 <TaskAreaDialog
                     item={editingItem}
-                    type={editingType} //'Habit', 'Daily', 'To-do', 'Reward'
+                    editingType={editingType} //'Habit', 'Daily', 'To-do', 'Reward'
                     onClose={() => setEditDialogVisible(false)}
                     onSave={handleSaveItem}
                     onDelete={handleDeleteItem}
