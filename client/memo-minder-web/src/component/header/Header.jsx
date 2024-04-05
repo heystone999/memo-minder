@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "./Header.css";
 import { getAuthInfo } from '../../utils/auth'
+import MilestonesArea from '../milestonesArea/MilestonesArea';
 
 const defaultProducts = [
   { id: 'stick', name: 'Stick', price: 15, imgSrc: '/stick.png', soldSrc: '/stick.png' },
@@ -11,13 +12,18 @@ const defaultProducts = [
 const Header = ({ health, experience, level, products = defaultProducts }) => {
     const [boughtProducts, setBoughtProducts] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [milestonesImages, setMilestonesImages] = useState([]);
     const [username, setUserName] = useState(getAuthInfo()?.username);
     useEffect(() => {
         // update state
         const updateBoughtProducts = () => {
             const boughtItems = JSON.parse(localStorage.getItem('boughtItems') || '{}');
+            
             const updatedBoughtProducts = products.filter(product => boughtItems[product.id]);
             setBoughtProducts(updatedBoughtProducts);
+
+            const milestonesImages = JSON.parse(localStorage.getItem('milestoneImages') || '[]');
+            setMilestonesImages(milestonesImages)
         };
         // get bought products
         updateBoughtProducts();
@@ -55,7 +61,15 @@ const Header = ({ health, experience, level, products = defaultProducts }) => {
                     }
                 </div>
                 <div className="user-character-info">
+                    <div style={{ display: 'flex' }}>
                     <div className="username">{username}</div>
+
+                    <div className="username" style={{ display: 'flex', padding: '0 10px' }}>
+                        {milestonesImages.map((imageUrl, index) => (
+                            <img className="milestone-image" key={index} src={imageUrl} alt={`Image ${index + 1}`} />
+                        ))}
+                    </div>
+                    </div>
                     <div className="user-data">
                         {/*- Health Bar -*/}
                         <div className="health">

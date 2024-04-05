@@ -61,6 +61,22 @@ const MilestonesArea = () => {
                     setRewardsAdded(history.rewardsAdded);
                     setTodosAdded(history.todosAdded);
                 }
+                const completedRightImages = [];
+
+                milestonesData.forEach(milestone => {
+                    if (milestone.completedCount >= milestone.totalCount) {
+                    console.warn("milestone: ", milestone)
+                        completedRightImages.push(milestone.rightImage);
+                    }
+                });
+            
+                // console.log(completedRightImages);
+                
+                if (completedRightImages.length > JSON.parse(localStorage.getItem('milestoneImages') || '[]').length) {
+                    localStorage.setItem('milestoneImages', JSON.stringify(completedRightImages)); // update in localStorage
+                    console.error("refresh localstorage");
+                  } 
+
             } catch (error) {
                 console.warn('query history error:', error);
             }
@@ -74,7 +90,7 @@ const MilestonesArea = () => {
             leftImage: '/warrior.png',
             subscript: 'Warrior',
             text: 'Fight once',
-            rightImage: 'crystal5.png',
+            rightImage: '/crystal6.png',
             completedCount: 1,
             totalCount: 1
         },
@@ -82,41 +98,41 @@ const MilestonesArea = () => {
             leftImage: '/daily.png',
             subscript: '3 Perfect Days',
             text: 'Completed all active Dailies on 3 days',
-            rightImage: '/crystal6.png',
+            rightImage: '/crystal5.png',
             completedCount: 0,
             totalCount: 3
         },
         {
             leftImage: '/habit.png',
             subscript: 'Habit Planner',
-            text: 'Add 10 Habits',
+            text: 'Add 3 Habits',
             rightImage: '/crystal7.png',
             completedCount: habitsAdded,
-            totalCount: 10
+            totalCount: 3
         },
         {
             leftImage: '/daily.png',
             subscript: 'Daily Planner',
-            text: 'Add 10 Dailies',
+            text: 'Add 3 Dailies',
             rightImage: '/crystal8.png',
             completedCount: dailiesAdded,
-            totalCount: 10
+            totalCount: 3
         },
         {
             leftImage: '/todo.png',
             subscript: 'Todo Planner',
-            text: 'Add 10 Todo\'s',
+            text: 'Add 3 Todo\'s',
             rightImage: '/crystal9.png',
             completedCount: todosAdded,
-            totalCount: 10
+            totalCount: 3
         },
         {
             leftImage: '/reward.png',
             subscript: 'Daydreamer',
-            text: 'Add 10 Rewards',
+            text: 'Add  Rewards',
             rightImage: '/crystal10.png',
             completedCount: rewardsAdded,
-            totalCount: 10
+            totalCount: 3
         },
         // {
         //     leftImage: '/habit.png',
