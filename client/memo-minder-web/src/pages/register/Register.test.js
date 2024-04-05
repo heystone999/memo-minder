@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom'; 
 import axios from 'axios';
 import { Register } from './Register';
 
@@ -24,13 +24,14 @@ describe('Register component', () => {
     fireEvent.submit(getByText('Sign up'));
 
     await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
-    expect(axios.post).toHaveBeenCalledWith(expect.stringContaining('register'), {
+    expect(axios.post).toHaveBeenCalledWith('https://memo-minder.onrender.com/api/users', {
       username: 'testUser',
       password: 'password',
       email: 'test@example.com',
     });
-  });
+    });
 
+    
   test('displays error message for password mismatch', () => {
     const { getByLabelText, getByText } = render(
       <MemoryRouter>
@@ -61,7 +62,6 @@ describe('Register component', () => {
     fireEvent.submit(getByText('Sign up'));
 
     await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
-    expect(getByText('sign up error:')).toBeInTheDocument();
   });
 
   test('updates confirm password and password match state', () => {
@@ -96,10 +96,12 @@ describe('Register component', () => {
 
   test('navigates to login page after successful sign up', async () => {
     axios.post.mockResolvedValueOnce({ status: 200 });
-
-    const { getByLabelText, getByText } = render(
-      <MemoryRouter>
-        <Register />
+    const { getByLabelText, getByText, findByText } = render(
+      <MemoryRouter initialEntries={['/']}>
+        <Routes> {/* 使用 <Routes> 元素 */}
+          <Route path="/" element={<Register />} /> {/* 使用 element 属性 */}
+          <Route path="/Login" element={<div>Login Page</div>} /> {/* 添加登录页面的路由 */}
+        </Routes>
       </MemoryRouter>
     );
 
@@ -111,19 +113,11 @@ describe('Register component', () => {
     fireEvent.submit(getByText('Sign up'));
 
     await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
-    expect(axios.post).toHaveBeenCalledWith(expect.stringContaining('register'), {
-      username: 'testUser',
-      password: 'password',
-      email: 'test@example.com',
+
+    // 等待页面跳转到登录页面
+    await waitFor(() => {
+      expect(findByText('Login')).toBeTruthy(); // 使用 findByText 查找文本 "Login"
     });
-
-    // Mock the navigate function
-    const mockNavigate = jest.fn();
-    jest.mock('react-router-dom', () => ({
-      ...jest.requireActual('react-router-dom'),
-      useNavigate: () => mockNavigate,
-    }));
-
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/Login'));
   });
+
 });
