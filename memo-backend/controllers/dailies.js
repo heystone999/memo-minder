@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Daily = require('../models/daily');
 const History = require('../models/history');
+const updateProfileAfterTaskCompletion = require('../utils/profileHelpers')
 
 // Middleware function to verify JWT token
 const verifyToken = (req, res, next) => {
