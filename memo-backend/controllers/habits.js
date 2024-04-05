@@ -3,9 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Habit = require('../models/habit');
-const updateProfileAfterTaskCompletion = require('../utils/profileHelpers')
-
-
+const History = require('../models/history');
 
 // Middleware function to verify JWT token
 const verifyToken = (req, res, next) => {
@@ -19,7 +17,7 @@ const verifyToken = (req, res, next) => {
     req.user = decoded; // Attach user information to request object
     next(); // Move to the next middleware
   } catch (error) {
-    return res.status(403).json({ message: 'Invalid or expired token' });
+      return res.status(403).json({ message: 'Invalid or expired token' });
   }
 };
 

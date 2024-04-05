@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "NODE_ENV=test jest --verbose --runInBand",
+    "test": "set NODE_ENV=test & jest --verbose --runInBand",
     "build:ui": "rm -rf build && cd ../client/memo-minder-web && npm run build && cp -r build ../../memo-backend",
     "deploy:full": "npm run build:ui && git add . && git commit -m auto-uibuild && git push"
   },

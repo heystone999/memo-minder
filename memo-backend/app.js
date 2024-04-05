@@ -19,12 +19,12 @@ const shopRouter = require('./controllers/shop')
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 
-// set this to 1 if running a jest test
-const jest_test = 0
-if (jest_test) {
-    mongoose.connect("mongodb+srv://stone:helsinki@cluster0.opxsuzi.mongodb.net/testMemo?retryWrites=true&w=majority");
+if (config.TEST = 1){
+    mongoose.connect(config.TEST_MONGODB_URI);
+    console.log("running in test mongodb uri")
 } else {
     mongoose.connect(config.MONGODB_URI);
+    console.log("running in production mongodb uri")
 }
 
 app.use(cors())
