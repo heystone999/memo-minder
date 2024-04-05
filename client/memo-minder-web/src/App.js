@@ -206,7 +206,7 @@ function App() {
       const updateHabitsUrl = `${BASE_URL}${SERVER_API.MODIFY_HABIT.replace(':habitId', habitId)}`;
       const response = await axios.put(updateHabitsUrl , {
         'title': updatedHabit.content,
-        'type': updatedHabit.type,
+        'type': updatedHabit.types,
         'note': updatedHabit.notes,
       }, {
         headers: {

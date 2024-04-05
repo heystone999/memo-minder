@@ -6,7 +6,7 @@ import './TaskAreaDialog.css';
 const TaskAreaDialog = ({ item, editingType, onClose, onSave, onDelete }) => {
   const [title, setTitle] = useState(item.title || '');
   const [notes, setNotes] = useState(item.note || '');
-  const [type, setType] = useState(item.type);
+  //const [type, setType] = useState(item.type || '');
   const [positive, setPositive] = useState(item.type === 'positive' || item.type === 'both');
   const [negative, setNegative] = useState(item.type === 'negative' || item.type === 'both');
   //const [completed, setCompleted] = useState(item.completed);
@@ -17,20 +17,22 @@ const TaskAreaDialog = ({ item, editingType, onClose, onSave, onDelete }) => {
 
 
 
-  const togglePositive = () => {
-    setPositive(!positive);
-  };
+  //const togglePositive = () => {
+    //setPositive(!positive);
+  //};
 
-  const toggleNegative = () => {
-      setNegative(!negative);
-  };
+  //const toggleNegative = () => {
+      //setNegative(!negative);
+  //};
 
 
   useEffect(() => {
     // when item change the state will be updated
     setTitle(item.title || '');
     setNotes(item.note || '');
-    setType(item.type);
+    //setType(item.type || '')
+    setPositive(item.type === 'positive' || item.type === 'both');
+    setNegative(item.type === 'negative' || item.type === 'both');
   }, [item]);
 
 
@@ -41,7 +43,10 @@ const TaskAreaDialog = ({ item, editingType, onClose, onSave, onDelete }) => {
         habitId: item._id,
         content: title,
         notes,
-        type: !positive && !negative ? 'neutral' : positive && negative ? 'both' : positive ? 'positive' : 'negative',
+        positive,
+        negative,
+        types: positive && negative ? 'both' : positive && negative ? 'neutral' : positive ? 'positive' : 'negative',
+
       };
       console.log("update by dialog", updatedItem)
       onSave(updatedItem);
@@ -116,10 +121,10 @@ const TaskAreaDialog = ({ item, editingType, onClose, onSave, onDelete }) => {
         <div className="dialogHeaderButtonsWrapper">
           {editingType === 'Habit' && (
             <div className="dialogHeaderButtons">
-              <button className={`pos ${positive ? 'active' : 'inactive'}`} onClick={togglePositive}>
+              <button className={`pos ${positive ? 'active' : 'inactive'}`} >
                 Positive
               </button>
-              <button className={`neg ${negative ? 'active' : 'inactive'}`} onClick={toggleNegative}>
+              <button className={`neg ${negative ? 'active' : 'inactive'}`} >
                 Negative
               </button>
             </div>
