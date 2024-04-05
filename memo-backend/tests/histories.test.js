@@ -62,6 +62,14 @@ describe('History routes', () => {
     expect(response.body.habit.type).toBe('positive');
   });
 
+  it('should not fetch history: no such user', async () => {
+    const response = await api
+      .get(`/api/history/60c6d32167c8b7148cc7d145`)
+      .set('Authorization', `${token}`);
+
+    expect(response.status).toBe(404);
+  });
+
   it('should fetch history for a specific user', async () => {
     const response = await api
       .get(`/api/history/${userId}`)

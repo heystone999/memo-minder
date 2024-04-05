@@ -61,7 +61,6 @@ router.post('/', verifyToken, async (req, res) => {
 
     res.status(201).json({ message: 'Habit added successfully', habit });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -78,7 +77,6 @@ router.get('/user/:userId', verifyToken, async (req, res) => {
     const habits = await Habit.find({ user: userId });
     res.status(200).json({ habits });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -115,7 +113,6 @@ router.put('/:habitId', verifyToken, async (req, res) => {
 
     res.status(200).json({ message: 'Habit modified successfully', habit });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -137,7 +134,6 @@ router.delete('/:habitId', verifyToken, async (req, res) => {
     await Habit.findByIdAndDelete(habitId);
     res.status(200).json({ message: 'Habit deleted successfully' });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -170,7 +166,6 @@ router.put('/:habitId/increment/positive', verifyToken, async (req, res) => {
     // return updatedProfile
     res.status(200).json({ message: 'Positive counter incremented successfully', habit, profile: updatedProfile });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -196,7 +191,6 @@ router.put('/:habitId/increment/negative', verifyToken, async (req, res) => {
     // return updatedProfile
     res.status(200).json({ message: 'Negative counter incremented successfully', habit, profile: updatedProfile });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });

@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.77% </span>
+                <span class="strong">82.89% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>63/81</span>
+                <span class='fraction'>63/76</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.77% </span>
+                <span class="strong">82.89% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>63/81</span>
+                <span class='fraction'>63/76</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -216,12 +216,7 @@
 <a name='L151'></a><a href='#L151'>151</a>
 <a name='L152'></a><a href='#L152'>152</a>
 <a name='L153'></a><a href='#L153'>153</a>
-<a name='L154'></a><a href='#L154'>154</a>
-<a name='L155'></a><a href='#L155'>155</a>
-<a name='L156'></a><a href='#L156'>156</a>
-<a name='L157'></a><a href='#L157'>157</a>
-<a name='L158'></a><a href='#L158'>158</a>
-<a name='L159'></a><a href='#L159'>159</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">7x</span>
+<a name='L154'></a><a href='#L154'>154</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
@@ -255,7 +250,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -288,7 +282,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -323,7 +316,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -342,7 +334,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -373,7 +364,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -412,7 +402,6 @@ router.get('/user/:userId', verifyToken, async (req, res) =&gt; {
     const rewards = await Reward.find({ user: userId });
     res.status(200).json({ rewards });
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >    res.status(500).json({ message: 'Internal server error' });</span>
   }
 });
@@ -445,7 +434,6 @@ router.post('/', verifyToken, async (req, res) =&gt; {
 &nbsp;
     res.status(201).json({ message: 'Reward added successfully', reward });
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >    res.status(500).json({ message: 'Internal server error' });</span>
   }
 });
@@ -480,7 +468,6 @@ router.put('/:rewardId', verifyToken, async (req, res) =&gt; {
 &nbsp;
     res.status(200).json({ message: 'Reward modified successfully', reward });
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >    res.status(500).json({ message: 'Internal server error' });</span>
   }
 });
@@ -499,7 +486,6 @@ router.delete('/:rewardId', verifyToken, async (req, res) =&gt; {
     await Reward.findByIdAndDelete(rewardId);
     res.status(200).json({ message: 'Reward deleted successfully' });
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >    res.status(500).json({ message: 'Internal server error' });</span>
   }
 });
@@ -531,7 +517,6 @@ router.put('/:rewardId/complete', verifyToken, async (req, res) =&gt; {
 &nbsp;
     res.status(200).json({ message: 'Reward marked as completed', reward });
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >    res.status(500).json({ message: 'Internal server error' });</span>
   }
 });
@@ -544,7 +529,7 @@ module.exports = router;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-05T03:01:18.346Z
+                at 2024-04-05T03:43:43.888Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

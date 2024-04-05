@@ -63,6 +63,40 @@ describe('Daily routes', () => {
     dailyId = response.body.daily._id;
   });
 
+  
+  it('should not add a new daily: incomplete body', async () => {
+    const newDailyData = {
+      startDate: '2024-03-08', // Add start date
+      repeats: 'daily',
+      repeatEvery: 1
+    };
+    
+    const response = await api
+      .post('/api/dailies')
+      .set('Authorization', `${token}`)
+      .send(newDailyData);
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should not add a new daily: wrong repeats', async () => {
+    const newDailyData = {
+      title: 'Morning Walk',
+      startDate: '2024-03-08', // Add start date
+      repeats: 'wrong',
+      repeatEvery: 1
+    };
+
+    // Making a POST request to add a new daily, authenticated with the obtained token
+    const response = await api
+      .post('/api/dailies')
+      .set('Authorization', `${token}`)
+      .send(newDailyData);
+
+    expect(response.status).toBe(400);
+  });
+
+
   // Test GET /api/dailies/user/:userId
   it('should fetch all dailies for a specific user', async () => {
     const response = await api
@@ -73,6 +107,35 @@ describe('Daily routes', () => {
     expect(response.body.dailies).toBeDefined();
     expect(response.body.dailies.length).toBeGreaterThan(0);
   });
+
+  // Test PUT /api/dailies/:dailyId
+  it('should not modify an existing daily: no info', async () => {
+    const dailyData = {
+    };
+
+    const response = await api
+      .put(`/api/dailies/${dailyId}`)
+      .set('Authorization', `${token}`)
+      .send(dailyData);
+
+    expect(response.status).toBe(400);
+  });
+
+    // Test PUT /api/dailies/:dailyId
+    it('should not modify an existing daily: wrong id', async () => {
+      const dailyData = {
+        title: 'Evening Yoga',
+        repeats: 'weekly', // Change repeats (optional)
+        repeatEvery: 2 // Change repeatEvery (optional)
+      };
+  
+      const response = await api
+        .put(`/api/dailies/60c6d32167c8b7148cc7d145`)
+        .set('Authorization', `${token}`)
+        .send(dailyData);
+  
+      expect(response.status).toBe(404);
+    });
 
   // Test PUT /api/dailies/:dailyId
   it('should modify an existing daily', async () => {

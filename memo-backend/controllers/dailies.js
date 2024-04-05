@@ -61,7 +61,6 @@ router.post('/', verifyToken, async (req, res) => {
 
     res.status(201).json({ message: 'Daily habit added successfully', daily });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -77,7 +76,6 @@ router.get('/user/:userId', verifyToken, async (req, res) => {
     const dailies = await Daily.find({ user: userId });
     res.status(200).json({ dailies });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -119,7 +117,6 @@ router.put('/:dailyId', verifyToken, async (req, res) => {
 
     res.status(200).json({ message: 'Daily habit modified successfully', daily });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -140,7 +137,6 @@ router.delete('/:dailyId', verifyToken, async (req, res) => {
     await Daily.findByIdAndDelete(dailyId);
     res.status(200).json({ message: 'Daily habit deleted successfully' });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -180,7 +176,6 @@ router.put('/:dailyId/complete', verifyToken, async (req, res) => {
 
     res.status(200).json({ message: 'Daily habit marked as completed', daily, updatedProfile });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });

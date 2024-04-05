@@ -49,7 +49,6 @@ router.post('/', verifyToken, async (req, res) => {
 
     res.status(201).json({ message: 'Todo added successfully', todo });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -64,7 +63,6 @@ router.get('/user/:userId', verifyToken, async (req, res) => {
     const todos = await Todo.find({ user: userId });
     res.status(200).json({ todos });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -99,7 +97,6 @@ router.put('/:todoId', verifyToken, async (req, res) => {
 
     res.status(200).json({ message: 'Todo modified successfully', todo });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -118,7 +115,6 @@ router.delete('/:todoId', verifyToken, async (req, res) => {
     await Todo.findByIdAndDelete(todoId);
     res.status(200).json({ message: 'Todo deleted successfully' });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -158,7 +154,6 @@ router.put('/:todoId/complete', verifyToken, async (req, res) => {
 
     res.status(200).json({ message: 'Todo marked as completed', todo, updatedProfile });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });

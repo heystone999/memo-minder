@@ -31,7 +31,6 @@ router.get('/user/:userId', verifyToken, async (req, res) => {
     const rewards = await Reward.find({ user: userId });
     res.status(200).json({ rewards });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -64,7 +63,6 @@ router.post('/', verifyToken, async (req, res) => {
 
     res.status(201).json({ message: 'Reward added successfully', reward });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -99,7 +97,6 @@ router.put('/:rewardId', verifyToken, async (req, res) => {
 
     res.status(200).json({ message: 'Reward modified successfully', reward });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -118,7 +115,6 @@ router.delete('/:rewardId', verifyToken, async (req, res) => {
     await Reward.findByIdAndDelete(rewardId);
     res.status(200).json({ message: 'Reward deleted successfully' });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -150,7 +146,6 @@ router.put('/:rewardId/complete', verifyToken, async (req, res) => {
 
     res.status(200).json({ message: 'Reward marked as completed', reward });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });

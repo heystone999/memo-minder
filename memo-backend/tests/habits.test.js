@@ -69,6 +69,35 @@ describe('Habit routes', () => {
     habitId = response.body.habit._id;
   });
 
+  
+  it('should not add a new habit due to incomplete body', async () => {
+    const newHabitData = {
+      type: 'positive'
+    };
+    // Making a POST request to add a new habit, authenticated with the obtained token
+    const response = await api
+      .post('/api/habits')
+      .set('Authorization', `${token}`)
+      .send(newHabitData);
+
+    expect(response.status).toBe(400);
+  });
+
+  it('should not add a new habit due to wrong type', async () => {
+    const newHabitData = {
+      title: 'Exercise',
+      note: "do exercise",
+      type: 'wrong'
+    };
+    // Making a POST request to add a new habit, authenticated with the obtained token
+    const response = await api
+      .post('/api/habits')
+      .set('Authorization', `${token}`)
+      .send(newHabitData);
+
+    expect(response.status).toBe(400);
+  });
+
   // Test GET /api/habits/user/:userId
   it('should fetch all habits for a specific user', async () => {
 
@@ -91,6 +120,36 @@ describe('Habit routes', () => {
     expect(response.status).toBe(200);
     expect(response.body.message).toBe('Positive counter incremented successfully');
     // Add more assertions as needed
+  });
+
+  // Test PUT /api/habits/:habitId
+  it('should not modify a habit: no title and note provided', async () => {
+    const habitData = {
+      type: 'negative' // New type (optional)
+    };
+
+    const response = await api
+      .put(`/api/habits/${habitId}`)
+      .set('Authorization', `${token}`)
+      .send(habitData);
+
+    expect(response.status).toBe(400);
+  });
+
+  // Test PUT /api/habits/:habitId
+  it('should not modify a habit: habit not exist', async () => {
+    const habitData = {
+      title: 'New Habit Title',
+      note: 'Updated notes about the habit',
+      type: 'negative' // New type (optional)
+    };
+
+    const response = await api
+      .put(`/api/habits/60c6d32167c8b7148cc7d145`)
+      .set('Authorization', `${token}`)
+      .send(habitData);
+
+    expect(response.status).toBe(404);
   });
 
   // Test PUT /api/habits/:habitId
@@ -132,5 +191,14 @@ describe('Habit routes', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe('Habit deleted successfully');
+  });
+
+  // Test DELETE /api/habits/:habitId
+  it('should not delete an existing habit: not found', async () => {
+    const response = await api
+      .delete(`/api/habits/${habitId}`)
+      .set('Authorization', `${token}`);
+
+    expect(response.status).toBe(404);
   });
 });
