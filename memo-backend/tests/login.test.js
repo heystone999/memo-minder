@@ -8,6 +8,8 @@ const mongoose = require('mongoose');
 const api = supertest(app);
 
 describe('User endpoints', () => {
+  let userId;
+  
   afterAll(async () => {
     // Delete the user
     await User.findByIdAndDelete(userId);
